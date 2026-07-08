@@ -7,7 +7,7 @@ import { defineConfig, loadEnv } from "vite";
 export default defineConfig(({ mode }) => {
   // The API port lives in the root .env so backend and proxy can't drift apart.
   const env = loadEnv(mode, path.resolve(import.meta.dirname, ".."), "");
-  const apiPort = env.PORT || "3000";
+  const apiPort = env.API_PORT || "3000";
 
   return {
     plugins: [tanstackRouter({ target: "react", autoCodeSplitting: true }), react(), tailwindcss()],

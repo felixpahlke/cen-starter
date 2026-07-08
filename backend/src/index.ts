@@ -28,6 +28,6 @@ if (env.NODE_ENV === "production") {
   app.get("*", serveStatic({ path: "./static/index.html" }));
 }
 
-serve({ fetch: app.fetch, port: env.PORT }, (info) => {
+serve({ fetch: app.fetch, port: env.API_PORT ?? env.PORT ?? 3000 }, (info) => {
   console.log(`api ready on http://localhost:${info.port}  (Swagger UI: /api/docs)`);
 });

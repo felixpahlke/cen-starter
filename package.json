@@ -1,0 +1,28 @@
+{
+  "name": "cen-template",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.29.3",
+  "engines": {
+    "node": ">=22"
+  },
+  "cen": {
+    "templateVersion": "0.1.0",
+    "flavors": [],
+    "finalized": false
+  },
+  "scripts": {
+    "dev": "docker compose up -d --wait && pnpm db:migrate && pnpm --recursive --parallel dev",
+    "check": "pnpm --recursive typecheck && biome check .",
+    "fix": "biome check --write .",
+    "build": "pnpm --recursive build",
+    "db:generate": "pnpm --filter @cen/backend db:generate",
+    "db:migrate": "pnpm --filter @cen/backend db:migrate",
+    "db:studio": "pnpm --filter @cen/backend db:studio",
+    "prepare": "lefthook install"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "lefthook": "catalog:"
+  }
+}

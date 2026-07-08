@@ -1,0 +1,24 @@
+# Dev services only — the app itself runs natively via `pnpm dev`.
+# `name` prefixes all containers/volumes; create-cen-app rewrites it to your project name.
+name: cen-template
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app
+    ports:
+      # DB_PORT comes from .env — change it (and DATABASE_URL) if 5432 is taken on your machine
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  db-data:

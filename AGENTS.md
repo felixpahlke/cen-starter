@@ -1,0 +1,43 @@
+# AGENTS.md
+
+Guidelines for AI agents working in this repository.
+
+## Stack map
+
+pnpm workspace with three packages:
+
+- `backend/` — Hono on Node. Routes are defined with `@hono/zod-openapi` (`createRoute`), which gives request validation, the OpenAPI spec, and Swagger UI (`/api/docs`) from one definition. Auth is better-auth (email/password + admin plugin) behind a seam (see rule 3). Database is PostgreSQL via Drizzle.
+- `frontend/` — React SPA: Vite, TanStack Router (file-based) + TanStack Query, Tailwind, shadcn/ui. Talks to the API through the Hono RPC client (`hc<AppType>`) — types flow from the backend with no codegen.
+- `shared/` — zod schemas used by both sides.
+
+Dev services (PostgreSQL) run in Docker Compose; the apps themselves run natively.
+
+## Commands
+
+```bash
+pnpm dev          # everything: db + migrations + api + web
+pnpm check        # typecheck + lint — run this before considering any task done
+pnpm fix          # auto-fix lint/format
+pnpm db:generate  # generate migration from schema.ts changes
+pnpm db:migrate   # apply migrations (needs the db running)
+```
+
+## Rules
+
+1. **Copy the canonical resource.** `shared/src/schemas/items.ts` + `backend/src/routes/items.ts` show the pattern for every resource: schemas in shared, `createRoute` definitions, one chained `OpenAPIHono`. Don't invent a second style.
+2. **Schemas live in `shared/`.** The zod schema is the single source of truth — API validation, OpenAPI docs, and frontend forms all derive from it. Never duplicate a schema on one side.
+3. **Auth is a seam.** Routes only use `getSession` / `requireAuth` / `Session` from `backend/src/auth`. Never import better-auth outside `backend/src/auth/` — the implementation is swappable and other code must not know which one is installed.
+4. **Database changes**: edit `backend/src/db/schema.ts` → `pnpm db:generate` → `pnpm db:migrate`. Never edit generated migration files by hand.
+5. **New env vars** go into `backend/src/env.ts` (zod-validated, the server refuses to boot without them) *and* `.env.example`, always both.
+6. **Register new routes** on the chained `api` in `backend/src/index.ts` — the chain is what makes RPC types reach the frontend.
+7. **Frontend imports backend types type-only**: `import type { AppType } from "@cen/backend"`. A value import would pull server code into the bundle.
+8. **pnpm only.** Never npm or yarn.
+9. Don't weaken `tsconfig`, Biome rules, or zod schemas to make an error go away — fix the cause.
+
+## Pitfalls
+
+- Ports are configured in the root `.env`. If 5432 or 3000 is taken on this machine, change `DB_PORT` (together with the port inside `DATABASE_URL`) or `PORT` (together with `BETTER_AUTH_URL`) — don't kill other projects' containers.
+- `pnpm db:migrate` needs the database container running (`docker compose up -d --wait`).
+- Everything under `frontend/src/components/ui/` is vendored shadcn — edit freely, it's owned code, but keep changes intentional.
+
+**Done means `pnpm check` is green.**

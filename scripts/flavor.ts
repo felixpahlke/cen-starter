@@ -89,7 +89,7 @@ async function apply(name: string) {
   await recordFlavor(name);
 
   try {
-    run("pnpm install");
+    run("pnpm install --no-frozen-lockfile");
     for (const command of manifest.verify) run(command);
   } catch (error) {
     console.error(

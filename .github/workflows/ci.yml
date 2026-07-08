@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  base:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm check
+
+      - run: pnpm build
+
+  flavors:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # One matrix entry per valid combination. Use comma-separated names for
+        # multi-flavor entries, e.g. "carbon,oauth-proxy"; extend when new flavors land.
+        flavors: ["no-database"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Apply flavors
+        run: |
+          IFS=',' read -ra names <<< "${{ matrix.flavors }}"
+          for name in "${names[@]}"; do
+            pnpm flavor apply "$name"
+          done
+
+      - run: pnpm check
+
+      - run: pnpm build
+
+  smoke:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d app"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/app
+      BETTER_AUTH_SECRET: ci-only-secret-change-me-please-really
+      BETTER_AUTH_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm --filter @cen/backend db:migrate
+
+      - name: Start backend
+        run: |
+          pnpm --filter @cen/backend dev > backend.log 2>&1 &
+          echo "$!" > backend.pid
+
+      - name: Wait for backend
+        run: |
+          for attempt in {1..30}; do
+            if curl -fsS http://localhost:3000/api/health > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+
+          cat backend.log
+          exit 1
+
+      - name: Smoke API
+        run: |
+          health="$(curl -fsS http://localhost:3000/api/health)"
+          test "$health" = '{"status":"ok"}'
+
+          status="$(
+            curl -sS -o /tmp/signup.json -w "%{http_code}" \
+              -X POST http://localhost:3000/api/auth/sign-up/email \
+              -H "content-type: application/json" \
+              --data '{"email":"ci@example.com","password":"ci-password-123","name":"CI User"}'
+          )"
+          test "$status" = "200"

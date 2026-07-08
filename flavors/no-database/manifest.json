@@ -1,0 +1,81 @@
+{
+  "name": "no-database",
+  "description": "Remove PostgreSQL, Drizzle, Better Auth persistence, and the example items resource.",
+  "conflicts": [],
+  "requires": [],
+  "delete": [
+    "backend/src/db/**",
+    "backend/drizzle.config.ts",
+    "docker-compose.yml",
+    "backend/src/auth/better-auth.ts",
+    "backend/src/routes/items.ts",
+    "shared/src/schemas/items.ts",
+    "frontend/src/routes/_layout/items.tsx",
+    "frontend/src/routes/login.tsx",
+    "frontend/src/routes/signup.tsx",
+    "frontend/src/routes/_layout/settings.tsx",
+    "frontend/src/routes/_layout/admin.tsx"
+  ],
+  "overlay": "overlay",
+  "edits": [
+    {
+      "file": "shared/src/index.ts",
+      "find": "export * from \"./schemas/items\";\n",
+      "replace": ""
+    },
+    {
+      "file": "backend/src/index.ts",
+      "find": "import { auth } from \"./auth/better-auth\";\n",
+      "replace": ""
+    },
+    {
+      "file": "backend/src/index.ts",
+      "find": "import { itemsRoute } from \"./routes/items\";\n",
+      "replace": ""
+    },
+    {
+      "file": "backend/src/index.ts",
+      "find": "const api = new OpenAPIHono().route(\"/health\", healthRoute).route(\"/items\", itemsRoute);",
+      "replace": "const api = new OpenAPIHono().route(\"/health\", healthRoute);"
+    },
+    {
+      "file": "backend/src/index.ts",
+      "find": "app.on([\"GET\", \"POST\"], \"/api/auth/*\", (c) => auth.handler(c.req.raw));\n",
+      "replace": ""
+    },
+    {
+      "file": "backend/src/env.ts",
+      "find": "  WEB_PORT: z.coerce.number().int().default(5173),\n  DATABASE_URL: z.url(),\n  BETTER_AUTH_SECRET: z.string().min(32),\n  BETTER_AUTH_URL: z.url(),\n});",
+      "replace": "  WEB_PORT: z.coerce.number().int().default(5173),\n  API_KEY: z.string().min(1),\n});"
+    },
+    {
+      "file": ".env.example",
+      "find": "# If 5432 is taken on your machine, change DB_PORT and the port in DATABASE_URL together.\nDB_PORT=5432\nDATABASE_URL=postgres://postgres:postgres@localhost:5432/app\n\n# Any random string >= 32 chars. Generate a real one for production: `openssl rand -hex 32`\nBETTER_AUTH_SECRET=dev-only-secret-change-me-please-really\nBETTER_AUTH_URL=http://localhost:3000",
+      "replace": "# API key accepted by the no-database auth stub for server-to-server requests.\nAPI_KEY=dev-only-api-key"
+    },
+    {
+      "file": "package.json",
+      "find": "    \"dev\": \"docker compose up -d --wait && pnpm db:migrate && pnpm --recursive --parallel dev\",\n",
+      "replace": "    \"dev\": \"pnpm --recursive --parallel dev\",\n"
+    },
+    {
+      "file": "package.json",
+      "find": "    \"db:generate\": \"pnpm --filter @cen/backend db:generate\",\n    \"db:migrate\": \"pnpm --filter @cen/backend db:migrate\",\n    \"db:studio\": \"pnpm --filter @cen/backend db:studio\",\n",
+      "replace": ""
+    },
+    {
+      "file": "backend/package.json",
+      "find": "    \"typecheck\": \"tsc --noEmit\",\n    \"db:generate\": \"drizzle-kit generate\",\n    \"db:migrate\": \"drizzle-kit migrate\",\n    \"db:studio\": \"drizzle-kit studio\"\n",
+      "replace": "    \"typecheck\": \"tsc --noEmit\"\n"
+    }
+  ],
+  "packageJson": {
+    "@cen/backend": {
+      "remove": ["drizzle-orm", "pg", "better-auth", "@types/pg", "drizzle-kit"]
+    },
+    "@cen/frontend": {
+      "remove": ["better-auth"]
+    }
+  },
+  "verify": ["pnpm check"]
+}

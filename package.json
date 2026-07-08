@@ -13,6 +13,7 @@
   },
   "scripts": {
     "dev": "docker compose up -d --wait && pnpm db:migrate && pnpm --recursive --parallel dev",
+    "flavor": "tsx scripts/flavor.ts",
     "check": "pnpm --recursive typecheck && biome check .",
     "fix": "biome check --write .",
     "build": "pnpm --recursive build",
@@ -23,6 +24,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
-    "lefthook": "catalog:"
+    "lefthook": "catalog:",
+    "tsx": "catalog:",
+    "zod": "catalog:"
   }
 }

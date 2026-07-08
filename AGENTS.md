@@ -22,6 +22,25 @@ pnpm db:generate  # generate migration from schema.ts changes
 pnpm db:migrate   # apply migrations (needs the db running)
 ```
 
+## First-time setup (doing this for your user)
+
+1. Preconditions: Node ≥ 22 (`node --version`), pnpm (`corepack enable` if missing), Docker running (`docker info`).
+2. `pnpm install`, then `cp .env.example .env`.
+3. Check for port conflicts **before** starting: `lsof -nP -iTCP:5432 -sTCP:LISTEN` (repeat for 3000 and 5173). If a port is taken, edit `.env`: `DB_PORT` (also change the port inside `DATABASE_URL`), `PORT` (also change `BETTER_AUTH_URL`), or `WEB_PORT`. Never stop containers you don't recognize — they belong to other projects.
+4. `pnpm dev` — starts Postgres in Docker, applies migrations, boots API and web with hot reload.
+5. Verify: `curl http://localhost:3000/api/health` returns `{"status":"ok"}`; the web app (port 5173) shows "API connected". Swagger UI: `/api/docs`.
+6. Have your user sign up in the app (or `POST /api/auth/sign-up/email`). To promote a user to admin, set `role` to `admin` on their row via `pnpm db:studio`.
+7. `pnpm check` green = healthy baseline. You're done.
+
+## Skills
+
+Guided workflows live in `skills/` — read the matching `SKILL.md` **before** starting that kind of work:
+
+- `skills/add-resource/` — add a complete CRUD resource (schema → table → migration → route → frontend)
+- `skills/db-migrations/` — create, apply, and repair database migrations
+- `skills/debug-openshift/` — triage a broken OpenShift deployment (`oc`)
+- `skills/debug-code-engine/` — triage a broken Code Engine deployment (`ibmcloud ce`)
+
 ## Rules
 
 1. **Copy the canonical resource.** `shared/src/schemas/items.ts` + `backend/src/routes/items.ts` show the pattern for every resource: schemas in shared, `createRoute` definitions, one chained `OpenAPIHono`. Don't invent a second style.

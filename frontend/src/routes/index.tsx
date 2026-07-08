@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 
@@ -17,7 +18,10 @@ function Home() {
     <main className="flex min-h-svh items-center justify-center">
       <div className="w-full max-w-md space-y-6 rounded-lg border bg-card p-8 text-card-foreground">
         <div className="space-y-2">
-          <h1 className="font-semibold text-2xl tracking-tight">CEN-APP</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="font-semibold text-2xl tracking-tight">CEN-APP</h1>
+            <ModeToggle />
+          </div>
           <p className="text-muted-foreground text-sm">
             {health.data?.status === "ok"
               ? "API connected. You're ready to build."

@@ -1,27 +1,23 @@
+<!-- AI agents: setting this project up for your user? Read AGENTS.md first — it contains
+     the setup runbook (env, port conflicts, verification) and links the guided workflows
+     in skills/. Do not start guessing; the runbook covers the whole path. -->
+
 # CEN-APP
 
 **The full-stack starter for the agent era.** TypeScript end-to-end, type-safe from database to
 browser, and running in under five minutes — one branch, one command, zero config.
 
-CEN-APP is the successor to `full-stack-cen-template`. The old template kept eight flavor
-branches in sync by hand; every fix meant a merge marathon. CEN-APP inverts the model: **one
-maximal base app**, with every variation (Carbon, oauth-proxy, no database, backend-only) as a
-small, CI-tested transformation you — or your AI agent — apply in seconds. Change lands once,
-CI proves it everywhere.
+One maximal base app: every variation (Carbon, oauth-proxy, no database, backend-only) is a
+small, CI-tested transformation you — or your AI agent — apply in seconds instead of a template
+branch you're stuck with.
 
-## Why you'll like it
+## Start a project
 
-- **Instant start.** Clone, install, `pnpm dev`. Local auth works out of the box — no identity
-  provider, no accounts, no setup call.
-- **Type-safe without the ceremony.** The frontend infers API types straight from the backend
-  (Hono RPC). No client generation step to forget — and you still get a full OpenAPI spec and
-  Swagger UI, derived from the same zod schemas that validate every request.
-- **Agent-native.** Conventions live in [AGENTS.md](AGENTS.md), guided workflows in `skills/`.
-  Ask your agent to "switch to Carbon" or "add a projects resource" and it knows exactly how.
-- **Handover-clean.** When decisions are made, `pnpm flavor finalize` strips all the machinery.
-  What you deliver is exactly the app — nothing more.
+```bash
+pnpm create cen-app@latest
+```
 
-## Quickstart
+Or set up a clone of this repo directly:
 
 ```bash
 pnpm install
@@ -37,6 +33,24 @@ machine, adjust `.env`.
 | http://localhost:5173 | Web app (Vite dev server) |
 | http://localhost:3000/api | API |
 | http://localhost:3000/api/docs | Swagger UI (generated from the zod schemas) |
+
+## Why you'll like it
+
+- **Instant start.** Local auth works out of the box — no identity provider, no accounts, no
+  setup call. Sign up and build.
+- **Type-safe without the ceremony.** The frontend infers API types straight from the backend
+  (Hono RPC). No client generation step to forget — and you still get a full OpenAPI spec and
+  Swagger UI, derived from the same zod schemas that validate every request.
+- **Agent-native.** Conventions live in [AGENTS.md](AGENTS.md), guided workflows in `skills/`.
+  Ask your agent to "switch to Carbon" or "add a projects resource" and it knows exactly how.
+- **Handover-clean.** When decisions are made, `pnpm flavor finalize` strips all the machinery.
+  What you deliver is exactly the app — nothing more.
+
+## For AI agents
+
+Read [AGENTS.md](AGENTS.md) before touching anything — it has the first-time setup runbook,
+the conventions, and the pitfalls. Guided workflows (adding resources, migrations, deployment
+debugging) live in `skills/`.
 
 ## Stack
 
@@ -57,3 +71,7 @@ pnpm db:generate  # create a migration after editing backend/src/db/schema.ts
 pnpm db:migrate   # apply migrations
 pnpm db:studio    # browse the database (Drizzle Studio)
 ```
+
+---
+
+*CEN-APP succeeds `full-stack-cen-template`.*

@@ -3,55 +3,53 @@ packages:
   - frontend
   - shared
 
-onlyBuiltDependencies:
-  - esbuild
-  - lefthook
+allowBuilds:
+  esbuild: true
+  lefthook: true
 
 catalog:
-  # runtime
-  hono: ^4.9.0
-  "@hono/node-server": ^1.19.0
-  "@hono/zod-openapi": ^1.1.0
-  "@hono/swagger-ui": ^0.5.2
-  zod: ^4.1.0
-  drizzle-orm: ^0.45.2
-  pg: ^8.16.0
+  '@biomejs/biome': ^2.5.3
+  '@fontsource-variable/ibm-plex-sans': ^5.2.0
+  '@hono/node-server': ^1.19.0
+  '@hono/swagger-ui': ^0.5.2
+  '@hono/zod-openapi': ^1.1.0
+  '@hookform/resolvers': ^5.2.1
+  '@radix-ui/react-avatar': ^1.1.10
+  '@radix-ui/react-dialog': ^1.1.15
+  '@radix-ui/react-dropdown-menu': ^2.1.16
+  '@radix-ui/react-label': ^2.1.7
+  '@radix-ui/react-separator': ^1.1.7
+  '@radix-ui/react-slot': ^1.2.0
+  '@tailwindcss/vite': ^4.1.0
+  '@tanstack/react-query': ^5.85.0
+  '@tanstack/react-router': ^1.130.0
+  '@tanstack/react-router-devtools': ^1.130.0
+  '@tanstack/router-plugin': ^1.130.0
+  '@types/node': ^24.0.0
+  '@types/pg': ^8.15.0
+  '@types/react': ^19.1.0
+  '@types/react-dom': ^19.1.0
+  '@vitejs/plugin-react': ^5.0.0
   better-auth: ^1.3.0
-  react: ^19.1.0
-  react-dom: ^19.1.0
-  "@tanstack/react-router": ^1.130.0
-  "@tanstack/react-router-devtools": ^1.130.0
-  "@tanstack/react-query": ^5.85.0
-  "@radix-ui/react-avatar": ^1.1.10
-  "@radix-ui/react-dialog": ^1.1.15
-  "@radix-ui/react-dropdown-menu": ^2.1.16
-  "@radix-ui/react-label": ^2.1.7
-  "@radix-ui/react-separator": ^1.1.7
-  "@radix-ui/react-slot": ^1.2.0
-  "@hookform/resolvers": ^5.2.1
-  react-hook-form: ^7.62.0
   class-variance-authority: ^0.7.1
   clsx: ^2.1.1
-  tailwind-merge: ^3.3.0
-  "@fontsource-variable/ibm-plex-sans": ^5.2.0
-  lucide-react: ^1.23.0
-  sonner: ^2.0.7
-  # tooling
-  typescript: ^6.0.0
-  "@biomejs/biome": ^2.3.0
   drizzle-kit: ^0.31.0
-  "@types/pg": ^8.15.0
-  "@types/node": ^24.0.0
-  tsx: ^4.20.0
-  tsup: ^8.5.0
+  drizzle-orm: ^0.45.2
+  hono: ^4.9.0
   lefthook: ^1.12.0
-  vite: ^8.1.0
-  "@vitejs/plugin-react": ^5.0.0
-  "@tanstack/router-plugin": ^1.130.0
+  lucide-react: ^1.23.0
+  pg: ^8.16.0
+  react: ^19.1.0
+  react-dom: ^19.1.0
+  react-hook-form: ^7.62.0
+  sonner: ^2.0.7
+  tailwind-merge: ^3.3.0
   tailwindcss: ^4.1.0
-  "@tailwindcss/vite": ^4.1.0
-  "@types/react": ^19.1.0
-  "@types/react-dom": ^19.1.0
+  tsup: ^8.5.0
+  tsx: ^4.20.0
+  typescript: ^6.0.0
+  vite: ^8.1.0
+  zod: ^4.1.0
 
 minimumReleaseAgeExclude:
   - '@rolldown/binding-android-arm64@1.1.5'
@@ -72,6 +70,6 @@ minimumReleaseAgeExclude:
   - electron-to-chromium@1.5.389
   - rolldown@1.1.5
 
-allowBuilds:
-  esbuild: true
-  lefthook: true
+onlyBuiltDependencies:
+  - esbuild
+  - lefthook

@@ -1,0 +1,15 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: cen-app
+  labels:
+    app.kubernetes.io/name: cen-app
+spec:
+  to:
+    kind: Service
+    name: cen-app
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

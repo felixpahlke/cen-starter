@@ -9,18 +9,29 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@cen/shared": "workspace:*",
     "@fontsource-variable/ibm-plex-sans": "catalog:",
+    "@hookform/resolvers": "catalog:",
+    "@radix-ui/react-avatar": "catalog:",
+    "@radix-ui/react-dialog": "catalog:",
+    "@radix-ui/react-dropdown-menu": "catalog:",
+    "@radix-ui/react-label": "catalog:",
+    "@radix-ui/react-separator": "catalog:",
     "@radix-ui/react-slot": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
+    "@tanstack/react-router-devtools": "catalog:",
     "better-auth": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "hono": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-hook-form": "catalog:",
     "tailwind-merge": "catalog:",
-    "lucide-react": "catalog:"
+    "lucide-react": "catalog:",
+    "sonner": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@cen/backend": "workspace:*",

@@ -5,7 +5,11 @@ import { z } from "zod";
 
 const EnvSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-  PORT: z.coerce.number().int().default(3000),
+  // API_PORT is the explicit dev setting; PORT is what PaaS platforms (Code Engine)
+  // inject in production. API_PORT wins so stray PORT vars can't hijack local dev.
+  API_PORT: z.coerce.number().int().optional(),
+  PORT: z.coerce.number().int().optional(),
+  WEB_PORT: z.coerce.number().int().default(5173),
   DATABASE_URL: z.url(),
   BETTER_AUTH_SECRET: z.string().min(32),
   BETTER_AUTH_URL: z.url(),

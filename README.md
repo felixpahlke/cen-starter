@@ -1,6 +1,25 @@
-# cen-template
+# CEN-APP
 
-Full-stack TypeScript starter: Hono API + React SPA, end-to-end type-safe, one command to run.
+**The full-stack starter for the agent era.** TypeScript end-to-end, type-safe from database to
+browser, and running in under five minutes — one branch, one command, zero config.
+
+CEN-APP is the successor to `full-stack-cen-template`. The old template kept eight flavor
+branches in sync by hand; every fix meant a merge marathon. CEN-APP inverts the model: **one
+maximal base app**, with every variation (Carbon, oauth-proxy, no database, backend-only) as a
+small, CI-tested transformation you — or your AI agent — apply in seconds. Change lands once,
+CI proves it everywhere.
+
+## Why you'll like it
+
+- **Instant start.** Clone, install, `pnpm dev`. Local auth works out of the box — no identity
+  provider, no accounts, no setup call.
+- **Type-safe without the ceremony.** The frontend infers API types straight from the backend
+  (Hono RPC). No client generation step to forget — and you still get a full OpenAPI spec and
+  Swagger UI, derived from the same zod schemas that validate every request.
+- **Agent-native.** Conventions live in [AGENTS.md](AGENTS.md), guided workflows in `skills/`.
+  Ask your agent to "switch to Carbon" or "add a projects resource" and it knows exactly how.
+- **Handover-clean.** When decisions are made, `pnpm flavor finalize` strips all the machinery.
+  What you deliver is exactly the app — nothing more.
 
 ## Quickstart
 
@@ -21,9 +40,12 @@ machine, adjust `.env`.
 
 ## Stack
 
-- **backend/** — [Hono](https://hono.dev) + zod-openapi (validation + OpenAPI + Swagger UI from one schema), [better-auth](https://better-auth.com) (email/password + admin), [Drizzle](https://orm.drizzle.team) on PostgreSQL
-- **frontend/** — React + Vite + TanStack Router/Query + Tailwind + shadcn/ui. Fully typed API client via Hono RPC — no code generation, types flow directly from the backend
+- **backend/** — [Hono](https://hono.dev) + zod-openapi (validation + OpenAPI + Swagger UI from one schema), [better-auth](https://better-auth.com) (email/password + admin panel), [Drizzle](https://orm.drizzle.team) on PostgreSQL
+- **frontend/** — React + Vite + TanStack Router/Query + Tailwind + shadcn/ui, styled IBM by default (Carbon-flavored theme, swappable in one line)
 - **shared/** — zod schemas used by both sides (API validation and form validation can't drift apart)
+
+Production ships as a single container: the API serves the built SPA. One image, one deploy —
+OpenShift and Code Engine scripts included.
 
 ## Everyday commands
 
@@ -35,8 +57,3 @@ pnpm db:generate  # create a migration after editing backend/src/db/schema.ts
 pnpm db:migrate   # apply migrations
 pnpm db:studio    # browse the database (Drizzle Studio)
 ```
-
-## Working with AI agents
-
-This repo is built for it — see [AGENTS.md](AGENTS.md) for conventions and `skills/` for
-guided workflows (adding resources, deploying, changing stack flavors).

@@ -1,5 +1,5 @@
 {
-  "name": "cen-template",
+  "name": "cen-app",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.29.3",

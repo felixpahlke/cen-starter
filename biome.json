@@ -6,11 +6,16 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!backend/src/db/migrations/**"]
+    "includes": ["**", "!backend/src/db/migrations", "!frontend/src/routeTree.gen.ts"]
   },
   "formatter": {
     "indentStyle": "space",
     "lineWidth": 100
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
   },
   "assist": {
     "actions": {

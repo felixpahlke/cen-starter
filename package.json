@@ -20,7 +20,7 @@
     "db:generate": "pnpm --filter @cen/backend db:generate",
     "db:migrate": "pnpm --filter @cen/backend db:migrate",
     "db:studio": "pnpm --filter @cen/backend db:studio",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install || true"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",

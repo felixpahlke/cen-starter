@@ -1,6 +1,6 @@
 <!-- AI agents: setting this project up for your user? Read AGENTS.md first — it contains
      the setup runbook (env, port conflicts, verification) and links the guided workflows
-     in skills/. Do not start guessing; the runbook covers the whole path. -->
+     in .agents/skills/. Do not start guessing; the runbook covers the whole path. -->
 
 # CEN-APP
 
@@ -41,7 +41,7 @@ machine, adjust `.env`.
 - **Type-safe without the ceremony.** The frontend infers API types straight from the backend
   (Hono RPC). No client generation step to forget — and you still get a full OpenAPI spec and
   Swagger UI, derived from the same zod schemas that validate every request.
-- **Agent-native.** Conventions live in [AGENTS.md](AGENTS.md), guided workflows in `skills/`.
+- **Agent-native.** Conventions live in [AGENTS.md](AGENTS.md), guided workflows in `.agents/skills/`.
   Ask your agent to "switch to Carbon" or "add a projects resource" and it knows exactly how.
 - **Handover-clean.** When decisions are made, `pnpm flavor finalize` strips all the machinery.
   What you deliver is exactly the app — nothing more.
@@ -50,7 +50,7 @@ machine, adjust `.env`.
 
 Read [AGENTS.md](AGENTS.md) before touching anything — it has the first-time setup runbook,
 the conventions, and the pitfalls. Guided workflows (adding resources, migrations, deployment
-debugging) live in `skills/`.
+debugging) live in `.agents/skills/`.
 
 ## Stack
 

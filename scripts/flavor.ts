@@ -107,6 +107,7 @@ async function finalize() {
   const hadSetup = await exists(abs("scripts/setup.ts"));
   await rm(abs("flavors"), { recursive: true, force: true });
   await rm(abs("scripts/flavor.ts"), { force: true });
+  await rm(abs(".agents/skills/setup"), { recursive: true, force: true });
   if (hadSetup) await rm(abs("scripts/setup.ts"), { force: true });
 
   const pkg = await readJson("package.json");

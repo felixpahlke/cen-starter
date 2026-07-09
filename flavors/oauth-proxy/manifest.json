@@ -1,7 +1,7 @@
 {
   "name": "oauth-proxy",
   "description": "Replace local Better Auth with oauth2-proxy/OIDC while keeping PostgreSQL, Drizzle, and the example items resource.",
-  "conflicts": ["no-database", "backend-only"],
+  "conflicts": ["no-database", "backend-only", "carbon"],
   "requires": [],
   "delete": [
     "backend/src/auth/better-auth.ts",

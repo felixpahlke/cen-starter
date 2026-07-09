@@ -1,0 +1,6 @@
+// Carbon Design System styles. Font-face emission is disabled — IBM Plex Sans is
+// self-hosted via @fontsource-variable (imported in index.css); Carbon's tokens
+// reference the same family name.
+@use "@carbon/react" with (
+  $css--font-face: false
+);

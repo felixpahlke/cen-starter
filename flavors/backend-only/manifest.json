@@ -1,7 +1,7 @@
 {
   "name": "backend-only",
   "description": "Remove the React frontend and static SPA serving while keeping the Hono API, Swagger UI, Better Auth, and PostgreSQL/Drizzle.",
-  "conflicts": ["no-database"],
+  "conflicts": ["no-database", "carbon"],
   "requires": [],
   "delete": ["frontend/**"],
   "overlay": "overlay",
@@ -18,7 +18,7 @@
     },
     {
       "file": "backend/src/auth/better-auth.ts",
-      "find": "  // Dev only: the browser reaches the API through the Vite proxy, so auth requests\n  // carry the web origin. In production the API serves the SPA — same origin.\n  trustedOrigins: env.NODE_ENV === \"development\" ? [`http://localhost:${env.WEB_PORT}`] : undefined,\n",
+      "find": "  // Dev only: the browser reaches the API through the Vite proxy, so auth requests\n  // carry the web origin. In production the API serves the SPA \u2014 same origin.\n  trustedOrigins: env.NODE_ENV === \"development\" ? [`http://localhost:${env.WEB_PORT}`] : undefined,\n",
       "replace": ""
     },
     {

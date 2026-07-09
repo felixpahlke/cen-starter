@@ -52,6 +52,8 @@ Guided workflows live in `.agents/skills/` — read the matching `SKILL.md` **be
 - `.agents/skills/deploy-code-engine/` — first deploy and updates on IBM Code Engine (`ibmcloud ce`)
 - `.agents/skills/debug-openshift/` — triage a broken OpenShift deployment (`oc`)
 - `.agents/skills/debug-code-engine/` — triage a broken Code Engine deployment (`ibmcloud ce`)
+- `.agents/skills/update-from-template/` — pull template improvements into this project (upstream merge)
+- `.agents/skills/handover/` — prepare the project for handover to a client or another team
 
 ## Rules
 

@@ -180,7 +180,7 @@ function CreateItemDialog({
 
   function onSubmit(values: ItemCreateOutput) {
     createMutation.mutate({
-      title: values.title.trim(),
+      title: values.title,
       description: normalizeDescription(values.description),
     });
   }
@@ -252,7 +252,7 @@ function EditItemDialog({ item, onClose }: { item: Item | null; onClose: () => v
     updateMutation.mutate({
       id: item.id,
       values: {
-        title: values.title?.trim(),
+        title: values.title,
         description: normalizeDescription(values.description),
       },
     });
@@ -418,8 +418,7 @@ async function deleteItem(id: string) {
 }
 
 function normalizeDescription(value: string | null | undefined) {
-  const description = value?.trim();
-  return description ? description : null;
+  return value ? value : null;
 }
 
 function formatDate(value: string) {

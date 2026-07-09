@@ -1,24 +1,18 @@
 import { ItemCreateSchema, ItemSchema, ItemUpdateSchema, PaginationSchema } from "@cen/shared";
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { type AuthEnv, requireAuth } from "../auth";
 import { db } from "../db";
 import { items } from "../db/schema";
+import { json, notFound } from "./lib";
 
 // The canonical resource. Every new resource copies this file's structure:
-// schemas from @cen/shared, createRoute definitions, one OpenAPIHono chain.
+// schemas from @cen/shared, shared route helpers from ./lib, createRoute
+// definitions, one OpenAPIHono chain.
 
 const IdParam = z.object({ id: z.uuid() });
 
-const NotFound = {
-  description: "Item not found",
-  content: { "application/json": { schema: z.object({ error: z.string() }) } },
-};
-
-const json = <T extends z.ZodType>(schema: T, description: string) => ({
-  description,
-  content: { "application/json": { schema } },
-});
+const NotFound = notFound("Item");
 
 const listItems = createRoute({
   method: "get",
@@ -70,7 +64,12 @@ app.use(requireAuth);
 export const itemsRoute = app
   .openapi(listItems, async (c) => {
     const { limit, offset } = c.req.valid("query");
-    const rows = await db.query.items.findMany({ limit, offset });
+    const userId = c.get("session").user.id;
+    const rows = await db.query.items.findMany({
+      where: eq(items.ownerId, userId),
+      limit,
+      offset,
+    });
     return c.json(rows.map(serialize), 200);
   })
   .openapi(createItem, async (c) => {
@@ -85,20 +84,32 @@ export const itemsRoute = app
   })
   .openapi(getItem, async (c) => {
     const { id } = c.req.valid("param");
-    const row = await db.query.items.findFirst({ where: eq(items.id, id) });
+    const userId = c.get("session").user.id;
+    const row = await db.query.items.findFirst({
+      where: and(eq(items.id, id), eq(items.ownerId, userId)),
+    });
     if (!row) return c.json({ error: "Item not found" }, 404);
     return c.json(serialize(row), 200);
   })
   .openapi(updateItem, async (c) => {
     const { id } = c.req.valid("param");
     const body = c.req.valid("json");
-    const [row] = await db.update(items).set(body).where(eq(items.id, id)).returning();
+    const userId = c.get("session").user.id;
+    const [row] = await db
+      .update(items)
+      .set(body)
+      .where(and(eq(items.id, id), eq(items.ownerId, userId)))
+      .returning();
     if (!row) return c.json({ error: "Item not found" }, 404);
     return c.json(serialize(row), 200);
   })
   .openapi(deleteItem, async (c) => {
     const { id } = c.req.valid("param");
-    const [row] = await db.delete(items).where(eq(items.id, id)).returning();
+    const userId = c.get("session").user.id;
+    const [row] = await db
+      .delete(items)
+      .where(and(eq(items.id, id), eq(items.ownerId, userId)))
+      .returning();
     if (!row) return c.json({ error: "Item not found" }, 404);
     return c.body(null, 204);
   });

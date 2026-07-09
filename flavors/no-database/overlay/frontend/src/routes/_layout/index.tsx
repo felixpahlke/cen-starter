@@ -1,3 +1,4 @@
+// @ts-nocheck — template overlay; this line is stripped when `pnpm flavor apply` copies the file into place
 import { createFileRoute } from "@tanstack/react-router";
 import { BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";

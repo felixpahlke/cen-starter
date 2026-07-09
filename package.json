@@ -15,6 +15,7 @@
     "dev": "docker compose up -d --wait && pnpm db:migrate && pnpm --recursive --parallel dev",
     "flavor": "tsx scripts/flavor.ts",
     "check": "pnpm --recursive typecheck && biome check .",
+    "test": "pnpm --recursive --if-present run test",
     "fix": "biome check --write .",
     "build": "pnpm --recursive build",
     "db:generate": "pnpm --filter @cen/backend db:generate",

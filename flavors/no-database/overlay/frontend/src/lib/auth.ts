@@ -1,3 +1,4 @@
+// @ts-nocheck — template overlay; this line is stripped when `pnpm flavor apply` copies the file into place
 type Role = "user" | "admin";
 
 type StubUser = {

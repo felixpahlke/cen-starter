@@ -13,6 +13,7 @@ const ManifestSchema = z
     name: z.string().min(1),
     description: z.string().min(1),
     conflicts: z.array(z.string()),
+    combinesWith: z.array(z.string()).optional(),
     requires: z.array(z.string()),
     delete: z.array(z.string()),
     overlay: z.string().min(1).optional(),
@@ -36,28 +37,86 @@ type JsonObject = Record<string, unknown>;
 type Manifest = z.infer<typeof ManifestSchema>;
 type Edit = NonNullable<Manifest["edits"]>[number];
 type PackagePatches = NonNullable<Manifest["packageJson"]>;
+type OverlayDeleteMatcher = { flavor: string; matcher: RegExp };
+type PackagePatchValidation = { packages: Map<string, string>; skipped: Set<string> };
+type FlavorPlan = {
+  name: string;
+  manifest: Manifest;
+  composing: boolean;
+  deletes: string[];
+  overlay: string | null;
+  comboOverlays: string[];
+  packages: Map<string, string>;
+  skippedPackagePatches: Set<string>;
+  overlayDeleteMatchers: OverlayDeleteMatcher[];
+};
 
 const root = process.cwd();
 const flavorsDir = path.join(root, "flavors");
 const skippedDirs = new Set([".git", "node_modules"]);
 
 async function main() {
-  const [command, name] = process.argv.slice(2);
+  const [command, ...names] = process.argv.slice(2);
   if (command === "list") return list();
-  if (command === "apply" && name) return apply(name);
+  if (command === "apply" && names.length) return apply(names);
   if (command === "finalize") return finalize();
-  throw new Error("Usage: pnpm flavor list | pnpm flavor apply <name> | pnpm flavor finalize");
+  throw new Error(
+    "Usage: pnpm flavor list | pnpm flavor apply <name> [<name>...] | pnpm flavor finalize",
+  );
 }
 
 async function list() {
   const applied = getCen(await readJson("package.json")).flavors;
   for (const manifest of await allManifests()) {
     const marker = applied.includes(manifest.name) ? " (applied)" : "";
-    console.log(`${manifest.name}${marker} - ${manifest.description}`);
+    const combines = manifest.combinesWith?.length
+      ? ` (combines with: ${manifest.combinesWith.join(", ")})`
+      : "";
+    console.log(`${manifest.name}${marker} - ${manifest.description}${combines}`);
   }
 }
 
-async function apply(name: string) {
+async function apply(names: string[]) {
+  rejectDuplicateNames(names);
+  const initialCen = getCen(await readJson("package.json"));
+  if (initialCen.finalized) {
+    throw new Error("Refusing to apply a flavor after cen.finalized is true.");
+  }
+  for (const name of names) {
+    if (initialCen.flavors.includes(name)) throw new Error(`Flavor "${name}" is already applied.`);
+  }
+
+  const verifyCommands: string[] = [];
+  let appliedAny = false;
+  for (const name of names) {
+    try {
+      const plan = await prepareFlavor(name);
+      await applyFlavorPlan(plan);
+      addVerifyCommands(verifyCommands, plan.manifest.verify);
+      appliedAny = true;
+    } catch (error) {
+      if (appliedAny) throw withResetHint(error);
+      throw error;
+    }
+  }
+
+  try {
+    run("pnpm install --no-frozen-lockfile");
+    for (const command of verifyCommands) run(command);
+  } catch (error) {
+    const subject =
+      names.length === 1
+        ? `Flavor "${names[0]}" was`
+        : `Flavors ${names.map((applied) => `"${applied}"`).join(", ")} were`;
+    console.error(
+      `${subject} applied, but install or verification failed. ` +
+        'Inspect the tree, or reset with "git checkout . && git clean -fd".',
+    );
+    throw error;
+  }
+}
+
+async function prepareFlavor(name: string): Promise<FlavorPlan> {
   const manifest = await readManifest(name);
   const cen = getCen(await readJson("package.json"));
   if (cen.finalized) throw new Error("Refusing to apply a flavor after cen.finalized is true.");
@@ -66,38 +125,43 @@ async function apply(name: string) {
     if (!cen.flavors.includes(required))
       throw new Error(`Flavor "${name}" requires "${required}".`);
   }
-  for (const conflict of manifest.conflicts) {
-    if (cen.flavors.includes(conflict)) {
-      throw new Error(`Flavor "${name}" conflicts with "${conflict}".`);
-    }
-  }
-  for (const applied of await appliedManifests(cen.flavors)) {
-    if (applied.conflicts.includes(name)) {
-      throw new Error(`Flavor "${name}" conflicts with already-applied "${applied.name}".`);
-    }
-  }
+  const composing = isComposing(manifest, cen.flavors);
+  const applied = await appliedManifests(cen.flavors);
+  validateCompatibility(manifest, cen.flavors, applied);
 
-  const deletes = await resolveDeletes(manifest.delete);
+  const deletes = await resolveDeletes(manifest.delete, composing);
   const overlay = await validateOverlay(name, manifest.overlay);
+  const comboOverlays = await validateComboOverlays(name, manifest.combinesWith ?? [], cen.flavors);
   await validateEdits(manifest.edits ?? []);
-  const packages = await validatePackagePatches(manifest.packageJson ?? {});
+  const packageValidation = await validatePackagePatches(manifest.packageJson ?? {}, composing);
 
-  for (const target of deletes) await rm(abs(target), { recursive: true, force: true });
-  if (overlay) await copyOverlay(overlay, root);
-  await applyEdits(manifest.edits ?? []);
-  await applyPackagePatches(manifest.packageJson ?? {}, packages);
-  await recordFlavor(name);
+  return {
+    name,
+    manifest,
+    composing,
+    deletes,
+    overlay,
+    comboOverlays,
+    packages: packageValidation.packages,
+    skippedPackagePatches: packageValidation.skipped,
+    overlayDeleteMatchers: overlayDeleteMatchers(applied),
+  };
+}
 
-  try {
-    run("pnpm install --no-frozen-lockfile");
-    for (const command of manifest.verify) run(command);
-  } catch (error) {
-    console.error(
-      `Flavor "${name}" was applied, but install or verification failed. ` +
-        'Inspect the tree, or reset with "git checkout . && git clean -fd".',
-    );
-    throw error;
+async function applyFlavorPlan(plan: FlavorPlan) {
+  for (const target of plan.deletes) await rm(abs(target), { recursive: true, force: true });
+  if (plan.overlay) await copyOverlay(plan.overlay, root, plan.overlayDeleteMatchers);
+  for (const comboOverlay of plan.comboOverlays) {
+    await copyOverlay(comboOverlay, root, plan.overlayDeleteMatchers);
   }
+  await applyEdits(plan.manifest.edits ?? []);
+  await applyPackagePatches(
+    plan.manifest.packageJson ?? {},
+    plan.packages,
+    plan.skippedPackagePatches,
+    plan.composing,
+  );
+  await recordFlavor(plan.name);
 }
 
 async function finalize() {
@@ -148,7 +212,46 @@ async function readManifest(name: string) {
   return manifest;
 }
 
-async function resolveDeletes(patterns: string[]) {
+function rejectDuplicateNames(names: string[]) {
+  const seen = new Set<string>();
+  for (const name of names) {
+    if (seen.has(name)) throw new Error(`Flavor "${name}" was specified more than once.`);
+    seen.add(name);
+  }
+}
+
+function validateCompatibility(
+  manifest: Manifest,
+  appliedNames: string[],
+  appliedManifests: Manifest[],
+) {
+  const appliedByName = new Map(appliedManifests.map((applied) => [applied.name, applied]));
+  for (const appliedName of appliedNames) {
+    const applied = appliedByName.get(appliedName);
+    if (manifest.combinesWith?.includes(appliedName)) continue;
+    if (applied?.combinesWith?.includes(manifest.name)) {
+      throw new Error(
+        `Flavor "${applied.name}" composes on top of "${manifest.name}" - ` +
+          `apply them as: pnpm flavor apply ${manifest.name} ${applied.name} ` +
+          '(reset first with "git checkout . && git clean -fd" if needed).',
+      );
+    }
+    if (manifest.conflicts.includes(appliedName)) {
+      throw new Error(`Flavor "${manifest.name}" conflicts with "${appliedName}".`);
+    }
+    if (applied?.conflicts.includes(manifest.name)) {
+      throw new Error(
+        `Flavor "${manifest.name}" conflicts with already-applied "${applied.name}".`,
+      );
+    }
+  }
+}
+
+function isComposing(manifest: Manifest, appliedNames: string[]) {
+  return manifest.combinesWith?.some((combined) => appliedNames.includes(combined)) ?? false;
+}
+
+async function resolveDeletes(patterns: string[], composing = false) {
   const paths = await repoPaths();
   const targets = new Set<string>();
   for (const pattern of patterns) {
@@ -159,7 +262,13 @@ async function resolveDeletes(patterns: string[]) {
       const base = safePattern.slice(0, -3).replace(/\/$/, "");
       if (base && (await exists(abs(base)))) matches.add(base);
     }
-    if (!matches.size) throw new Error(`Delete pattern matched nothing: ${pattern}`);
+    if (!matches.size) {
+      if (composing) {
+        console.log(`delete skipped (nothing left to delete): ${pattern}`);
+        continue;
+      }
+      throw new Error(`Delete pattern matched nothing: ${pattern}`);
+    }
     for (const match of matches) targets.add(match);
   }
   return [...targets].sort((left, right) => left.length - right.length);
@@ -172,6 +281,22 @@ async function validateOverlay(name: string, overlay?: string) {
   if (!info?.isDirectory()) throw new Error(`Overlay must be a directory: ${overlay}`);
   await rejectSymlinks(source);
   return source;
+}
+
+async function validateComboOverlays(name: string, combinesWith: string[], appliedNames: string[]) {
+  const overlays: string[] = [];
+  for (const combined of combinesWith) {
+    if (!appliedNames.includes(combined)) continue;
+    const source = path.join(flavorsDir, name, "combo", safe(combined));
+    const info = await stat(source).catch(() => null);
+    if (!info) continue;
+    if (!info.isDirectory()) {
+      throw new Error(`Combo overlay must be a directory: flavors/${name}/combo/${combined}`);
+    }
+    await rejectSymlinks(source);
+    overlays.push(source);
+  }
+  return overlays;
 }
 
 async function validateEdits(edits: Edit[]) {
@@ -190,12 +315,23 @@ async function validateEdits(edits: Edit[]) {
   }
 }
 
-async function validatePackagePatches(patches: PackagePatches) {
+async function validatePackagePatches(
+  patches: PackagePatches,
+  composing = false,
+): Promise<PackagePatchValidation> {
   const packages = await workspacePackages();
+  const skipped = new Set<string>();
   for (const name of Object.keys(patches)) {
-    if (!packages.has(name)) throw new Error(`Workspace package not found: ${name}`);
+    if (!packages.has(name)) {
+      if (composing) {
+        console.log(`package patch skipped (package removed by an earlier flavor): ${name}`);
+        skipped.add(name);
+        continue;
+      }
+      throw new Error(`Workspace package not found: ${name}`);
+    }
   }
-  return packages;
+  return { packages, skipped };
 }
 
 async function applyEdits(edits: Edit[]) {
@@ -212,10 +348,22 @@ async function applyEdits(edits: Edit[]) {
   }
 }
 
-async function applyPackagePatches(patches: PackagePatches, packages: Map<string, string>) {
+async function applyPackagePatches(
+  patches: PackagePatches,
+  packages: Map<string, string>,
+  skippedPackagePatches = new Set<string>(),
+  composing = false,
+) {
   for (const [name, patch] of Object.entries(patches)) {
+    if (skippedPackagePatches.has(name)) continue;
     const file = packages.get(name);
-    if (!file) throw new Error(`Workspace package not found: ${name}`);
+    if (!file || !(await exists(file))) {
+      if (composing) {
+        console.log(`package patch skipped (package removed by an earlier flavor): ${name}`);
+        continue;
+      }
+      throw new Error(`Workspace package not found: ${name}`);
+    }
     const pkg = await readJson(file);
     for (const dependency of patch.remove ?? []) removeDependency(pkg, dependency);
     const additions = patch.add ?? {};
@@ -250,6 +398,33 @@ async function recordFlavor(name: string) {
   const pkg = await readJson("package.json");
   getCen(pkg).flavors.push(name);
   await writeJson("package.json", pkg);
+}
+
+function overlayDeleteMatchers(manifests: Manifest[]) {
+  const matchers: OverlayDeleteMatcher[] = [];
+  for (const manifest of manifests) {
+    for (const pattern of manifest.delete) {
+      matchers.push({ flavor: manifest.name, matcher: globRegExp(safe(pattern)) });
+    }
+  }
+  return matchers;
+}
+
+function addVerifyCommands(commands: string[], next: string[]) {
+  const seen = new Set(commands);
+  for (const command of next) {
+    if (seen.has(command)) continue;
+    commands.push(command);
+    seen.add(command);
+  }
+}
+
+function withResetHint(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  if (message.includes("git checkout . && git clean -fd")) return new Error(message);
+  return new Error(
+    `${message}\nReset with "git checkout . && git clean -fd" if needed before retrying.`,
+  );
 }
 
 function getCen(pkg: JsonObject) {
@@ -294,16 +469,27 @@ async function rejectSymlinks(directory: string) {
   }
 }
 
-async function copyOverlay(source: string, target: string) {
+async function copyOverlay(
+  source: string,
+  target: string,
+  deleteMatchers: OverlayDeleteMatcher[] = [],
+) {
   const info = await stat(source);
   if (info.isDirectory()) {
-    await mkdir(target, { recursive: true });
     for (const entry of await readdir(source)) {
-      await copyOverlay(path.join(source, entry), path.join(target, entry));
+      await copyOverlay(path.join(source, entry), path.join(target, entry), deleteMatchers);
     }
     return;
   }
 
+  const destination = posix(path.relative(root, target));
+  const deletedBy = deleteMatchers.find(({ matcher }) => matcher.test(destination));
+  if (deletedBy) {
+    console.log(`overlay skipped (deleted by "${deletedBy.flavor}"): ${destination}`);
+    return;
+  }
+
+  await mkdir(path.dirname(target), { recursive: true });
   if (!/\.(ts|tsx)$/.test(source)) {
     await cp(source, target, { force: true });
     return;

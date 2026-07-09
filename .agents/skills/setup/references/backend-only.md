@@ -6,13 +6,15 @@ zod-openapi, Swagger UI at `/api/docs`, better-auth (email/password endpoints un
 
 ## When to choose it
 
-The consumer is not a browser you own: another team's frontend, a mobile app, service-to-
-service calls, or a data-science client. If the user "might add a UI later", keep the base —
-re-adding the frontend package by hand is far more work than ignoring it.
+The consumer is not a browser you own: tools/APIs for **watsonx Orchestrate**, an agent
+backend, another team's frontend, a mobile app, or service-to-service calls. If the user
+"might add a UI later", keep the base — re-adding the frontend package by hand is far more
+work than ignoring it.
 
-**Conflicts with `no-database`** (declared in the manifest — the engine refuses the combo).
-A stateless API-only variant is a possible future flavor; today, pick whichever constraint
-matters more.
+**Combines with `no-database`** for fully stateless services (Orchestrate tools, pure
+orchestration/proxying): `pnpm flavor apply backend-only no-database`, in that order. What
+remains is Hono + Swagger + the API-key auth stub — zero Docker, single tiny container.
+**Conflicts with `carbon` and `oauth-proxy`** (both rework the frontend this flavor deletes).
 
 ## What it changes
 

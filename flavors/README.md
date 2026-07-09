@@ -15,12 +15,15 @@ project setup:
   files start with a `// @ts-nocheck` line that is stripped on apply
 
 ```bash
-pnpm flavor list            # what's available
-pnpm flavor apply <name>    # validates everything first — a failing apply changes nothing
-pnpm flavor finalize        # when choices are settled: deletes this folder and all machinery
+pnpm flavor list                     # what's available
+pnpm flavor apply <name> [<name>...] # validates everything first — a failing apply changes nothing
+pnpm flavor finalize                 # when choices are settled: deletes this folder and all machinery
 ```
 
-Flavor decision guidance lives in `.agents/skills/setup/references/<flavor>.md`.
+Supported combinations are declared per manifest (`combinesWith`) and are order-sensitive —
+the combining flavor goes last: `oauth-proxy carbon`, `backend-only no-database`. Colliding
+files for a combination live in `<flavor>/combo/<other>/`. Flavor decision guidance lives in
+`.agents/skills/setup/references/<flavor>.md`.
 
 ## Maintaining flavors (template repo only)
 

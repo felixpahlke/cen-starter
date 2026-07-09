@@ -6,6 +6,20 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-07-09
+
+Flavor composition: two flavors can now be applied together when the manifests declare it.
+
+- Engine: `pnpm flavor apply <name> [<name>...]` applies flavors in order; `combinesWith`
+  in a manifest whitelists a combination; overlays skip files an earlier flavor deleted;
+  colliding files resolve via `flavors/<name>/combo/<other>/`; install + verify run once
+  per invocation. Wrong order or untested pairs fail with an explanatory error.
+- `oauth-proxy carbon` — the classic IBM-internal setup: Carbon UI behind company SSO
+- `backend-only no-database` — stateless API services (e.g. watsonx Orchestrate tools)
+- Setup skill interview is now scenario-driven: it recommends a configuration from what the
+  project is (client-branded app, IBM-internal asset, SSO requirement, headless service)
+- CI flavor matrix covers both combinations
+
 ## [0.1.0] — 2026-07-09
 
 Initial release of the single-branch template (successor to `full-stack-cen-template`).

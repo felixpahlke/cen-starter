@@ -13,7 +13,9 @@ Initial release of the single-branch template (successor to `full-stack-cen-temp
 - Base app: Hono + zod-openapi backend (Swagger UI from the zod schemas), React/Vite/TanStack
   frontend with shadcn/ui and a Carbon-flavored theme, better-auth (email/password + admin),
   Drizzle + PostgreSQL, end-to-end types via Hono RPC (no codegen)
-- Flavor engine: `pnpm flavor list/apply/finalize` with `no-database` and `backend-only`
+- Flavor engine: `pnpm flavor list/apply/finalize` with four flavors: `no-database`,
+  `backend-only`, `oauth-proxy` (oauth2-proxy + bundled Dex for local dev), and `carbon`
+  (full @carbon/react UI with Carbon-token Tailwind bridge)
 - Agent surface: AGENTS.md (setup mode + runbook), `.agents/skills/` (setup, add-resource,
   add-page, db-migrations, deploy + debug for OpenShift and Code Engine)
 - Backend test setup: vitest + in-memory PGlite running the real migrations

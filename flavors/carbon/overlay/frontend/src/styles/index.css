@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@import "@fontsource-variable/ibm-plex-sans";
+
+/* Carbon tokens exposed as Tailwind colors (generated — see carbon-map.css) */
+@import "./carbon-map.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Unlayered on purpose: Carbon's reset styles body with the non-variable Plex
+   family name; this must win the cascade. */
+body {
+  background: var(--cds-background);
+  color: var(--cds-text-primary);
+  font-family: var(--font-sans);
+}

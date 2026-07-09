@@ -26,6 +26,10 @@ oauth-proxy needs the user table).
 - Frontend keeps a shell without auth guard or user menu; `frontend/src/lib/auth.ts` stays as
   a stub with the same exports so future code doesn't pull better-auth back into the bundle.
 - `pnpm dev` no longer starts Docker; env needs `API_KEY` instead of `DATABASE_URL`/auth vars.
+- Production: `deploy/Dockerfile` loses its copy-migrations step and `.env.production.example`
+  asks for `API_KEY` — skip the migrations step in the deploy skills.
+- Deletes the now-inapplicable `db-migrations` and `add-resource` skills (the canonical
+  resource pattern assumes Drizzle; new endpoints follow `backend/src/routes/health.ts`).
 
 ## Post-apply checks
 

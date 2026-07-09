@@ -91,18 +91,6 @@ async function main() {
     console.log("  add your project's own repo as origin when you have one.");
   }
 
-  // --- .env ----------------------------------------------------------------
-  try {
-    await copyFile(
-      path.join(root, ".env.example"),
-      path.join(root, ".env"),
-      constants.COPYFILE_EXCL,
-    );
-    console.log("✓ Created .env from .env.example");
-  } catch {
-    console.log("• .env already exists — left untouched");
-  }
-
   // --- flavors (optional here; the agent-guided interview is the main path) -
   const flavorsArg = flag("flavors");
   let chosen: string[] = [];
@@ -137,6 +125,18 @@ async function main() {
   for (const flavor of chosen) {
     console.log(`\nApplying flavor: ${flavor}`);
     run("pnpm", ["flavor", "apply", flavor]);
+  }
+
+  // --- .env ----------------------------------------------------------------
+  try {
+    await copyFile(
+      path.join(root, ".env.example"),
+      path.join(root, ".env"),
+      constants.COPYFILE_EXCL,
+    );
+    console.log("✓ Created .env from .env.example");
+  } catch {
+    console.log("• .env already exists — left untouched");
   }
 
   // --- done -----------------------------------------------------------------

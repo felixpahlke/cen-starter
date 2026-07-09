@@ -28,6 +28,7 @@ docker build -f deploy/Dockerfile -t <registry>/<repo>/cen-starter:<tag> .
 docker push <registry>/<repo>/cen-starter:<tag>
 
 # 3. Migrations — run BEFORE deploying; the runtime image deliberately has no drizzle-kit
+#    (skip this step in projects without a database — no-database flavor)
 DATABASE_URL='<production url>' pnpm --filter @cen/backend db:migrate
 
 # 4. Deploy — creates/updates the app-env secret, applies kustomize, waits for rollout

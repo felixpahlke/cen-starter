@@ -31,8 +31,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # One matrix entry per valid combination. Use comma-separated names for
-        # multi-flavor entries, e.g. "carbon,oauth-proxy"; extend when new flavors land.
+        # One matrix entry per valid combination. Use comma-separated names in apply
+        # order for multi-flavor entries, e.g. "oauth-proxy,carbon"; extend when new
+        # flavors land.
         flavors: ["no-database", "backend-only", "oauth-proxy", "carbon", "oauth-proxy,carbon", "backend-only,no-database"]
     steps:
       - uses: actions/checkout@v4

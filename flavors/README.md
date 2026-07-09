@@ -12,11 +12,12 @@ project setup:
 - `<flavor>/manifest.json` — declarative recipe: `delete` globs, exact-match `edits`,
   `packageJson` dependency removals, `verify` commands
 - `<flavor>/overlay/` — files copied over the tree (mirrors repo paths); `.ts`/`.tsx` overlay
-  files start with a `// @ts-nocheck` line that is stripped on apply
+  files start with a `// @ts-nocheck` line that is stripped on apply (exception: overlaid
+  `routeTree.gen.ts` keeps its own generated `@ts-nocheck` and carries no template header)
 
 ```bash
 pnpm flavor list                     # what's available
-pnpm flavor apply <name> [<name>...] # validates everything first — a failing apply changes nothing
+pnpm flavor apply <name> [<name>...] # invalid requests are rejected before any file changes
 pnpm flavor finalize                 # when choices are settled: deletes this folder and all machinery
 ```
 

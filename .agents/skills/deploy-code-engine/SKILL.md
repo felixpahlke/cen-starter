@@ -24,16 +24,16 @@ cp .env.production.example .env.production        # DATABASE_URL, BETTER_AUTH_SE
                                                   # BETTER_AUTH_URL (fill after first deploy, see below)
 
 # 2. Build + push
-docker build -f deploy/Dockerfile -t icr.io/<namespace>/cen-app:<tag> .
-docker push icr.io/<namespace>/cen-app:<tag>
+docker build -f deploy/Dockerfile -t icr.io/<namespace>/cen-starter:<tag> .
+docker push icr.io/<namespace>/cen-starter:<tag>
 
 # 3. Migrations — run BEFORE deploying; the runtime image deliberately has no drizzle-kit
 DATABASE_URL='<production url>' pnpm --filter @cen/backend db:migrate
 
 # 4. Secret + app
 ibmcloud ce secret create --name app-env --from-env-file .env.production
-ibmcloud ce app create --name cen-app \
-  --image icr.io/<namespace>/cen-app:<tag> \
+ibmcloud ce app create --name cen-starter \
+  --image icr.io/<namespace>/cen-starter:<tag> \
   --port 8080 --env-from-secret app-env \
   --min-scale 1 --cpu 0.5 --memory 1G
 ```
@@ -44,13 +44,13 @@ to exactly that URL, update the secret, and restart:
 
 ```bash
 ibmcloud ce secret update --name app-env --from-env-file .env.production
-ibmcloud ce app update --name cen-app       # new revision picks up the secret
+ibmcloud ce app update --name cen-starter       # new revision picks up the secret
 ```
 
 ## Verify — before telling the user it's live
 
 ```bash
-ibmcloud ce app get --name cen-app          # Ready, and note the URL
+ibmcloud ce app get --name cen-starter          # Ready, and note the URL
 curl -s https://<app-url>/api/health        # {"status":"ok"}
 ```
 
@@ -59,9 +59,9 @@ Open the URL: sign-up must work end-to-end. Promote the first admin by setting
 
 ## Update an existing deployment
 
-New code: build + push a new tag, `ibmcloud ce app update --name cen-app --image <new-ref>`.
+New code: build + push a new tag, `ibmcloud ce app update --name cen-starter --image <new-ref>`.
 Schema changed? Run migrations first (step 3 above) — always before the new image serves traffic.
-Env change: `ibmcloud ce secret update ... && ibmcloud ce app update --name cen-app`.
+Env change: `ibmcloud ce secret update ... && ibmcloud ce app update --name cen-starter`.
 Every update creates a new revision — rollback is `ibmcloud ce app get` (list revisions) and
 routing traffic back.
 

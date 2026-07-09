@@ -1,13 +1,13 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: cen-app
+  name: cen-starter
   labels:
-    app.kubernetes.io/name: cen-app
+    app.kubernetes.io/name: cen-starter
 spec:
   to:
     kind: Service
-    name: cen-app
+    name: cen-starter
   port:
     targetPort: http
   tls:

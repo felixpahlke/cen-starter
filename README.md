@@ -2,7 +2,7 @@
      the setup runbook (env, port conflicts, verification) and links the guided workflows
      in .agents/skills/. Do not start guessing; the runbook covers the whole path. -->
 
-# CEN-APP
+# CEN Starter
 
 **The full-stack starter for the agent era.** TypeScript end-to-end, type-safe from database to
 browser, and running in under five minutes — one branch, one command, zero config.
@@ -74,4 +74,4 @@ pnpm db:studio    # browse the database (Drizzle Studio)
 
 ---
 
-*CEN-APP succeeds `full-stack-cen-template`.*
+*CEN Starter succeeds `full-stack-cen-template`.*

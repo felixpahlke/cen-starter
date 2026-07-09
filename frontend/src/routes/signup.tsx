@@ -62,7 +62,7 @@ function Signup() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Create account</CardTitle>
-          <CardDescription>Use an email and password to start with CEN-APP.</CardDescription>
+          <CardDescription>Use an email and password to start with CEN Starter.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>

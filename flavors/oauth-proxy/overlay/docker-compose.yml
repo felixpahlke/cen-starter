@@ -1,6 +1,6 @@
 # Dev services only — the app itself runs natively via `pnpm dev`.
 # `name` prefixes all containers/volumes; create-cen-app rewrites it to your project name.
-name: cen-app
+name: cen-starter
 
 services:
   db:
@@ -34,7 +34,7 @@ services:
     command:
       - --http-address=0.0.0.0:4180
       - --provider=oidc
-      - --client-id=cen-app
+      - --client-id=cen-starter
       - --client-secret=cen-dev-secret
       - --oidc-issuer-url=http://localhost:5556/dex
       - --skip-oidc-discovery

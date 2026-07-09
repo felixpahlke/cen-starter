@@ -1,6 +1,6 @@
 # Dev services only — the app itself runs natively via `pnpm dev`.
 # `name` prefixes all containers/volumes; create-cen-app rewrites it to your project name.
-name: cen-app
+name: cen-starter
 
 services:
   db:

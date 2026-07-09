@@ -14,7 +14,7 @@ const prefersDark = () => window.matchMedia("(prefers-color-scheme: dark)").matc
 
 export function ThemeProvider({
   children,
-  storageKey = "cen-app-theme",
+  storageKey = "cen-starter-theme",
 }: {
   children: ReactNode;
   storageKey?: string;

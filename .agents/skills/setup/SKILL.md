@@ -1,7 +1,7 @@
 ---
 name: setup
 description: >-
-  Configure a freshly cloned CEN-APP template: interview the user about what they need,
+  Configure a freshly cloned CEN Starter template: interview the user about what they need,
   apply the matching flavors, verify, and finalize. Use when flavors/ exists (cen.finalized
   is false in package.json) — this project has not been set up yet.
 ---

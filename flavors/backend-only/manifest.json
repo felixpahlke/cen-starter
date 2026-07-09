@@ -1,7 +1,7 @@
 {
   "name": "backend-only",
   "description": "Remove the React frontend and static SPA serving while keeping the Hono API, Swagger UI, Better Auth, and PostgreSQL/Drizzle.",
-  "conflicts": ["no-database", "carbon"],
+  "conflicts": ["carbon"],
   "requires": [],
   "delete": ["frontend/**"],
   "overlay": "overlay",

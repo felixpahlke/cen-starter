@@ -17,29 +17,43 @@ project none of this applies.
 
 ## 1. Interview the user
 
-Ask only about decisions a flavor exists for — run `pnpm flavor list` to see what's available,
-and read `references/<flavor>.md` for any flavor you're considering. The canonical questions:
+Open with the project, not the tech: **what are you building, and who is it for?** Then
+recommend a configuration with reasons — act like an experienced colleague, not a form. Run
+`pnpm flavor list` to see what exists; read `references/<flavor>.md` for any flavor you're
+about to recommend.
 
-- **Do you need a database?** Persistent data, user accounts → keep the base. Stateless API,
-  proxy, demo without persistence → `no-database`.
-- **Which design system?** The base is shadcn/ui with an IBM-flavored theme (safe default,
-  fully ownable code). Hard requirement for IBM Carbon components → `carbon` (if available).
-- **Do you need the frontend at all?** API-only service → `backend-only` (if available).
-- **How will users authenticate?** Local email/password (base) works instantly. Company SSO in
-  front of the app → `oauth-proxy` (if available).
+Typical CEN scenarios and what to recommend:
 
-Don't ask about things the user already told you. Don't offer flavors that don't exist in
-`flavors/`. When in doubt, keep the base — subtracting later is documented in each reference
-file; re-adding is manual work.
+- **App for a client, branded as theirs** → keep the base. The shadcn/ui components are
+  ownable code — restyle them to the client's brand so the solution feels like the client's
+  own product.
+- **IBM-internal asset or tool, or Carbon compliance is a requirement** → `carbon`. Real
+  `@carbon/react`; it looks like an IBM product out of the box.
+- **Company SSO in front of the app** (W3ID, Entra, any OIDC IdP) → `oauth-proxy`. For the
+  classic internal-tool setup, combine it with Carbon:
+  `pnpm flavor apply oauth-proxy carbon`.
+- **Backend service — tools for watsonx Orchestrate, an agent backend, another team's
+  frontend** → `backend-only`. If it holds no state of its own (stateless tools, pure
+  orchestration), drop the database too: `pnpm flavor apply backend-only no-database`.
+- **Quick demo or PoC with user accounts** → base as-is; local email/password works
+  instantly, no IdP conversation needed.
+
+Ask one or two clarifying questions at most, and only about decisions a flavor exists for
+(database? frontend? design system? auth?). Don't ask about things the user already told you.
+When in doubt, keep the base — subtracting later is documented in each reference file;
+re-adding is manual work.
 
 ## 2. Apply
 
 ```bash
-pnpm flavor apply <name>        # one at a time; validates everything before touching files
+pnpm flavor apply <name> [<name>...]    # validates before touching files
 ```
 
-The engine dry-runs the whole manifest first — a failing apply changes nothing. After each
-apply, run the flavor's post-apply checks from `references/<flavor>.md`, then commit:
+The engine dry-runs each manifest first — a failing apply changes nothing. Supported
+combinations are declared in the manifests (`combinesWith`) and **order matters**: the
+combining flavor goes last (`oauth-proxy carbon`, `backend-only no-database`). Everything
+else the engine refuses with an explanation. After applying, run the post-apply checks from
+each flavor's `references/<flavor>.md`, then commit:
 
 ```bash
 git add -A && git commit -m "Apply <name> flavor"

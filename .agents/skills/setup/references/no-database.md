@@ -9,6 +9,11 @@ The app is stateless — a proxy, an integration service, a demo without persist
 data lives entirely in external systems. If the user is unsure whether they'll need their own
 tables, keep the base instead: subtracting later means redoing this flavor's changes by hand.
 
+**Combines with `backend-only`** for stateless API services such as watsonx Orchestrate
+tools: `pnpm flavor apply backend-only no-database` (that order — backend-only first).
+**Conflicts with `carbon` and `oauth-proxy`** (Carbon reworks pages this flavor deletes;
+oauth-proxy needs the user table).
+
 ## What it changes
 
 - Deletes `backend/src/db/`, `drizzle.config.ts`, `docker-compose.yml`, the items resource

@@ -1,7 +1,8 @@
 {
   "name": "no-database",
   "description": "Remove PostgreSQL, Drizzle, Better Auth persistence, and the example items resource.",
-  "conflicts": ["backend-only", "carbon"],
+  "conflicts": ["carbon"],
+  "combinesWith": ["backend-only"],
   "requires": [],
   "delete": [
     "backend/src/db/**",
@@ -46,8 +47,8 @@
     },
     {
       "file": "backend/src/env.ts",
-      "find": "  WEB_PORT: z.coerce.number().int().default(5173),\n  DATABASE_URL: z.url(),\n  BETTER_AUTH_SECRET: z.string().min(32),\n  BETTER_AUTH_URL: z.url(),\n});",
-      "replace": "  WEB_PORT: z.coerce.number().int().default(5173),\n  API_KEY: z.string().min(1),\n});"
+      "find": "  DATABASE_URL: z.url(),\n  BETTER_AUTH_SECRET: z.string().min(32),\n  BETTER_AUTH_URL: z.url(),\n});",
+      "replace": "  API_KEY: z.string().min(1),\n});"
     },
     {
       "file": ".env.example",

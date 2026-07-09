@@ -10,8 +10,10 @@ The organization requires SSO (W3ID, Entra, any OIDC provider) or forbids app-lo
 If the project just needs "log in and build" without an IdP conversation, keep the base —
 this flavor's production setup requires an OIDC client registration from whoever owns the IdP.
 
-**Conflicts with `no-database`** (users get a database row for role/ownership) **and
-`backend-only`** (it reworks the frontend shell). Declared in the manifest.
+**Combines with `carbon`** for the classic internal-tool look:
+`pnpm flavor apply oauth-proxy carbon` (that order). **Conflicts with `no-database`** (users
+get a database row for role/ownership) **and `backend-only`** (it reworks the frontend
+shell). Declared in the manifest.
 
 ## How auth works after apply
 

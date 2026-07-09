@@ -1,0 +1,61 @@
+# Dev services only — the app itself runs natively via `pnpm dev`.
+# `name` prefixes all containers/volumes; create-cen-app rewrites it to your project name.
+name: cen-app
+
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app
+    ports:
+      # DB_PORT comes from .env — change it (and DATABASE_URL) if 5432 is taken on your machine
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      # postgres 18+ images store data under /var/lib/postgresql (not …/data)
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  dex:
+    image: dexidp/dex:latest-distroless
+    command: ["dex", "serve", "/etc/dex/config.yaml"]
+    ports:
+      - "5556:5556"
+    volumes:
+      - ./dev/dex/config.yaml:/etc/dex/config.yaml:ro
+
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.7.1
+    command:
+      - --http-address=0.0.0.0:4180
+      - --provider=oidc
+      - --client-id=cen-app
+      - --client-secret=cen-dev-secret
+      - --oidc-issuer-url=http://localhost:5556/dex
+      - --skip-oidc-discovery
+      - --login-url=http://localhost:5556/dex/auth
+      - --redeem-url=http://dex:5556/dex/token
+      - --oidc-jwks-url=http://dex:5556/dex/keys
+      - --redirect-url=http://localhost:4180/oauth2/callback
+      - --upstream=http://host.docker.internal:${WEB_PORT:-5173}
+      - --email-domain=*
+      - --cookie-secure=false
+      - --cookie-secret=dev-only-cookie-secret-32-bytes!
+      - --pass-user-headers
+      - --skip-provider-button
+      # dex honors skipApprovalScreen only when the client does not force approval
+      - --approval-prompt=auto
+    depends_on:
+      - dex
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "4180:4180"
+
+volumes:
+  db-data:

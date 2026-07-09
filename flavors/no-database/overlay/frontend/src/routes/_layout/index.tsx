@@ -13,7 +13,7 @@ function Dashboard() {
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
       <div className="space-y-2">
         <h1 className="font-semibold text-3xl tracking-tight">Welcome</h1>
-        <p className="text-muted-foreground">CEN-APP is ready for product work.</p>
+        <p className="text-muted-foreground">CEN Starter is ready for product work.</p>
       </div>
       <Card>
         <CardHeader>

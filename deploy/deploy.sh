@@ -51,7 +51,7 @@ oc create secret generic app-env --from-env-file=.env.production --dry-run=clien
 oc apply -n "$namespace" -k deploy/openshift
 
 if [ -n "$image" ]; then
-  oc set image -n "$namespace" deploy/cen-app cen-app="$image"
+  oc set image -n "$namespace" deploy/cen-starter cen-starter="$image"
 fi
 
-oc rollout status -n "$namespace" deploy/cen-app
+oc rollout status -n "$namespace" deploy/cen-starter

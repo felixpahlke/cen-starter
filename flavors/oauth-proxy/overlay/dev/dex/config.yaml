@@ -7,11 +7,11 @@ web:
   http: 0.0.0.0:5556
 
 staticClients:
-  - id: cen-app
+  - id: cen-starter
     secret: cen-dev-secret
     redirectURIs:
       - http://localhost:4180/oauth2/callback
-    name: CEN-APP (dev)
+    name: CEN Starter (dev)
 
 oauth2:
   skipApprovalScreen: true

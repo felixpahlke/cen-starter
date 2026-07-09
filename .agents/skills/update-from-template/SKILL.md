@@ -1,6 +1,6 @@
 ---
 name: update-from-template
-description: Pull improvements from the CEN-APP template into a project created from it — fetch upstream, review the changelog, merge, repair flavor-deleted files and the lockfile.
+description: Pull improvements from the CEN Starter template into a project created from it — fetch upstream, review the changelog, merge, repair flavor-deleted files and the lockfile.
 ---
 
 # Update from the template

@@ -24,14 +24,14 @@ cp .env.production.example .env.production        # then fill in real values:
 #    DATABASE_URL, BETTER_AUTH_SECRET (openssl rand -hex 32), BETTER_AUTH_URL (the route URL)
 
 # 2. Build + push (from repo root; use the cluster-reachable registry ref)
-docker build -f deploy/Dockerfile -t <registry>/<repo>/cen-app:<tag> .
-docker push <registry>/<repo>/cen-app:<tag>
+docker build -f deploy/Dockerfile -t <registry>/<repo>/cen-starter:<tag> .
+docker push <registry>/<repo>/cen-starter:<tag>
 
 # 3. Migrations — run BEFORE deploying; the runtime image deliberately has no drizzle-kit
 DATABASE_URL='<production url>' pnpm --filter @cen/backend db:migrate
 
 # 4. Deploy — creates/updates the app-env secret, applies kustomize, waits for rollout
-./deploy/deploy.sh -n <namespace> -i <registry>/<repo>/cen-app:<tag>
+./deploy/deploy.sh -n <namespace> -i <registry>/<repo>/cen-starter:<tag>
 ```
 
 ## Verify — before telling the user it's live
@@ -50,7 +50,7 @@ user's row in the database.
 Build + push a new tag, rerun `deploy.sh` with `-i`. Schema changed? Run migrations first
 (step 3 above) — always before the new image serves traffic. Env change: edit
 `.env.production`, rerun `deploy.sh` (it re-applies the secret), then
-`oc rollout restart deploy/cen-app` so pods pick it up.
+`oc rollout restart deploy/cen-starter` so pods pick it up.
 
 ## When something is broken
 

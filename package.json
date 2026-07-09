@@ -1,5 +1,5 @@
 {
-  "name": "cen-app",
+  "name": "cen-starter",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.29.3",

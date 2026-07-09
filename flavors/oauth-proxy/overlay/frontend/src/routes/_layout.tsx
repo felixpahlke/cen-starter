@@ -60,7 +60,7 @@ function ProtectedLayout() {
       <aside className="hidden w-64 shrink-0 border-r bg-card text-card-foreground md:flex md:flex-col">
         <div className="flex h-16 items-center border-b px-6">
           <Link to="/" className="font-semibold text-lg tracking-tight">
-            CEN-APP
+            CEN Starter
           </Link>
         </div>
         <nav className="flex flex-1 flex-col gap-1 p-3">
@@ -70,7 +70,7 @@ function ProtectedLayout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-40 flex min-h-16 flex-wrap items-center gap-3 border-b bg-background/95 px-4 backdrop-blur md:px-6">
           <Link to="/" className="font-semibold text-lg tracking-tight md:hidden">
-            CEN-APP
+            CEN Starter
           </Link>
           <nav className="flex min-w-0 flex-1 gap-1 overflow-x-auto md:hidden">
             <NavLinks items={navItems} compact />
@@ -148,7 +148,7 @@ function AuthState({ title, description }: { title: string; description: string 
     <div className="flex min-h-svh flex-col bg-background">
       <header className="flex h-16 items-center justify-between border-b px-4 md:px-6">
         <Link to="/" className="font-semibold text-lg tracking-tight">
-          CEN-APP
+          CEN Starter
         </Link>
         <ModeToggle />
       </header>

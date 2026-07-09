@@ -1,11 +1,11 @@
 ---
 name: template-maintenance
-description: Maintain the CEN-APP template repository itself — keep flavors applying, add flavors, release versions. Template repo only; not for projects created from it (deleted at finalize).
+description: Maintain the CEN Starter template repository itself — keep flavors applying, add flavors, release versions. Template repo only; not for projects created from it (deleted at finalize).
 ---
 
 # Template maintenance
 
-Only applies in the **template repository** (`cen-app` itself). If this is a project created
+Only applies in the **template repository** (`cen-starter` itself). If this is a project created
 from the template, stop — this skill is not for you (finalize removes it).
 
 ## Changing the base app

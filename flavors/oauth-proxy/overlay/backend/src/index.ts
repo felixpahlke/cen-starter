@@ -21,7 +21,7 @@ app.route("/api", api);
 
 app.doc31("/api/openapi.json", {
   openapi: "3.1.0",
-  info: { title: "CEN-APP API", version: "0.1.0" },
+  info: { title: "CEN Starter API", version: "0.1.0" },
 });
 app.get("/api/docs", swaggerUI({ url: "/api/openapi.json" }));
 

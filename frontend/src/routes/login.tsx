@@ -60,7 +60,7 @@ function Login() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Sign in</CardTitle>
-          <CardDescription>Access CEN-APP with your email and password.</CardDescription>
+          <CardDescription>Access CEN Starter with your email and password.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>

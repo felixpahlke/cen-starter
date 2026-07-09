@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cen-app
+  name: cen-starter
   labels:
-    app.kubernetes.io/name: cen-app
+    app.kubernetes.io/name: cen-starter
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: cen-app
+      app.kubernetes.io/name: cen-starter
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: cen-app
+        app.kubernetes.io/name: cen-starter
     spec:
       containers:
-        - name: cen-app
-          image: cen-app:latest # Placeholder; override with kustomize images: or deploy.sh -i.
+        - name: cen-starter
+          image: cen-starter:latest # Placeholder; override with kustomize images: or deploy.sh -i.
           ports:
             - name: http
               containerPort: 8080

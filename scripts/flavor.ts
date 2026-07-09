@@ -108,6 +108,7 @@ async function finalize() {
   await rm(abs("flavors"), { recursive: true, force: true });
   await rm(abs("scripts/flavor.ts"), { force: true });
   await rm(abs(".agents/skills/setup"), { recursive: true, force: true });
+  await rm(abs(".agents/skills/template-maintenance"), { recursive: true, force: true });
   if (hadBootstrap) await rm(abs("scripts/bootstrap.ts"), { force: true });
 
   const pkg = await readJson("package.json");

@@ -198,9 +198,12 @@ async function finalize() {
   await rm(abs(".agents/skills/setup"), { recursive: true, force: true });
   await rm(abs(".agents/skills/template-maintenance"), { recursive: true, force: true });
   if (hadBootstrap) await rm(abs("scripts/bootstrap.ts"), { force: true });
+  // The root tsconfig only covers scripts/, which is gone after finalize.
+  await rm(abs("tsconfig.json"), { force: true });
 
   const pkg = await readJson("package.json");
   delete objectAt(pkg, "scripts").flavor;
+  delete objectAt(pkg, "scripts").typecheck;
   if (hadBootstrap) delete objectAt(pkg, "scripts").bootstrap;
   objectAt(pkg, "cen").finalized = true;
   await writeJson("package.json", pkg);

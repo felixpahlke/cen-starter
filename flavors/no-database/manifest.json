@@ -8,6 +8,7 @@
     "backend/src/db/**",
     "backend/drizzle.config.ts",
     "docker-compose.yml",
+    "deploy/openshift/postgres.yaml",
     "backend/src/auth/better-auth.ts",
     "backend/src/routes/items.ts",
     "backend/src/routes/items.test.ts",
@@ -34,6 +35,11 @@
     },
     {
       "file": "backend/src/index.ts",
+      "find": "import { migrateOnStart } from \"./db/migrate-on-start\";\n",
+      "replace": ""
+    },
+    {
+      "file": "backend/src/index.ts",
       "find": "import { itemsRoute } from \"./routes/items\";\n",
       "replace": ""
     },
@@ -48,8 +54,13 @@
       "replace": ""
     },
     {
+      "file": "backend/src/index.ts",
+      "find": "await migrateOnStart();\n",
+      "replace": ""
+    },
+    {
       "file": "backend/src/env.ts",
-      "find": "  DATABASE_URL: z.url(),\n  BETTER_AUTH_SECRET: z.string().min(32),\n  BETTER_AUTH_URL: z.url(),\n});",
+      "find": "  DATABASE_URL: z.url(),\n  BETTER_AUTH_SECRET: z.string().min(32),\n  BETTER_AUTH_URL: z.url(),\n  MIGRATE_ON_START: z.enum([\"true\", \"false\"]).optional(),\n});",
       "replace": "  API_KEY: z.string().min(1),\n});"
     },
     {
@@ -59,7 +70,7 @@
     },
     {
       "file": ".env.production.example",
-      "find": "# PostgreSQL connection string reachable from the runtime platform.\nDATABASE_URL=postgres://USER:PASSWORD@HOST:5432/DATABASE\n\n# Generate a real secret with: openssl rand -hex 32\nBETTER_AUTH_SECRET=replace-with-at-least-32-random-characters\n\n# Public origin of the deployed app, without a trailing slash.\nBETTER_AUTH_URL=https://cen-starter.example.com\n",
+      "find": "# PostgreSQL connection string reachable from the runtime platform.\nDATABASE_URL=postgres://USER:PASSWORD@HOST:5432/DATABASE\n\n# Generate a real secret with: openssl rand -hex 32\nBETTER_AUTH_SECRET=replace-with-at-least-32-random-characters\n\n# Public origin of the deployed app, without a trailing slash.\nBETTER_AUTH_URL=https://cen-starter.example.com\n\n# Migrations auto-apply at boot in production. Set to \"false\" to manage them manually.\n# MIGRATE_ON_START=false\n",
       "replace": "# API key accepted by the no-database auth stub. Generate: openssl rand -hex 32\nAPI_KEY=replace-with-a-real-api-key\n"
     },
     {

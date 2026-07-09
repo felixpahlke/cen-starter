@@ -27,9 +27,10 @@ cp .env.production.example .env.production        # DATABASE_URL, BETTER_AUTH_SE
 docker build -f deploy/Dockerfile -t icr.io/<namespace>/cen-starter:<tag> .
 docker push icr.io/<namespace>/cen-starter:<tag>
 
-# 3. Migrations — run BEFORE deploying; the runtime image deliberately has no drizzle-kit
-#    (skip this step in projects without a database — no-database flavor)
-DATABASE_URL='<production url>' pnpm --filter @cen/backend db:migrate
+# 3. Migrations — nothing to do: the image migrates its own schema at boot
+#    (MIGRATE_ON_START, production default). To manage them manually instead, set
+#    MIGRATE_ON_START=false in .env.production and run:
+#    DATABASE_URL='<production url>' pnpm --filter @cen/backend db:migrate
 
 # 4. Secret + app
 ibmcloud ce secret create --name app-env --from-env-file .env.production
@@ -61,7 +62,8 @@ Open the URL: sign-up must work end-to-end. Promote the first admin by setting
 ## Update an existing deployment
 
 New code: build + push a new tag, `ibmcloud ce app update --name cen-starter --image <new-ref>`.
-Schema changed? Run migrations first (step 3 above) — always before the new image serves traffic.
+Schema changed? Nothing extra — the new image migrates the schema at boot before serving
+traffic (unless `MIGRATE_ON_START=false`, in which case run step 3's manual command first).
 Env change: `ibmcloud ce secret update ... && ibmcloud ce app update --name cen-starter`.
 Every update creates a new revision — rollback is `ibmcloud ce app get` (list revisions) and
 routing traffic back.

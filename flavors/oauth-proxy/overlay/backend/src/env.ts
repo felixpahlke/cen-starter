@@ -12,6 +12,7 @@ const EnvSchema = z.object({
   PORT: z.coerce.number().int().optional(),
   WEB_PORT: z.coerce.number().int().default(5173),
   DATABASE_URL: z.url(),
+  MIGRATE_ON_START: z.enum(["true", "false"]).optional(),
 });
 
 // In dev, .env lives at the repo root; in production, real env vars are set by the platform.

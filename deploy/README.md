@@ -30,13 +30,24 @@ curl http://localhost:8080/api/health
 
 ## OpenShift
 
-Create `.env.production` from `.env.production.example`, set production values, and push the image to a registry the cluster can pull from.
+Create `.env.production` from `.env.production.example` and set production values. Two modes:
 
 ```bash
+# Auto-deploy (recommended for internal tools/pilots): one-time setup, then git push = deploy.
+# The cluster builds the image itself (ImageStream + BuildConfig + GitHub webhook).
+GITHUB_TOKEN=<token> ./deploy/deploy.sh -n <namespace> --autodeploy
+
+# Explicit: build/push yourself, deploy a specific image.
 ./deploy/deploy.sh -n <namespace> -i <registry>/<repo>/cen-starter:<tag>
 ```
 
-The script creates or updates the `app-env` secret from `.env.production`, applies the kustomize base in `deploy/openshift`, optionally sets the image, and waits for the rollout.
+Either way the script creates/updates the `app-env` secret from `.env.production` (filtering
+out `GITHUB_TOKEN`), applies the kustomize base in `deploy/openshift`, and waits for rollout.
+
+**Database convention**: if `.env.production` contains no `DATABASE_URL`, the script deploys
+an in-cluster PostgreSQL (`deploy/openshift/postgres.yaml`, pilot/demo grade) and injects the
+generated `DATABASE_URL` into `app-env`. Set `DATABASE_URL` to use a managed PostgreSQL
+instead — recommended for production engagements.
 
 ## Code Engine
 
@@ -71,10 +82,17 @@ Use `--min-scale 1` for production web traffic to avoid cold starts. For lower-c
 
 ## Migrations
 
-Run migrations before deploying a new image, from a source checkout with dependencies installed and `DATABASE_URL` set:
+The image migrates its own schema at boot: in production the backend applies pending
+migrations (shipped as SQL in the image, applied via drizzle-orm under a Postgres advisory
+lock) before it starts serving. No manual step, and deploying a new image is always
+schema-safe — including webhook-triggered auto-deploys.
+
+To manage migrations manually instead, set `MIGRATE_ON_START=false` in the environment and
+run them from a source checkout with `DATABASE_URL` set:
 
 ```bash
 pnpm --filter @cen/backend db:migrate
 ```
 
-This can run as a CI pre-deploy step or a one-off job. The runtime image intentionally does not contain `drizzle-kit` or the Drizzle config, so migrations are not run from the production container.
+The runtime image intentionally does not contain `drizzle-kit`; the boot-time migrator uses
+drizzle-orm's runtime migrator over the bundled SQL files.

@@ -6,8 +6,8 @@ import { z } from "zod";
 
 export const ItemSchema = z.object({
   id: z.uuid(),
-  title: z.string().min(1).max(200),
-  description: z.string().max(2000).nullable(),
+  title: z.string().trim().min(1).max(200),
+  description: z.string().trim().max(2000).nullable(),
   ownerId: z.string(),
   createdAt: z.iso.datetime(),
 });
@@ -21,7 +21,11 @@ export const ItemCreateSchema = ItemSchema.pick({
 export const ItemUpdateSchema = ItemSchema.pick({
   title: true,
   description: true,
-}).partial();
+})
+  .partial()
+  .refine((value) => Object.values(value).some((field) => field !== undefined), {
+    message: "At least one field must be provided",
+  });
 
 export type Item = z.infer<typeof ItemSchema>;
 export type ItemCreate = z.infer<typeof ItemCreateSchema>;

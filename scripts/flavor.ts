@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from "node:child_process";
-import { cp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { z } from "zod";
@@ -83,7 +83,7 @@ async function apply(name: string) {
   const packages = await validatePackagePatches(manifest.packageJson ?? {});
 
   for (const target of deletes) await rm(abs(target), { recursive: true, force: true });
-  if (overlay) await cp(overlay, root, { recursive: true, force: true });
+  if (overlay) await copyOverlay(overlay, root);
   await applyEdits(manifest.edits ?? []);
   await applyPackagePatches(manifest.packageJson ?? {}, packages);
   await recordFlavor(name);
@@ -290,6 +290,31 @@ async function rejectSymlinks(directory: string) {
     if (entry.isSymbolicLink()) throw new Error(`Overlay contains a symlink: ${entry.name}`);
     if (entry.isDirectory()) await rejectSymlinks(path.join(directory, entry.name));
   }
+}
+
+async function copyOverlay(source: string, target: string) {
+  const info = await stat(source);
+  if (info.isDirectory()) {
+    await mkdir(target, { recursive: true });
+    for (const entry of await readdir(source)) {
+      await copyOverlay(path.join(source, entry), path.join(target, entry));
+    }
+    return;
+  }
+
+  if (!/\.(ts|tsx)$/.test(source)) {
+    await cp(source, target, { force: true });
+    return;
+  }
+
+  await writeFile(target, stripOverlayTsNoCheck(await readFile(source, "utf8")));
+}
+
+function stripOverlayTsNoCheck(text: string) {
+  const newline = text.indexOf("\n");
+  const firstLine = newline === -1 ? text : text.slice(0, newline);
+  if (!firstLine.startsWith("// @ts-nocheck")) return text;
+  return newline === -1 ? "" : text.slice(newline + 1);
 }
 
 function removeYamlKey(text: string, keyPath: string[]) {

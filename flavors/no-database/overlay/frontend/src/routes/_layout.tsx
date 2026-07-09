@@ -1,3 +1,4 @@
+// @ts-nocheck — template overlay; this line is stripped when `pnpm flavor apply` copies the file into place
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { Home, type LucideIcon } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";

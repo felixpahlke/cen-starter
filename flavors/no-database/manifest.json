@@ -9,6 +9,7 @@
     "docker-compose.yml",
     "backend/src/auth/better-auth.ts",
     "backend/src/routes/items.ts",
+    "backend/src/routes/items.test.ts",
     "shared/src/schemas/items.ts",
     "frontend/src/routes/_layout/items.tsx",
     "frontend/src/routes/login.tsx",
@@ -71,11 +72,18 @@
   ],
   "packageJson": {
     "@cen/backend": {
-      "remove": ["drizzle-orm", "pg", "better-auth", "@types/pg", "drizzle-kit"]
+      "remove": [
+        "drizzle-orm",
+        "pg",
+        "better-auth",
+        "@electric-sql/pglite",
+        "@types/pg",
+        "drizzle-kit"
+      ]
     },
     "@cen/frontend": {
       "remove": ["better-auth"]
     }
   },
-  "verify": ["pnpm check"]
+  "verify": ["pnpm check", "pnpm test"]
 }

@@ -163,7 +163,29 @@ async function applyFlavorPlan(plan: FlavorPlan) {
     plan.skippedPackagePatches,
     plan.composing,
   );
+  await preserveComposeProjectName();
+  await warnOnEnvExampleDrift(plan.manifest.edits ?? []);
   await recordFlavor(plan.name);
+}
+
+// Overlays ship the template's compose `name:`; a bootstrap-renamed project must keep its own.
+async function preserveComposeProjectName() {
+  const compose = abs("docker-compose.yml");
+  if (!(await exists(compose))) return;
+  const pkgName = (await readJson("package.json")).name;
+  if (typeof pkgName !== "string" || !pkgName) return;
+  const text = await readFile(compose, "utf8");
+  const next = text.replace(/^name: .+$/m, `name: ${pkgName}`);
+  if (next !== text) await writeFile(compose, next);
+}
+
+async function warnOnEnvExampleDrift(edits: Edit[]) {
+  if (!edits.some((edit) => edit.file === ".env.example")) return;
+  if (!(await exists(abs(".env")))) return;
+  console.log(
+    "note: this flavor changed .env.example, but your existing .env was not modified — " +
+      "compare the two and update .env (required variables changed).",
+  );
 }
 
 async function finalize() {

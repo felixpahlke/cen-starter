@@ -46,7 +46,7 @@ async function main() {
   const pkgPath = path.join(root, "package.json");
   const pkg = JSON.parse(await readFile(pkgPath, "utf8"));
   if (pkg.cen?.finalized) fail("This project is finalized — setup no longer applies.");
-  if (pkg.cen?.setupDone) fail("Setup already ran here. Continue with `pnpm dev`.");
+  if (pkg.cen?.bootstrapped) fail("Bootstrap already ran here. Continue with `pnpm dev`.");
 
   // --- preflight ----------------------------------------------------------
   const major = Number(process.versions.node.split(".")[0]);
@@ -118,7 +118,7 @@ async function main() {
 
   await writeFile(
     pkgPath,
-    `${JSON.stringify({ ...pkg, cen: { ...pkg.cen, setupDone: true } }, null, 2)}\n`,
+    `${JSON.stringify({ ...pkg, cen: { ...pkg.cen, bootstrapped: true } }, null, 2)}\n`,
   );
   console.log(`✓ Project renamed to "${name}"`);
 

@@ -59,6 +59,10 @@ each flavor's `references/<flavor>.md`, then commit:
 git add -A && git commit -m "Apply <name> flavor"
 ```
 
+If `.env` already existed before the apply (bootstrap creates it), compare it against the
+updated `.env.example` — flavors change which variables are required. The engine prints a
+note when this applies.
+
 ## 3. First-time boot
 
 Follow **"First-time setup"** in `AGENTS.md` (env file, port conflicts, `pnpm dev`,

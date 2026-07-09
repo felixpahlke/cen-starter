@@ -19,6 +19,10 @@ Flavor composition: two flavors can now be applied together when the manifests d
 - Setup skill interview is now scenario-driven: it recommends a configuration from what the
   project is (client-branded app, IBM-internal asset, SSO requirement, headless service)
 - CI flavor matrix covers both combinations
+- Verified against real agents: three setup scenarios run by weaker models on fresh clones;
+  fixes from that exercise — flavor apply preserves a bootstrap-renamed compose project
+  name, warns when a flavor changes `.env.example` under an existing `.env`,
+  `cen.setupDone` renamed to `cen.bootstrapped`, placeholder favicon
 - Release-audit fixes: `no-database` now also fixes the production Dockerfile and
   `.env.production.example`, removes inapplicable skills (as does `backend-only`), and
   `pnpm bootstrap` writes `.env` after flavors so flavored env examples land in it;

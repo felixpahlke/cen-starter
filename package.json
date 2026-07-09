@@ -15,7 +15,8 @@
     "dev": "docker compose up -d --wait && pnpm db:migrate && pnpm --recursive --parallel dev",
     "flavor": "tsx scripts/flavor.ts",
     "bootstrap": "tsx scripts/bootstrap.ts",
-    "check": "pnpm --recursive typecheck && biome check .",
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm --recursive --include-workspace-root --if-present typecheck && biome check .",
     "test": "pnpm --recursive --if-present run test",
     "fix": "biome check --write .",
     "build": "pnpm --recursive build",
@@ -26,8 +27,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
+    "@types/node": "catalog:",
     "lefthook": "catalog:",
     "tsx": "catalog:",
+    "typescript": "catalog:",
     "zod": "catalog:"
   }
 }

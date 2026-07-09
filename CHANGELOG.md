@@ -21,6 +21,9 @@ Deployment convenience restored from the old template, adapted to the single-ima
   in-cluster and rolls out automatically. `GITHUB_TOKEN` is filtered out of the app secret.
 - deploy-openshift / deploy-code-engine skills and `deploy/README.md` rewritten around the
   two modes; `no-database` strips the Postgres manifest and boot migrator.
+- Root `tsconfig.json` covering `scripts/` — the flavor/bootstrap scripts are now typechecked
+  by `pnpm check`, lefthook, and the editor (they previously ran type-stripped and unchecked);
+  `pnpm flavor finalize` removes it along with the scripts.
 
 ## [0.2.0] — 2026-07-09
 

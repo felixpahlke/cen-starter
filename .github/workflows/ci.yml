@@ -33,7 +33,7 @@ jobs:
       matrix:
         # One matrix entry per valid combination. Use comma-separated names for
         # multi-flavor entries, e.g. "carbon,oauth-proxy"; extend when new flavors land.
-        flavors: ["no-database", "backend-only"]
+        flavors: ["no-database", "backend-only", "oauth-proxy"]
     steps:
       - uses: actions/checkout@v4
 

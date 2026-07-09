@@ -2,6 +2,14 @@
 
 Guidelines for AI agents working in this repository.
 
+## Setup mode — check this first
+
+If `flavors/` exists (equivalently: `cen.finalized` is `false` in package.json), this is a
+freshly cloned template that has **not been configured yet**. Do not start building features.
+Read `.agents/skills/setup/SKILL.md` and follow it: interview your user about what they need
+(database? design system? frontend? auth?), apply the matching flavors, then run the
+first-time setup below. If `flavors/` is gone, setup is done — skip this section.
+
 ## Stack map
 
 pnpm workspace with three packages:
@@ -34,12 +42,13 @@ pnpm db:migrate   # apply migrations (needs the db running)
 
 ## Skills
 
-Guided workflows live in `skills/` — read the matching `SKILL.md` **before** starting that kind of work:
+Guided workflows live in `.agents/skills/` — read the matching `SKILL.md` **before** starting that kind of work:
 
-- `skills/add-resource/` — add a complete CRUD resource (schema → table → migration → route → frontend)
-- `skills/db-migrations/` — create, apply, and repair database migrations
-- `skills/debug-openshift/` — triage a broken OpenShift deployment (`oc`)
-- `skills/debug-code-engine/` — triage a broken Code Engine deployment (`ibmcloud ce`)
+- `.agents/skills/setup/` — configure a fresh clone: interview, flavors, finalize (deleted once setup is finalized)
+- `.agents/skills/add-resource/` — add a complete CRUD resource (schema → table → migration → route → frontend)
+- `.agents/skills/db-migrations/` — create, apply, and repair database migrations
+- `.agents/skills/debug-openshift/` — triage a broken OpenShift deployment (`oc`)
+- `.agents/skills/debug-code-engine/` — triage a broken Code Engine deployment (`ibmcloud ce`)
 
 ## Rules
 

@@ -46,7 +46,10 @@ Guided workflows live in `.agents/skills/` — read the matching `SKILL.md` **be
 
 - `.agents/skills/setup/` — configure a fresh clone: interview, flavors, finalize (deleted once setup is finalized)
 - `.agents/skills/add-resource/` — add a complete CRUD resource (schema → table → migration → route → frontend)
+- `.agents/skills/add-page/` — add a frontend page (route file → nav entry → data via the typed client)
 - `.agents/skills/db-migrations/` — create, apply, and repair database migrations
+- `.agents/skills/deploy-openshift/` — first deploy and updates on OpenShift (`oc` + `deploy.sh`)
+- `.agents/skills/deploy-code-engine/` — first deploy and updates on IBM Code Engine (`ibmcloud ce`)
 - `.agents/skills/debug-openshift/` — triage a broken OpenShift deployment (`oc`)
 - `.agents/skills/debug-code-engine/` — triage a broken Code Engine deployment (`ibmcloud ce`)
 

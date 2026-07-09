@@ -25,7 +25,7 @@ oc rollout status deploy/<app>                    # stuck rollout?
   (`backend/src/env.ts`) and prints exactly which variable is missing or malformed; fix the
   `app-env` secret, don't guess: `oc set data secret/app-env KEY=value` then restart. Second
   suspect: database unreachable (check `DATABASE_URL`, network policy, DB pod).
-- **Migration failure on startup** — logs show the failing SQL. See `skills/db-migrations/`
+- **Migration failure on startup** — logs show the failing SQL. See `.agents/skills/db-migrations/`
   ("Migration fails on deploy"). Never edit the applied migration.
 - **ImagePullBackOff** — wrong image ref or missing pull secret: `oc describe pod` shows which.
 - **OOMKilled** (`oc describe pod` → Last State) — raise the memory limit in the deployment

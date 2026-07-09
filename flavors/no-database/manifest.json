@@ -1,7 +1,7 @@
 {
   "name": "no-database",
   "description": "Remove PostgreSQL, Drizzle, Better Auth persistence, and the example items resource.",
-  "conflicts": [],
+  "conflicts": ["backend-only"],
   "requires": [],
   "delete": [
     "backend/src/db/**",

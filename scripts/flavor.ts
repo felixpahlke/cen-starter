@@ -104,15 +104,15 @@ async function finalize() {
   const status = execFileSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" });
   if (status.trim()) throw new Error("Refusing to finalize with a dirty git working tree.");
 
-  const hadSetup = await exists(abs("scripts/setup.ts"));
+  const hadBootstrap = await exists(abs("scripts/bootstrap.ts"));
   await rm(abs("flavors"), { recursive: true, force: true });
   await rm(abs("scripts/flavor.ts"), { force: true });
   await rm(abs(".agents/skills/setup"), { recursive: true, force: true });
-  if (hadSetup) await rm(abs("scripts/setup.ts"), { force: true });
+  if (hadBootstrap) await rm(abs("scripts/bootstrap.ts"), { force: true });
 
   const pkg = await readJson("package.json");
   delete objectAt(pkg, "scripts").flavor;
-  if (hadSetup) delete objectAt(pkg, "scripts").setup;
+  if (hadBootstrap) delete objectAt(pkg, "scripts").bootstrap;
   objectAt(pkg, "cen").finalized = true;
   await writeJson("package.json", pkg);
   await removeEmptyScriptsDir();

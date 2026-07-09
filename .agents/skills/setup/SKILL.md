@@ -60,6 +60,6 @@ pnpm flavor finalize            # requires a clean git tree; commit first
 git add -A && git commit -m "Finalize template setup"
 ```
 
-This deletes `flavors/`, `scripts/flavor.ts`, `scripts/setup.ts`, and this skill. It is not
+This deletes `flavors/`, `scripts/flavor.ts`, `scripts/bootstrap.ts`, and this skill. It is not
 reversible except via git. If the user is unsure, leave it un-finalized and tell them how to
 finalize later.

@@ -1,7 +1,7 @@
 {
   "name": "no-database",
   "description": "Remove PostgreSQL, Drizzle, Better Auth persistence, and the example items resource.",
-  "conflicts": ["carbon"],
+  "conflicts": ["carbon", "oauth-proxy"],
   "combinesWith": ["backend-only"],
   "requires": [],
   "delete": [
@@ -12,6 +12,8 @@
     "backend/src/routes/items.ts",
     "backend/src/routes/items.test.ts",
     "shared/src/schemas/items.ts",
+    ".agents/skills/db-migrations/**",
+    ".agents/skills/add-resource/**",
     "frontend/src/routes/_layout/items.tsx",
     "frontend/src/routes/login.tsx",
     "frontend/src/routes/signup.tsx",
@@ -54,6 +56,16 @@
       "file": ".env.example",
       "find": "# If 5432 is taken on your machine, change DB_PORT and the port in DATABASE_URL together.\nDB_PORT=5432\nDATABASE_URL=postgres://postgres:postgres@localhost:5432/app\n\n# Any random string >= 32 chars. Generate a real one for production: `openssl rand -hex 32`\nBETTER_AUTH_SECRET=dev-only-secret-change-me-please-really\nBETTER_AUTH_URL=http://localhost:3000",
       "replace": "# API key accepted by the no-database auth stub for server-to-server requests.\nAPI_KEY=dev-only-api-key"
+    },
+    {
+      "file": ".env.production.example",
+      "find": "# PostgreSQL connection string reachable from the runtime platform.\nDATABASE_URL=postgres://USER:PASSWORD@HOST:5432/DATABASE\n\n# Generate a real secret with: openssl rand -hex 32\nBETTER_AUTH_SECRET=replace-with-at-least-32-random-characters\n\n# Public origin of the deployed app, without a trailing slash.\nBETTER_AUTH_URL=https://cen-starter.example.com\n",
+      "replace": "# API key accepted by the no-database auth stub. Generate: openssl rand -hex 32\nAPI_KEY=replace-with-a-real-api-key\n"
+    },
+    {
+      "file": "deploy/Dockerfile",
+      "find": "# Keep migration SQL available without shipping Drizzle tooling or app source.\nRUN rm -rf /app/backend-prod/src /app/backend-prod/drizzle.config.ts /app/backend-prod/tsconfig.json \\\n  && mkdir -p /app/backend-prod/src/db \\\n  && cp -R /app/backend/src/db/migrations /app/backend-prod/src/db/migrations\n",
+      "replace": "RUN rm -rf /app/backend-prod/src /app/backend-prod/drizzle.config.ts /app/backend-prod/tsconfig.json\n"
     },
     {
       "file": "package.json",

@@ -8,3 +8,8 @@ coverage/
 *.local
 
 .DS_Store
+
+*.log
+.idea/
+.vscode/
+.codex/

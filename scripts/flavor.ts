@@ -85,6 +85,8 @@ async function apply(names: string[]) {
   for (const name of names) {
     if (initialCen.flavors.includes(name)) throw new Error(`Flavor "${name}" is already applied.`);
   }
+  const requestedManifests = await requestedManifestsFor(names);
+  await validateFlavorSequence(initialCen.flavors, requestedManifests);
 
   const verifyCommands: string[] = [];
   let appliedAny = false;
@@ -200,6 +202,30 @@ async function appliedManifests(names: string[]) {
     }
   }
   return manifests;
+}
+
+async function requestedManifestsFor(names: string[]) {
+  const manifests: Manifest[] = [];
+  for (const name of names) manifests.push(await readManifest(name));
+  return manifests;
+}
+
+async function validateFlavorSequence(
+  initialAppliedNames: string[],
+  requestedManifests: Manifest[],
+) {
+  const simulatedNames = [...initialAppliedNames];
+  const simulatedManifests = await appliedManifests(simulatedNames);
+  for (const manifest of requestedManifests) {
+    for (const required of manifest.requires) {
+      if (!simulatedNames.includes(required)) {
+        throw new Error(`Flavor "${manifest.name}" requires "${required}".`);
+      }
+    }
+    validateCompatibility(manifest, simulatedNames, simulatedManifests);
+    simulatedNames.push(manifest.name);
+    simulatedManifests.push(manifest);
+  }
 }
 
 async function readManifest(name: string) {

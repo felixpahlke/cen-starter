@@ -7,9 +7,9 @@
 **The full-stack starter for the agent era.** TypeScript end-to-end, type-safe from database to
 browser, and running in under five minutes — one branch, one command, zero config.
 
-One maximal base app: every variation (Carbon, oauth-proxy, no database, backend-only) is a
-small, CI-tested transformation you — or your AI agent — apply in seconds instead of a template
-branch you're stuck with.
+One maximal base app: every variation (Carbon, oauth-proxy, no database, backend-only — and
+the sensible combinations) is a small, CI-tested transformation you — or your AI agent —
+apply in seconds instead of a template branch you're stuck with.
 
 ## Start a project
 
@@ -21,7 +21,7 @@ Or set up a clone of this repo directly:
 
 ```bash
 pnpm install
-cp .env.example .env
+pnpm bootstrap   # naming, git remotes, .env — the same step create-cen-app runs for you
 pnpm dev
 ```
 
@@ -66,6 +66,7 @@ OpenShift and Code Engine scripts included.
 ```bash
 pnpm dev          # database (docker) + migrations + api + web, hot reload
 pnpm check        # typecheck + lint — green means done
+pnpm test         # backend tests (in-memory Postgres, real migrations)
 pnpm fix          # auto-fix lint/format
 pnpm db:generate  # create a migration after editing backend/src/db/schema.ts
 pnpm db:migrate   # apply migrations

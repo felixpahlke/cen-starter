@@ -24,6 +24,7 @@ remains is Hono + Swagger + the API-key auth stub — zero Docker, single tiny c
   TypeScript consumer can still get a fully typed client via Hono RPC.
 - Removes `WEB_PORT` and the dev-only Vite-proxy `trustedOrigins` from the auth config.
 - `deploy/Dockerfile`: no frontend build stage; smaller image, same port 8080 and deploy flow.
+- Deletes the now-inapplicable `add-page` skill (there are no frontend pages to add).
 
 ## Post-apply checks
 

@@ -36,13 +36,13 @@ pnpm db:migrate   # apply migrations (needs the db running)
 2. `pnpm install`, then `cp .env.example .env`.
 3. Check for port conflicts **before** starting: `lsof -nP -iTCP:5432 -sTCP:LISTEN` (repeat for 3000 and 5173). If a port is taken, edit `.env`: `DB_PORT` (also change the port inside `DATABASE_URL`), `API_PORT` (also change `BETTER_AUTH_URL`), or `WEB_PORT`. Never stop containers you don't recognize — they belong to other projects.
 4. `pnpm dev` — starts Postgres in Docker, applies migrations, boots API and web with hot reload.
-5. Verify: `curl http://localhost:3000/api/health` returns `{"status":"ok"}`; the web app (port 5173) shows "API connected". Swagger UI: `/api/docs`.
+5. Verify: `curl http://localhost:3000/api/health` returns `{"status":"ok"}`; the web app (port 5173) loads the login page. Swagger UI: `/api/docs`.
 6. Have your user sign up in the app (or `POST /api/auth/sign-up/email`). To promote a user to admin, set `role` to `admin` on their row via `pnpm db:studio`.
 7. `pnpm check` green = healthy baseline. You're done.
 
 ## Skills
 
-Guided workflows live in `.agents/skills/` — read the matching `SKILL.md` **before** starting that kind of work:
+Guided workflows live in `.agents/skills/` — read the matching `SKILL.md` **before** starting that kind of work. (This list is the full template's; flavors delete skills that no longer apply, so trust the directory over this list.)
 
 - `.agents/skills/setup/` — configure a fresh clone: interview, flavors, finalize (deleted once setup is finalized)
 - `.agents/skills/add-resource/` — add a complete CRUD resource (schema → table → migration → route → frontend)
@@ -59,7 +59,7 @@ Guided workflows live in `.agents/skills/` — read the matching `SKILL.md` **be
 
 1. **Copy the canonical resource.** `shared/src/schemas/items.ts` + `backend/src/routes/items.ts` show the pattern for every resource: schemas in shared, `createRoute` definitions, one chained `OpenAPIHono`. Don't invent a second style.
 2. **Schemas live in `shared/`.** The zod schema is the single source of truth — API validation, OpenAPI docs, and frontend forms all derive from it. Never duplicate a schema on one side.
-3. **Auth is a seam.** Routes only use `getSession` / `requireAuth` / `Session` from `backend/src/auth`. Never import better-auth outside `backend/src/auth/` — the implementation is swappable and other code must not know which one is installed.
+3. **Auth is a seam.** Feature code goes through the seam only: `getSession` / `requireAuth` / `Session` from `backend/src/auth` on the server, `frontend/src/lib/auth` in the browser. Never import better-auth anywhere else (the seam files and the `/api/auth/*` mount in `backend/src/index.ts` are the only exceptions) — the implementation is swappable and feature code must not know which one is installed.
 4. **Database changes**: edit `backend/src/db/schema.ts` → `pnpm db:generate` → `pnpm db:migrate`. Never edit generated migration files by hand.
 5. **New env vars** go into `backend/src/env.ts` (zod-validated, the server refuses to boot without them) *and* `.env.example`, always both.
 6. **Register new routes** on the chained `api` in `backend/src/index.ts` — the chain is what makes RPC types reach the frontend.

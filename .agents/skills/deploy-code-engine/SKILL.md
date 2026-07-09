@@ -28,6 +28,7 @@ docker build -f deploy/Dockerfile -t icr.io/<namespace>/cen-starter:<tag> .
 docker push icr.io/<namespace>/cen-starter:<tag>
 
 # 3. Migrations — run BEFORE deploying; the runtime image deliberately has no drizzle-kit
+#    (skip this step in projects without a database — no-database flavor)
 DATABASE_URL='<production url>' pnpm --filter @cen/backend db:migrate
 
 # 4. Secret + app

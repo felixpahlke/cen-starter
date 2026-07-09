@@ -3,6 +3,7 @@ import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { swaggerUI } from "@hono/swagger-ui";
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { migrateOnStart } from "./db/migrate-on-start";
 import { env } from "./env";
 import { healthRoute } from "./routes/health";
 import { itemsRoute } from "./routes/items";
@@ -31,6 +32,7 @@ if (env.NODE_ENV === "production") {
   app.get("*", serveStatic({ path: "./static/index.html" }));
 }
 
+await migrateOnStart();
 serve({ fetch: app.fetch, port: env.API_PORT ?? env.PORT ?? 3000 }, (info) => {
   console.log(`api ready on http://localhost:${info.port}  (Swagger UI: /api/docs)`);
 });

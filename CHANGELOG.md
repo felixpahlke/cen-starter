@@ -6,6 +6,22 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-07-09
+
+Deployment convenience restored from the old template, adapted to the single-image model.
+
+- **Migrate-on-start**: the production image applies pending migrations at boot
+  (drizzle-orm runtime migrator over the bundled SQL, under a Postgres advisory lock;
+  `MIGRATE_ON_START=false` opts out). The manual pre-deploy migration step is gone.
+- **In-cluster PostgreSQL by convention**: `deploy.sh` deploys a pilot-grade Postgres
+  (`deploy/openshift/postgres.yaml`) and wires `DATABASE_URL` automatically whenever
+  `.env.production` doesn't provide one; set `DATABASE_URL` for a managed database.
+- **`deploy.sh --autodeploy`**: one-time setup of ImageStream + Docker-strategy BuildConfig
+  + GitHub (Enterprise) webhook + image trigger — afterwards `git push` to `main` builds
+  in-cluster and rolls out automatically. `GITHUB_TOKEN` is filtered out of the app secret.
+- deploy-openshift / deploy-code-engine skills and `deploy/README.md` rewritten around the
+  two modes; `no-database` strips the Postgres manifest and boot migrator.
+
 ## [0.2.0] — 2026-07-09
 
 Flavor composition: two flavors can now be applied together when the manifests declare it.

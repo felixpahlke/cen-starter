@@ -6,6 +6,9 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
 
 ## [Unreleased]
 
+- Added a concise workstation-preparation skill covering Git, NVM, pnpm, Rancher Desktop,
+  IBM Bob, editor support, and the OpenShift and IBM Cloud deployment CLIs.
+- Removed skill-discovery instructions from `AGENTS.md`; coding harnesses discover skills.
 - Replaced the GitHub Actions workflow with local `pnpm verify` and
   `pnpm verify:flavors` commands. Flavor verification derives all standalone flavors and
   supported combinations from their manifests and checks disposable copies of the current

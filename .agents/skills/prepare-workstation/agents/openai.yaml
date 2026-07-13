@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prepare Workstation"
+  short_description: "Install and verify development prerequisites"
+  default_prompt: "Use $prepare-workstation to prepare this computer for CEN Starter development."

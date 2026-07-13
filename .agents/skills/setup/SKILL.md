@@ -15,7 +15,12 @@ user actually needs, apply the matching flavors, then hand over a running app.
 This skill and the `flavors/` machinery are deleted by `pnpm flavor finalize` — in a finalized
 project none of this applies.
 
-## 1. Interview the user
+## 1. Check the basics
+
+Before the configuration interview, verify the standard workstation baseline. If anything is
+missing, use the `prepare-workstation` skill before continuing.
+
+## 2. Interview the user
 
 Open with the project, not the tech: **what are you building, and who is it for?** Then
 recommend a configuration with reasons — act like an experienced colleague, not a form. Run
@@ -43,7 +48,7 @@ Ask one or two clarifying questions at most, and only about decisions a flavor e
 When in doubt, keep the base — subtracting later is documented in each reference file;
 re-adding is manual work.
 
-## 2. Apply
+## 3. Apply
 
 ```bash
 pnpm flavor apply <name> [<name>...]    # validates before touching files
@@ -63,12 +68,12 @@ If `.env` already existed before the apply (bootstrap creates it), compare it ag
 updated `.env.example` — flavors change which variables are required. The engine prints a
 note when this applies.
 
-## 3. First-time boot
+## 4. First-time boot
 
 Follow **"First-time setup"** in `AGENTS.md` (env file, port conflicts, `pnpm dev`,
 verification, first user). Do this even if no flavor was applied.
 
-## 4. Finalize — only with explicit user confirmation
+## 5. Finalize — only with explicit user confirmation
 
 When the user confirms the choices are settled (typically after the app runs and they've seen
 it), strip the template machinery:

@@ -28,15 +28,18 @@ files for a combination live in `<flavor>/combo/<other>/`. Flavor decision guida
 
 ## Maintaining flavors (template repo only)
 
-If you change the base app, verify the flavors still apply — in CI (the `flavors` matrix job)
-or locally in a scratch copy:
+If you change the base app or a flavor, verify every supported result from the current working
+tree:
 
 ```bash
-git worktree add /tmp/flavor-check && cd /tmp/flavor-check
-pnpm install && pnpm flavor apply <name>   # runs pnpm check + the manifest's verify commands
+pnpm verify:flavors
 ```
+
+The command derives standalone flavors and supported combinations from the manifests, copies
+the repository into disposable workspaces, and applies, checks, tests, and builds each result.
+A failing workspace is retained under the printed temporary path for inspection.
 
 A broken edit anchor fails the apply step loudly (every `find` must match exactly once). When
 touching manifests, prefer `delete` + `overlay` over `edits` — anchors are the fragile part.
-New flavor? Add it to the CI matrix in `.github/workflows/ci.yml` and write its
-`references/<flavor>.md`.
+New flavor? Declare its supported combinations in `combinesWith`, write its
+`references/<flavor>.md`, and run `pnpm verify:flavors`.

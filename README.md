@@ -67,6 +67,7 @@ OpenShift and Code Engine scripts included.
 pnpm dev          # database (docker) + migrations + api + web, hot reload
 pnpm check        # typecheck + lint — green means done
 pnpm test         # backend tests (in-memory Postgres, real migrations)
+pnpm verify       # check + test + production build
 pnpm fix          # auto-fix lint/format
 pnpm db:generate  # create a migration after editing backend/src/db/schema.ts
 pnpm db:migrate   # apply migrations

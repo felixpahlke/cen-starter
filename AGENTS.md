@@ -25,6 +25,7 @@ Dev services (PostgreSQL) run in Docker Compose; the apps themselves run nativel
 ```bash
 pnpm dev          # everything: db + migrations + api + web
 pnpm check        # typecheck + lint — run this before considering any task done
+pnpm verify       # check + test + production build
 pnpm fix          # auto-fix lint/format
 pnpm db:generate  # generate migration from schema.ts changes
 pnpm db:migrate   # apply migrations (needs the db running)

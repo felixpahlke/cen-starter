@@ -195,6 +195,7 @@ async function finalize() {
   const hadBootstrap = await exists(abs("scripts/bootstrap.ts"));
   await rm(abs("flavors"), { recursive: true, force: true });
   await rm(abs("scripts/flavor.ts"), { force: true });
+  await rm(abs("scripts/verify-flavors.ts"), { force: true });
   await rm(abs(".agents/skills/setup"), { recursive: true, force: true });
   await rm(abs(".agents/skills/template-maintenance"), { recursive: true, force: true });
   if (hadBootstrap) await rm(abs("scripts/bootstrap.ts"), { force: true });
@@ -204,6 +205,7 @@ async function finalize() {
   const pkg = await readJson("package.json");
   delete objectAt(pkg, "scripts").flavor;
   delete objectAt(pkg, "scripts").typecheck;
+  delete objectAt(pkg, "scripts")["verify:flavors"];
   if (hadBootstrap) delete objectAt(pkg, "scripts").bootstrap;
   objectAt(pkg, "cen").finalized = true;
   await writeJson("package.json", pkg);

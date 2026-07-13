@@ -20,6 +20,8 @@
     "test": "pnpm --recursive --if-present run test",
     "fix": "biome check --write .",
     "build": "pnpm --recursive build",
+    "verify": "pnpm check && pnpm test && pnpm build",
+    "verify:flavors": "tsx scripts/verify-flavors.ts",
     "db:generate": "pnpm --filter @cen/backend db:generate",
     "db:migrate": "pnpm --filter @cen/backend db:migrate",
     "db:studio": "pnpm --filter @cen/backend db:studio",

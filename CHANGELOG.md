@@ -6,6 +6,11 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
 
 ## [Unreleased]
 
+- Replaced the GitHub Actions workflow with local `pnpm verify` and
+  `pnpm verify:flavors` commands. Flavor verification derives all standalone flavors and
+  supported combinations from their manifests and checks disposable copies of the current
+  working tree.
+
 ## [0.3.0] — 2026-07-09
 
 Deployment convenience restored from the old template, adapted to the single-image model.

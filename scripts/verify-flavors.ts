@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { cp, mkdtemp, readdir, readFile, rm } from "node:fs/promises";
+import { cp, mkdtemp, readdir, readFile, rm, stat } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import process from "node:process";
@@ -21,16 +21,45 @@ async function main() {
 
   try {
     for (const names of variants) {
-      const label = names.join(" + ");
-      const workspace = path.join(temporaryRoot, names.join("--"));
+      const label = names.length ? names.join(" + ") : "base";
+      const workspace = path.join(temporaryRoot, names.length ? names.join("--") : "base");
       console.log(`\n=== Verifying ${label} ===`);
       await copySource(workspace);
 
       try {
         run("git", ["init", "--quiet"], workspace);
+        run("git", ["config", "user.name", "CEN Flavor Check"], workspace);
+        run("git", ["config", "user.email", "flavor-check@local"], workspace);
+        commit(workspace, "Pristine template");
         run(pnpm, ["install", "--frozen-lockfile"], workspace);
-        run(pnpm, ["flavor", "apply", ...names], workspace);
-        run(pnpm, ["build"], workspace);
+        if (!names.length) {
+          expectFailure(
+            pnpm,
+            ["flavor", "finalize"],
+            workspace,
+            "Refusing to finalize before `pnpm bootstrap`",
+          );
+        }
+
+        run(
+          pnpm,
+          [
+            "bootstrap",
+            "--name",
+            `flavor-check-${label.replaceAll(" + ", "-")}`,
+            "--flavors",
+            names.length ? names.join(",") : "none",
+          ],
+          workspace,
+        );
+        const stagedSkills = await skillNames(path.join(workspace, "scaffold/agent-skills"));
+        if (!stagedSkills.length)
+          throw new Error(`${label} left no post-setup skills to activate.`);
+
+        run(pnpm, ["verify"], workspace);
+        commit(workspace, `Configure ${label}`);
+        run(pnpm, ["flavor", "finalize"], workspace);
+        await assertFinalized(workspace, stagedSkills);
       } catch (error) {
         failed = true;
         console.error(`Failed workspace retained at ${workspace}`);
@@ -49,7 +78,7 @@ async function main() {
 async function flavorVariants() {
   const available = await readManifests();
   const names = new Set(available.map((manifest) => manifest.name));
-  const variants = available.map((manifest) => [manifest.name]);
+  const variants = [[], ...available.map((manifest) => [manifest.name])];
 
   for (const manifest of available) {
     for (const combined of manifest.combinesWith ?? []) {
@@ -61,6 +90,38 @@ async function flavorVariants() {
   }
 
   return variants;
+}
+
+async function skillNames(directory: string) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  return entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+}
+
+async function assertFinalized(workspace: string, stagedSkills: string[]) {
+  for (const relative of [
+    "flavors",
+    "scaffold/agent-skills",
+    ".agents/skills/setup",
+    ".agents/skills/template-maintenance",
+  ]) {
+    if (await exists(path.join(workspace, relative))) {
+      throw new Error(`Finalization did not remove ${relative}.`);
+    }
+  }
+
+  for (const skill of stagedSkills) {
+    if (!(await exists(path.join(workspace, ".agents/skills", skill, "SKILL.md")))) {
+      throw new Error(`Finalization did not activate skill "${skill}".`);
+    }
+  }
+
+  const pkg = JSON.parse(await readFile(path.join(workspace, "package.json"), "utf8"));
+  if (pkg.cen?.bootstrapped !== true || pkg.cen?.finalized !== true) {
+    throw new Error("Finalization did not persist the bootstrap/finalized markers.");
+  }
 }
 
 async function readManifests() {
@@ -113,6 +174,32 @@ function run(command: string, args: string[], cwd: string) {
   if (result.status !== 0) {
     throw new Error(`${command} ${args.join(" ")} failed with exit code ${result.status}.`);
   }
+}
+
+function expectFailure(command: string, args: string[], cwd: string, expected: string) {
+  const result = spawnSync(command, args, {
+    cwd,
+    env: { ...process.env, CI: "true" },
+    encoding: "utf8",
+  });
+  if (result.error) throw result.error;
+  const output = `${result.stdout ?? ""}${result.stderr ?? ""}`;
+  if (result.status === 0 || !output.includes(expected)) {
+    throw new Error(
+      `${command} ${args.join(" ")} should fail with ${JSON.stringify(expected)}.\n${output}`,
+    );
+  }
+}
+
+function commit(cwd: string, message: string) {
+  run("git", ["add", "-A"], cwd);
+  run("git", ["commit", "--quiet", "--no-verify", "-m", message], cwd);
+}
+
+async function exists(file: string) {
+  return stat(file)
+    .then(() => true)
+    .catch(() => false);
 }
 
 main().catch((error) => {

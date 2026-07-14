@@ -6,19 +6,37 @@ Drizzle, and the items resource stay.
 
 ## When to choose it
 
-The organization requires SSO (W3ID, Entra, any OIDC provider) or forbids app-local accounts.
-If the project just needs "log in and build" without an IdP conversation, keep the base —
-this flavor's production setup requires an OIDC client registration from whoever owns the IdP.
+Use this as the default for a browser app with human users when the organization requires SSO
+(W3ID, Entra, any OIDC provider) **or the pilot could plausibly become production**. If
+production likelihood is unknown, choose this flavor: bundled Dex keeps development local,
+and production then replaces the development IdP configuration instead of replacing the
+application's account system.
+
+Keep the base local auth only when one of these is intentional:
+
+- the product must own credentials and the account lifecycle, such as public self-sign-up for
+  users who do not share an IdP;
+- the environment must be self-contained without an external IdP in production; or
+- the work is a deliberately throwaway demo and production identity is explicitly out of
+  scope.
+
+**Do not choose local auth merely because the app needs more user data.** Authentication and
+product data are separate concerns. The proxy flavor still has a local `user` row and can keep
+profile fields, roles, preferences, tenant membership, consent, and ownership relations there.
+The IdP should remain the source of truth only for identity facts such as the login identifier,
+display name, organization groups, and account status.
 
 **Combines with `carbon`** for the classic internal-tool look:
-`pnpm flavor apply oauth-proxy carbon` (that order). **Conflicts with `no-database`** (users
+`pnpm bootstrap --name <project-name> --flavors oauth-proxy,carbon` (that order).
+**Conflicts with `no-database`** (users
 get a database row for role/ownership) **and `backend-only`** (it reworks the frontend
 shell). Declared in the manifest.
 
 ## How auth works after apply
 
 - oauth2-proxy authenticates every request and forwards identity headers
-  (`x-forwarded-email`, `x-forwarded-user`, `x-forwarded-preferred-username`).
+  (`x-forwarded-email`, `x-forwarded-user`, `x-forwarded-preferred-username`, and groups when
+  supplied by the provider).
 - The auth seam (`backend/src/auth/index.ts`) reads those headers and **JIT-provisions** a
   row in the `user` table (id = OIDC subject). Accounts live in the IdP; the local row
   carries `role` and satisfies ownership FKs.
@@ -28,6 +46,23 @@ shell). Declared in the manifest.
 - Admin promotion: set `role = 'admin'` on the user's row (`pnpm db:studio`). The admin UI
   and settings pages are removed (the IdP owns identity); `role` still drives API authz.
 - Frontend gets the session from `GET /api/me`; sign-out goes to `/oauth2/sign_out`.
+
+## User data and additional claims
+
+- **App-owned data:** add columns to the local `user` table or, preferably for larger domains,
+  add profile/membership tables keyed to `user.id`. Do not overwrite app-owned values during
+  the JIT identity upsert.
+- **IdP-owned claims:** the starter currently consumes only user id, email, and preferred
+  username. `x-forwarded-groups` is available when the IdP supplies it but is not yet part of
+  `Session`. If a feature needs groups or another claim, define the required scope and claim
+  name with the IdP owner, configure the proxy to pass it, validate it in the auth seam, and
+  expose only the normalized field the application needs.
+- **Calling an API as the user:** oauth2-proxy can pass an access token to the backend, but
+  enable that only for a concrete delegated-access use case. Keep the token server-side, ask
+  for the narrowest scopes, and do not add it to `Session` or return it from `/api/me`.
+
+Needing richer user context is therefore an extension of the auth seam, not a reason to move
+credential handling into the application.
 
 ## Local dev (bundled Dex — zero external IdP)
 
@@ -52,6 +87,19 @@ The OpenShift deployment gains an oauth2-proxy sidecar configured via `OAUTH2_PR
 values in `.env.production` (issuer URL, client id/secret from the IdP registration, cookie
 secret, redirect URL = the route URL + `/oauth2/callback`). The service targets the proxy
 port (4180), not the app port. Get the OIDC client registered early — it's the long pole.
+
+The production advantage is that the application code and trust boundary stay the same when
+the OIDC provider changes. Do not describe that as "just exchange the IdP," though: every
+provider still needs a client registration, callback URL, scopes, and compatible claim
+mapping. The current starter keys the local user row by the forwarded OIDC subject; if a new
+provider emits different subjects, plan a data migration/relink before cutover so ownership
+and roles do not silently attach to new rows. If provider changes are a real roadmap
+requirement, introduce an internal user id plus a separate `(issuer, subject)` identity table.
+
+Local auth may look operationally smaller because it has no sidecar or IdP registration, but
+in production the application team then owns password security, recovery, verification,
+offboarding, MFA policy, and account administration. The starter does not make those product
+and governance responsibilities disappear.
 
 ## Retrofitting late (flavor no longer applies)
 

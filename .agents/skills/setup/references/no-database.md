@@ -10,7 +10,8 @@ data lives entirely in external systems. If the user is unsure whether they'll n
 tables, keep the base instead: subtracting later means redoing this flavor's changes by hand.
 
 **Combines with `backend-only`** for stateless API services such as watsonx Orchestrate
-tools: `pnpm flavor apply backend-only no-database` (that order — backend-only first).
+tools: pass `--flavors backend-only,no-database` to bootstrap (that order — backend-only
+first).
 **Conflicts with `carbon` and `oauth-proxy`** (Carbon reworks pages this flavor deletes;
 oauth-proxy needs the user table).
 
@@ -28,8 +29,9 @@ oauth-proxy needs the user table).
 - `pnpm dev` no longer starts Docker; env needs `API_KEY` instead of `DATABASE_URL`/auth vars.
 - Production: `deploy/Dockerfile` loses its copy-migrations step and `.env.production.example`
   asks for `API_KEY` — skip the migrations step in the deploy skills.
-- Deletes the now-inapplicable `db-migrations` and `add-resource` skills (the canonical
-  resource pattern assumes Drizzle; new endpoints follow `backend/src/routes/health.ts`).
+- Prevents the staged `db-migrations` and `add-resource` skills from being activated at
+  finalization (the canonical resource pattern assumes Drizzle; new endpoints follow
+  `backend/src/routes/health.ts`).
 
 ## Post-apply checks
 

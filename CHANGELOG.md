@@ -6,6 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
 
 ## [Unreleased]
 
+- Added a structural setup gate for agents: post-setup feature skills remain staged and
+  undiscoverable until a successfully bootstrapped, clean, verified project is finalized.
+  Flavor finalization promotes only compatible skills; the flavor matrix now tests the full
+  bootstrap-to-finalize lifecycle.
+- Made guided setup outcome-focused for beginners, clarified the OAuth proxy decision and
+  self-contained local IdP, and required agents starting from empty workspaces to choose a
+  durable visible project location before cloning.
 - Added a concise workstation-preparation skill covering Git, NVM, pnpm, Rancher Desktop,
   IBM Bob, editor support, and the OpenShift and IBM Cloud deployment CLIs.
 - Removed skill-discovery instructions from `AGENTS.md`; coding harnesses discover skills.

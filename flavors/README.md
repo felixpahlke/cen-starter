@@ -4,6 +4,10 @@
 `.agents/skills/setup/SKILL.md` first: interview your user (database? design system?
 frontend? auth?), apply the matching flavors, and only then start building features.
 
+Post-setup feature skills live in `scaffold/agent-skills/` while this directory exists, so
+agents cannot discover and invoke them before setup is complete. Flavors delete incompatible
+staged skills. Finalization promotes the remainder into `.agents/skills/` in one operation.
+
 ## What this is
 
 The base app is maximal; each flavor is a one-time, subtractive transformation applied at
@@ -18,7 +22,7 @@ project setup:
 ```bash
 pnpm flavor list                     # what's available
 pnpm flavor apply <name> [<name>...] # invalid requests are rejected before any file changes
-pnpm flavor finalize                 # when choices are settled: deletes this folder and all machinery
+pnpm flavor finalize                 # verifies, activates compatible skills, deletes setup machinery
 ```
 
 Supported combinations are declared per manifest (`combinesWith`) and are order-sensitive —
@@ -41,5 +45,7 @@ A failing workspace is retained under the printed temporary path for inspection.
 
 A broken edit anchor fails the apply step loudly (every `find` must match exactly once). When
 touching manifests, prefer `delete` + `overlay` over `edits` — anchors are the fragile part.
-New flavor? Declare its supported combinations in `combinesWith`, write its
-`references/<flavor>.md`, and run `pnpm verify:flavors`.
+If a flavor makes a feature workflow inapplicable, delete it from
+`scaffold/agent-skills/<skill>/**` in the manifest. New flavor? Declare its supported
+combinations in `combinesWith`, write its `references/<flavor>.md`, and run
+`pnpm verify:flavors`.

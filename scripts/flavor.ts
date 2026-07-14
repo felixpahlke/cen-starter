@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from "node:child_process";
-import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { cp, mkdir, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { z } from "zod";
@@ -189,8 +189,18 @@ async function warnOnEnvExampleDrift(edits: Edit[]) {
 }
 
 async function finalize() {
+  const pkg = await readJson("package.json");
+  getCen(pkg);
+  const metadata = objectAt(pkg, "cen");
+  if (metadata.bootstrapped !== true) {
+    throw new Error("Refusing to finalize before `pnpm bootstrap` completes successfully.");
+  }
+
   const status = execFileSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" });
   if (status.trim()) throw new Error("Refusing to finalize with a dirty git working tree.");
+
+  console.log("Verifying the configured project before finalization...");
+  run("pnpm verify");
 
   const hadBootstrap = await exists(abs("scripts/bootstrap.ts"));
   await rm(abs("flavors"), { recursive: true, force: true });
@@ -198,18 +208,41 @@ async function finalize() {
   await rm(abs("scripts/verify-flavors.ts"), { force: true });
   await rm(abs(".agents/skills/setup"), { recursive: true, force: true });
   await rm(abs(".agents/skills/template-maintenance"), { recursive: true, force: true });
+  await activateStagedSkills();
   if (hadBootstrap) await rm(abs("scripts/bootstrap.ts"), { force: true });
   // The root tsconfig only covers scripts/, which is gone after finalize.
   await rm(abs("tsconfig.json"), { force: true });
 
-  const pkg = await readJson("package.json");
   delete objectAt(pkg, "scripts").flavor;
   delete objectAt(pkg, "scripts").typecheck;
   delete objectAt(pkg, "scripts")["verify:flavors"];
   if (hadBootstrap) delete objectAt(pkg, "scripts").bootstrap;
-  objectAt(pkg, "cen").finalized = true;
+  metadata.finalized = true;
   await writeJson("package.json", pkg);
   await removeEmptyScriptsDir();
+}
+
+async function activateStagedSkills() {
+  const staged = abs("scaffold/agent-skills");
+  if (!(await exists(staged))) return;
+
+  const active = abs(".agents/skills");
+  await mkdir(active, { recursive: true });
+  const entries = (await readdir(staged, { withFileTypes: true })).filter((entry) =>
+    entry.isDirectory(),
+  );
+  for (const entry of entries) {
+    if (await exists(path.join(active, entry.name))) {
+      throw new Error(`Refusing to overwrite active skill: .agents/skills/${entry.name}`);
+    }
+  }
+  for (const entry of entries) {
+    const destination = path.join(active, entry.name);
+    await rename(path.join(staged, entry.name), destination);
+  }
+
+  await removeEmptyDirectory(staged);
+  await removeEmptyDirectory(abs("scaffold"));
 }
 
 async function allManifests() {
@@ -692,9 +725,12 @@ async function exists(file: string) {
 }
 
 async function removeEmptyScriptsDir() {
-  const scripts = abs("scripts");
+  await removeEmptyDirectory(abs("scripts"));
+}
+
+async function removeEmptyDirectory(directory: string) {
   try {
-    if (!(await readdir(scripts)).length) await rm(scripts, { recursive: true });
+    if (!(await readdir(directory)).length) await rm(directory, { recursive: true });
   } catch {
     return;
   }

@@ -1,6 +1,6 @@
 ---
 name: handover
-description: Prepare this project for handover to a client or another team — finalize, rewrite the README for the project, verify docs/env/deploy state, and prove a fresh clone runs.
+description: Prepare this finalized project for handover to a client or another team — rewrite the README, verify docs/env/deploy state, and prove a fresh clone runs.
 ---
 
 # Project handover
@@ -10,8 +10,8 @@ below serves that one test.
 
 ## Checklist
 
-1. **Finalize** (if `flavors/` still exists): confirm with your user, then
-   `pnpm flavor finalize` — the template machinery must not ship to a client.
+1. **Confirm setup is finalized.** `package.json` must have `cen.finalized: true`, and
+   `flavors/` must be absent. If not, stop and complete the setup workflow first.
 2. **README rewrite.** The README still sells the template; the client needs it to describe
    *their project*: what it does, how to run it (3 commands), where it's deployed, who to
    contact. Keep the agent pointer to AGENTS.md. Delete template marketing.

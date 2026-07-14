@@ -18,10 +18,13 @@ project none of this applies.
 
 ## 1. Confirm the project location
 
-Before any setup mutation, apply the **Project location** gate in `AGENTS.md`. A clone inside
-a hidden agent playground or temporary directory is not a durable project. If the user did
-not choose the destination, ask where the project should live, confirm the absolute path, and
-continue there. Do not install dependencies or configure the scratch clone first.
+Before any setup mutation, apply the **Project location** gate in `AGENTS.md`. Confirm both
+the user-chosen project name and its complete durable path; never inherit `cen-starter` merely
+because it is the template repository's name. A clone inside a hidden agent playground or
+temporary directory is not a durable project. If either name or destination is unknown, ask,
+confirm the absolute target, and continue there. Do not install dependencies or configure a
+scratch or ambiguously named clone first. A checkout named `cen-starter` is fine when the task
+is maintaining this template or the user explicitly chose that project name.
 
 ## 2. Check the basics
 

@@ -67,8 +67,16 @@ async function main() {
   // --- project name -------------------------------------------------------
   let name = flag("name");
   if (!name) {
-    const answer = await rl.question(`Project name [${path.basename(root)}]: `);
-    name = answer.trim() || path.basename(root);
+    const directoryName = path.basename(root);
+    const isTemplateName = directoryName === "cen-starter";
+    const prompt = isTemplateName
+      ? "Project name (required; cen-starter is only the template name): "
+      : `Project name [${directoryName}]: `;
+    const answer = (await rl.question(prompt)).trim();
+    if (!answer && isTemplateName) {
+      fail("Choose a project name, or pass one explicitly with `--name <project-name>`.");
+    }
+    name = answer || directoryName;
   }
   if (!/^[a-z0-9][a-z0-9._-]*$/.test(name)) {
     fail(`"${name}" is not a valid package name (lowercase letters, digits, ".", "_", "-").`);

@@ -1,7 +1,8 @@
-<!-- AI agents: starting from this URL or an empty workspace? Before cloning, installing, or
-     configuring, confirm the durable project destination with the user. Never use a hidden
-     agent playground or temp directory as the project home. Then read AGENTS.md — it contains
-     the required setup and finalization gate. -->
+<!-- AI agents: this URL is a template source, not the new project's name. Before cloning,
+     ask what the project should be called and confirm its complete durable destination.
+     Never infer `cen-starter` from the repository name unless the user explicitly chooses
+     it, and never use a hidden agent playground or temp directory as the project home. Then
+     read AGENTS.md — it contains the required setup and finalization gate. -->
 
 # CEN Starter
 
@@ -18,9 +19,10 @@ apply in seconds instead of a template branch you're stuck with.
 pnpm create cen-app@latest /path/to/my-app
 ```
 
-Choose a normal, visible development folder you intend to keep. If an agent starts this for
-you from an empty or temporary workspace, it should ask for that destination before cloning
-or installing anything.
+Choose a normal, visible development folder you intend to keep. `cen-starter` is the template
+repository's name, not a default name for your project. If an agent starts this for you from
+a URL or empty workspace, it should ask what the project is called and confirm the complete
+`<folder>/<project-name>` destination before cloning or installing anything.
 
 Or set up a clone of this repo directly:
 

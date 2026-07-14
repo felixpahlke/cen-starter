@@ -4,20 +4,29 @@ Guidelines for AI agents working in this repository.
 
 ## Project location — check this before anything else
 
-Confirm that this clone lives in the durable location the user wants. Hidden agent workspaces
-and temporary paths (for example `~/.bob/`, `~/.codex/`, `/tmp/`, or macOS `/var/folders/`)
-are scratch space, not a project home, unless the user explicitly chose them.
+Confirm both that this clone has the user's intended project name and that it lives in the
+durable location they want. `cen-starter` is the source template's name, not the default name
+of a project created from it. Hidden agent workspaces and temporary paths (for example
+`~/.bob/`, `~/.codex/`, `/tmp/`, or macOS `/var/folders/`) are scratch space, not a project
+home, unless the user explicitly chose them.
 
-If the user started from a URL or an empty workspace and did not choose a destination, stop
-before installing dependencies, applying flavors, bootstrapping, or editing files. Ask one
-plain question: **"Where would you like me to create this project?"** If useful, inspect their
-home directory for an existing visible development folder and recommend a concrete
-`<folder>/<project-name>` path; do not invent several arbitrary locations. Confirm the absolute
-target, create a named project subfolder there, and continue all work in that location.
+If the user started from a URL or an empty workspace and did not choose a project name and
+destination, stop before cloning, installing dependencies, applying flavors, bootstrapping,
+or editing files. Ask one plain question: **"What should the project be called, and where
+would you like me to create it?"** If useful, inspect their home directory for an existing
+visible development folder and recommend one concrete `<folder>/<project-name>` path. Do not
+infer the name from the template URL or invent several arbitrary locations. Confirm the
+absolute target, create that named project folder, and continue all work there.
 
 If the repository was already cloned into scratch space, preserve any work, recreate or move
 it to the confirmed destination, and continue there. Do not delete the scratch copy without
 permission.
+
+If an unfinalized checkout is already in a folder named `cen-starter`, first distinguish
+template maintenance from new-project setup. Continue unchanged for template maintenance. For
+a new project, ask whether that name was intentional; if not, confirm the real project name
+and destination, preserve any existing work, and move or recreate the clone there before
+setup.
 
 ## Setup mode — check this first
 

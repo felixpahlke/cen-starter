@@ -46,7 +46,8 @@ pnpm bootstrap --name my-app --flavors oauth-proxy
 ```
 
 Local development needs no external IdP or client registration: `pnpm dev` starts a bundled
-Dex test IdP and OAuth2 Proxy, and the app is available through http://localhost:4180.
+Dex test IdP and OAuth2 Proxy, and the app is available through http://localhost:4180. Both
+auth variants start with the same development admin: `admin@example.com` / `ChangeMe`.
 
 Keep the base local auth when the product itself must own accounts and credentials (for
 example public self-sign-up across customers with no shared IdP), or for a deliberately
@@ -67,8 +68,9 @@ relinked. The guided setup skill covers the detailed decision and production cav
 
 ## Why you'll like it
 
-- **Instant start.** Local auth works out of the box — no identity provider, no accounts, no
-  setup call. Sign up and build.
+- **Instant start.** Run `pnpm dev`, then sign in as `admin@example.com` / `ChangeMe`. The
+  repeat-safe development seed also prepares this admin when the bundled OAuth test IdP is
+  selected; no external identity setup is required locally.
 - **Type-safe without the ceremony.** The frontend infers API types straight from the backend
   (Hono RPC). No client generation step to forget — and you still get a full OpenAPI spec and
   Swagger UI, derived from the same zod schemas that validate every request.
@@ -97,13 +99,14 @@ OpenShift and Code Engine scripts included.
 ## Everyday commands
 
 ```bash
-pnpm dev          # database (docker) + migrations + api + web, hot reload
+pnpm dev          # database + migrations + development seed + api + web, hot reload
 pnpm check        # typecheck + lint — green means done
 pnpm test         # backend tests (in-memory Postgres, real migrations)
 pnpm verify       # check + test + production build
 pnpm fix          # auto-fix lint/format
 pnpm db:generate  # create a migration after editing backend/src/db/schema.ts
 pnpm db:migrate   # apply migrations
+pnpm db:seed      # create the development admin if it is missing
 pnpm db:studio    # browse the database (Drizzle Studio)
 ```
 

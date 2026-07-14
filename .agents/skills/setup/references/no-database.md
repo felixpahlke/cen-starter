@@ -27,6 +27,8 @@ oauth-proxy needs the user table).
 - Frontend keeps a shell without auth guard or user menu; `frontend/src/lib/auth.ts` stays as
   a stub with the same exports so future code doesn't pull better-auth back into the bundle.
 - `pnpm dev` no longer starts Docker; env needs `API_KEY` instead of `DATABASE_URL`/auth vars.
+- `pnpm db:seed` is removed. This is the deliberate exception to the starter admin convention:
+  without persistent accounts there is no `admin@example.com` user to create or log in as.
 - Production: `deploy/Dockerfile` loses its copy-migrations step and `.env.production.example`
   asks for `API_KEY` — skip the migrations step in the deploy skills.
 - Prevents the staged `db-migrations` and `add-resource` skills from being activated at
@@ -43,7 +45,8 @@ oauth-proxy needs the user table).
    curl http://localhost:3000/api/health   # {"status":"ok"}
    ```
 
-3. Protected routes now expect the `x-api-key` header — tell your user.
+3. Verify a protected route with `x-api-key: $API_KEY`; do not look for or promise the normal
+   seeded development login. Tell your user that this variant authenticates by API key.
 
 ## Retrofitting late (flavor no longer applies)
 

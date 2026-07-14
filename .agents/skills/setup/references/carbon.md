@@ -37,9 +37,11 @@ and restyle by hand using the template repo's `carbon` overlay as the reference.
 ## Post-apply checks
 
 1. `pnpm check` and `pnpm test` green (apply runs them).
-2. `pnpm dev`, then click through: signup → dashboard (UI Shell renders, active nav
-   underline) → items create/edit/delete via modals → theme toggle (g10 ↔ g90, body
-   background must follow) → account panel sign-out.
+2. `pnpm dev`, then log in with `admin@example.com` / `ChangeMe` and click through: dashboard
+   (UI Shell renders, active nav underline) → items create/edit/delete via modals → theme
+   toggle (g10 ↔ g90, body background must follow) → account panel sign-out. With the
+   `oauth-proxy,carbon` combination, enter through http://localhost:4180 and use its Dex
+   login.
 3. The canonical copy pattern changes: new pages copy `_layout/items.tsx` (DataTable + Modal
    pattern), not a shadcn page. `.agents/skills/add-page` still applies for routing/nav.
 

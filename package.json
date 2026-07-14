@@ -13,7 +13,7 @@
     "finalized": false
   },
   "scripts": {
-    "dev": "docker compose up -d --wait && pnpm db:migrate && pnpm --recursive --parallel dev",
+    "dev": "docker compose up -d --wait && pnpm db:migrate && pnpm db:seed && pnpm --recursive --parallel dev",
     "flavor": "tsx scripts/flavor.ts",
     "bootstrap": "tsx scripts/bootstrap.ts",
     "typecheck": "tsc --noEmit",
@@ -25,6 +25,7 @@
     "verify:flavors": "tsx scripts/verify-flavors.ts",
     "db:generate": "pnpm --filter @cen/backend db:generate",
     "db:migrate": "pnpm --filter @cen/backend db:migrate",
+    "db:seed": "pnpm --filter @cen/backend db:seed",
     "db:studio": "pnpm --filter @cen/backend db:studio",
     "prepare": "lefthook install || true"
   },

@@ -46,8 +46,9 @@ pnpm bootstrap --name my-app --flavors oauth-proxy
 ```
 
 Local development needs no external IdP or client registration: `pnpm dev` starts a bundled
-Dex test IdP and OAuth2 Proxy, and the app is available through http://localhost:4180. Both
-auth variants start with the same development admin: `admin@example.com` / `ChangeMe`.
+Dex test IdP and OAuth2 Proxy. Both auth variants start with the same development admin:
+`admin@example.com` / `ChangeMe`. The default proxied URL is http://localhost:4180; Dex and
+proxy ports are ordinary `.env` settings if that port is occupied.
 
 Keep the base local auth when the product itself must own accounts and credentials (for
 example public self-sign-up across customers with no shared IdP), or for a deliberately
@@ -69,8 +70,8 @@ relinked. The guided setup skill covers the detailed decision and production cav
 ## Why you'll like it
 
 - **Instant start.** Run `pnpm dev`, then sign in as `admin@example.com` / `ChangeMe`. The
-  repeat-safe development seed also prepares this admin when the bundled OAuth test IdP is
-  selected; no external identity setup is required locally.
+  local-auth seed creates the account up front; the OAuth variant creates its local profile
+  from Dex's real identity on first login. No external identity setup is required locally.
 - **Type-safe without the ceremony.** The frontend infers API types straight from the backend
   (Hono RPC). No client generation step to forget — and you still get a full OpenAPI spec and
   Swagger UI, derived from the same zod schemas that validate every request.

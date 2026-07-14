@@ -80,8 +80,8 @@
     },
     {
       "file": "package.json",
-      "find": "    \"dev\": \"docker compose up -d --wait && pnpm db:migrate && pnpm db:seed && pnpm --recursive --parallel dev\",\n",
-      "replace": "    \"dev\": \"pnpm --recursive --parallel dev\",\n"
+      "find": "    \"dev\": \"node scripts/check-ports.mjs && docker compose up -d --wait && pnpm db:migrate && pnpm db:seed && pnpm --recursive --parallel dev\",\n",
+      "replace": "    \"dev\": \"node scripts/check-ports.mjs && pnpm --recursive --parallel dev\",\n"
     },
     {
       "file": "package.json",

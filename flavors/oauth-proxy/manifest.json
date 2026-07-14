@@ -16,7 +16,7 @@
     {
       "file": ".env.example",
       "find": "# Any random string >= 32 chars. Generate a real one for production: `openssl rand -hex 32`\nBETTER_AUTH_SECRET=dev-only-secret-change-me-please-really\nBETTER_AUTH_URL=http://localhost:3000\n\n",
-      "replace": "# Local dev auth is provided by Dex + oauth2-proxy in docker-compose.yml.\n# Open http://localhost:4180 to use the proxied app.\n\n"
+      "replace": "# Local dev auth is provided by Dex + oauth2-proxy in docker-compose.yml.\nDEX_PORT=5556\nOAUTH_PROXY_PORT=4180\n\n"
     },
     {
       "file": ".env.production.example",

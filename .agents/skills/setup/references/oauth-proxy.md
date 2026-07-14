@@ -43,10 +43,11 @@ shell). Declared in the manifest.
 - **Trust boundary:** the headers are only trustworthy because the app is reachable
   exclusively through the proxy — compose network locally, sidecar in production. Never
   expose the app port directly.
-- Admin promotion: for local development, `pnpm dev` repeat-safely prepares the bundled Dex
-  user's matching local row as an admin. Promote other users by setting `role = 'admin'` on
-  their row (`pnpm db:studio`). The admin UI and settings pages are removed (the IdP owns
-  identity); `role` still drives API authz.
+- Admin promotion: in local development, the exact bundled Dex identity
+  `admin@example.com` becomes an admin when it first authenticates and its local row is
+  created from the real forwarded OIDC subject. This is not a “first user wins” rule.
+  Promote other users by setting `role = 'admin'` on their row (`pnpm db:studio`). The admin
+  UI and settings pages are removed (the IdP owns identity); `role` still drives API authz.
 - Frontend gets the session from `GET /api/me`; sign-out goes to `/oauth2/sign_out`.
 
 ## User data and additional claims
@@ -72,18 +73,19 @@ The flavor sets Vite's `server.host: true` — the proxy runs in Docker and cann
 localhost-only dev server.
 
 `pnpm dev` starts Postgres + [Dex](https://dexidp.io/) (a dev OIDC provider) + oauth2-proxy
-in compose. **The app entry URL becomes http://localhost:4180** (the proxy). Log in with
-`admin@example.com` / `ChangeMe`. Dex owns the development password in
-`dev/dex/config.yaml`; `pnpm db:seed` prepares the same fixed-subject local user row and admin
-role. Opening :5173 directly shows the not-authenticated state — that's expected, headers
-only exist behind the proxy.
+in compose. The app entry URL is the `OAUTH_PROXY_PORT` in `.env` (4180 by default). Log in
+with `admin@example.com` / `ChangeMe`. Dex owns the development password;
+`dev/dex/config.yaml` reads its ports from `.env`. `pnpm db:seed` does not invent an OIDC
+subject: the local row is JIT-created from the first real login and receives the admin role
+only for this exact local identity. Opening `WEB_PORT` directly shows the not-authenticated
+state — that's expected, headers only exist behind the proxy.
 
 ## Post-apply checks
 
 1. `pnpm check` and `pnpm test` green.
-2. `pnpm dev`, open http://localhost:4180 → Dex login with `admin@example.com` / `ChangeMe`
-   → app renders with the Dex user shown in the user menu; items CRUD works; `/api/me`
-   returns the user with the `admin` role.
+2. `pnpm dev`, open the configured `OAUTH_PROXY_PORT` → Dex login with
+   `admin@example.com` / `ChangeMe` → app renders with the Dex user shown in the user menu;
+   items CRUD works; `/api/me` returns the user with the `admin` role.
 3. Sign out via the user menu → back to the Dex login.
 
 ## Production

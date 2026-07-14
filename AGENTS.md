@@ -51,7 +51,7 @@ Dev services (PostgreSQL) run in Docker Compose; the apps themselves run nativel
 ## Commands
 
 ```bash
-pnpm dev          # everything: db + migrations + development seed + api + web
+pnpm dev          # check ports and start everything selected for this project
 pnpm check        # typecheck + lint — run this before considering any task done
 pnpm verify       # check + test + production build
 pnpm fix          # auto-fix lint/format
@@ -66,15 +66,18 @@ pnpm db:seed      # create the development admin if missing (database variants o
 2. In setup mode, follow the setup skill and use `pnpm bootstrap`; it creates `.env` after
    applying flavors. In an already-finalized developer clone, use `pnpm install` and copy
    `.env.example` to `.env` if needed.
-3. Check configured ports for conflicts **before** starting. Never stop containers you don't
+3. Run `pnpm dev`. It checks every selected port before starting. If it reports conflicts,
+   update all affected `.env` values together and rerun it. Never stop containers you don't
    recognize — they belong to other projects.
-4. `pnpm dev` — starts the services included by the selected flavors with hot reload.
+4. Keep `pnpm dev` running; it starts the services selected by the flavors with hot reload.
 5. Verify: `curl http://localhost:3000/api/health` returns `{"status":"ok"}`. If a frontend
    exists, confirm it loads; Swagger UI is at `/api/docs`.
-6. Exercise the configured auth path before finalizing. Database-backed variants seed
-   `admin@example.com` / `ChangeMe` during `pnpm dev`. With local auth, log in through the
-   app and confirm the admin session. With `oauth-proxy`, enter through the proxy URL, log in
-   to the bundled Dex IdP with those credentials, and confirm `/api/me` reports an admin.
+6. Exercise the configured auth path before finalizing. With local auth, `pnpm dev` seeds
+   `admin@example.com` / `ChangeMe`; log in through the app and confirm the admin session.
+   With `oauth-proxy`, enter through the configured proxy port and log in to bundled Dex with
+   those credentials. The backend creates the matching local admin from the authenticated
+   OIDC subject; confirm `/api/me` reports it. This is tied to that named local identity,
+   never to whichever user logs in first.
    The `no-database` flavor has no human login; verify a protected endpoint with its API key.
 7. Run `pnpm verify`. This proves a healthy baseline, but setup mode is not complete until the
    setup skill's approval and finalization gate also succeeds.
@@ -93,7 +96,9 @@ pnpm db:seed      # create the development admin if missing (database variants o
 
 ## Pitfalls
 
-- Ports are configured in the root `.env`. If 5432, 3000, or 5173 is taken on this machine, change `DB_PORT` (together with the port inside `DATABASE_URL`), `API_PORT` (together with `BETTER_AUTH_URL`), or `WEB_PORT` — don't kill other projects' containers.
+- Ports are configured in the root `.env`; OAuth projects add `DEX_PORT` and
+  `OAUTH_PROXY_PORT`. `pnpm dev` reports conflicts together. Change `DB_PORT` together with
+  the port inside `DATABASE_URL`; do not kill other projects' containers.
 - `pnpm db:migrate` needs the database container running (`docker compose up -d --wait`).
 - `admin@example.com` / `ChangeMe` is a known development-only account. The seed refuses to
   run outside local development; never copy these credentials into production configuration.

@@ -1,4 +1,4 @@
-issuer: http://localhost:5556/dex
+issuer: http://localhost:{{ .Env.DEX_PORT }}/dex
 
 storage:
   type: memory
@@ -10,7 +10,7 @@ staticClients:
   - id: cen-starter
     secret: cen-dev-secret
     redirectURIs:
-      - http://localhost:4180/oauth2/callback
+      - http://localhost:{{ .Env.OAUTH_PROXY_PORT }}/oauth2/callback
     name: CEN Starter (dev)
 
 oauth2:

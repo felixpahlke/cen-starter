@@ -6,10 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
 
 ## [Unreleased]
 
-- Added an idempotent, development-only `pnpm db:seed` that gives every database-backed auth
-  variant the same ready-to-use admin (`admin@example.com` / `ChangeMe`). `pnpm dev` runs it
-  after migrations; the OAuth flavor aligns Dex and the local role row, while `no-database`
-  removes the seed and retains API-key auth.
+- Added the same ready-to-use development admin (`admin@example.com` / `ChangeMe`) to every
+  database-backed auth variant. Local auth uses an idempotent `pnpm db:seed`; OAuth assigns
+  the role when that exact Dex identity first authenticates, using its real OIDC subject.
+  `no-database` retains API-key auth.
+- `pnpm dev` now validates every selected stack port together and rejects silent Vite port
+  shifts. OAuth development ports are configurable through `DEX_PORT` and
+  `OAUTH_PROXY_PORT`.
 - Added a structural setup gate for agents: post-setup feature skills remain staged and
   undiscoverable until a successfully bootstrapped, clean, verified project is finalized.
   Flavor finalization promotes only compatible skills; the flavor matrix now tests the full

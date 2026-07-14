@@ -160,9 +160,8 @@ async function main() {
   // --- done -----------------------------------------------------------------
   console.log(`
 Next steps:
-  pnpm dev          # database + api + web, hot reload
+  pnpm dev          # validate ports, then start the configured local stack
   pnpm verify       # full configured-project baseline
-  http://localhost:5173
 
 Working with an AI agent? Point it at this repo — AGENTS.md tells it everything,
 including how to verify and finalize setup before adding your first resource.`);

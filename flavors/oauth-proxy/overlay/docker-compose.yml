@@ -23,11 +23,13 @@ services:
 
   dex:
     image: dexidp/dex:latest-distroless
-    command: ["dex", "serve", "/etc/dex/config.yaml"]
+    environment:
+      DEX_PORT: ${DEX_PORT:-5556}
+      OAUTH_PROXY_PORT: ${OAUTH_PROXY_PORT:-4180}
     ports:
-      - "5556:5556"
+      - "${DEX_PORT:-5556}:5556"
     volumes:
-      - ./dev/dex/config.yaml:/etc/dex/config.yaml:ro
+      - ./dev/dex/config.yaml:/etc/dex/config.docker.yaml:ro
 
   oauth2-proxy:
     image: quay.io/oauth2-proxy/oauth2-proxy:v7.7.1
@@ -36,12 +38,12 @@ services:
       - --provider=oidc
       - --client-id=cen-starter
       - --client-secret=cen-dev-secret
-      - --oidc-issuer-url=http://localhost:5556/dex
+      - --oidc-issuer-url=http://localhost:${DEX_PORT:-5556}/dex
       - --skip-oidc-discovery
-      - --login-url=http://localhost:5556/dex/auth
+      - --login-url=http://localhost:${DEX_PORT:-5556}/dex/auth
       - --redeem-url=http://dex:5556/dex/token
       - --oidc-jwks-url=http://dex:5556/dex/keys
-      - --redirect-url=http://localhost:4180/oauth2/callback
+      - --redirect-url=http://localhost:${OAUTH_PROXY_PORT:-4180}/oauth2/callback
       - --upstream=http://host.docker.internal:${WEB_PORT:-5173}
       - --email-domain=*
       - --cookie-secure=false
@@ -55,7 +57,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
-      - "4180:4180"
+      - "${OAUTH_PROXY_PORT:-4180}:4180"
 
 volumes:
   db-data:

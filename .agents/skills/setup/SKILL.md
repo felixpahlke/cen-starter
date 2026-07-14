@@ -121,18 +121,23 @@ After bootstrap, run the post-apply checks from each selected flavor's
 
 ## 5. Boot, verify, and commit
 
-Check configured ports for conflicts and run `pnpm dev`. For every database-backed variant,
-this applies migrations and repeat-safely creates the development admin
-`admin@example.com` / `ChangeMe` if it is missing; it never resets an existing user's
-password and refuses to seed outside local development.
+Run `pnpm dev`. It checks every selected port before starting. If it reports conflicts,
+update all affected `.env` values together (including `DATABASE_URL` when changing
+`DB_PORT`) and rerun it. Do not stop services belonging to other projects.
+
+For local auth, `pnpm dev` applies migrations and repeat-safely creates the development admin
+`admin@example.com` / `ChangeMe` if missing; it never resets an existing password and refuses
+to seed outside local development. With `oauth-proxy`, Dex owns those credentials and the
+backend creates the local admin profile from the real authenticated subject on first login.
+This rule matches the named local identity, not the first person to log in.
 
 Verify `/api/health`, load the frontend if present, and exercise the actual auth boundary:
 
 - **Base/local auth:** log in with the development admin and confirm the authenticated admin
   experience (or, for `backend-only`, its cookie-auth session through `/api/auth/*`).
-- **`oauth-proxy`:** enter through http://localhost:4180, log in to Dex with the development
-  admin, and confirm `/api/me` reports that user with the `admin` role. Do not treat opening
-  Vite directly on :5173 as an auth test.
+- **`oauth-proxy`:** enter through `OAUTH_PROXY_PORT` from `.env` (4180 by default), log in to
+  Dex with the development admin, and confirm `/api/me` reports that user with the `admin`
+  role. Do not treat opening Vite directly on `WEB_PORT` as an auth test.
 - **`no-database`:** there is deliberately no human account; verify a protected endpoint
   with `x-api-key: $API_KEY` instead.
 

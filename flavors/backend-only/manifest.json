@@ -23,7 +23,7 @@
     },
     {
       "file": ".env.example",
-      "find": "\n# Vite dev server port (default 5173)\n# WEB_PORT=5173\n",
+      "find": "\n# Vite dev server port.\nWEB_PORT=5173\n",
       "replace": "\n"
     }
   ],

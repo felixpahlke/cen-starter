@@ -12,7 +12,8 @@ backend, another team's frontend, a mobile app, or service-to-service calls. If 
 work than ignoring it.
 
 **Combines with `no-database`** for fully stateless services (Orchestrate tools, pure
-orchestration/proxying): `pnpm flavor apply backend-only no-database`, in that order. What
+orchestration/proxying): pass `--flavors backend-only,no-database` to bootstrap, in that
+order. What
 remains is Hono + Swagger + the API-key auth stub — zero Docker, single tiny container.
 **Conflicts with `carbon` and `oauth-proxy`** (both rework the frontend this flavor deletes).
 
@@ -24,7 +25,8 @@ remains is Hono + Swagger + the API-key auth stub — zero Docker, single tiny c
   TypeScript consumer can still get a fully typed client via Hono RPC.
 - Removes `WEB_PORT` and the dev-only Vite-proxy `trustedOrigins` from the auth config.
 - `deploy/Dockerfile`: no frontend build stage; smaller image, same port 8080 and deploy flow.
-- Deletes the now-inapplicable `add-page` skill (there are no frontend pages to add).
+- Prevents the staged `add-page` skill from being activated at finalization (there are no
+  frontend pages to add).
 
 ## Post-apply checks
 

@@ -116,15 +116,14 @@ async function main() {
 
   rl.close();
 
-  await writeFile(
-    pkgPath,
-    `${JSON.stringify({ ...pkg, cen: { ...pkg.cen, bootstrapped: true } }, null, 2)}\n`,
-  );
+  // Write the project name before flavors so overlaid compose files preserve it. The
+  // bootstrapped marker is deliberately written only after every step succeeds.
+  await writeFile(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
   console.log(`✓ Project renamed to "${name}"`);
 
-  for (const flavor of chosen) {
-    console.log(`\nApplying flavor: ${flavor}`);
-    run("pnpm", ["flavor", "apply", flavor]);
+  if (chosen.length) {
+    console.log(`\nApplying flavors: ${chosen.join(", ")}`);
+    run("pnpm", ["flavor", "apply", ...chosen]);
   }
 
   // --- .env ----------------------------------------------------------------
@@ -139,14 +138,26 @@ async function main() {
     console.log("• .env already exists — left untouched");
   }
 
+  const configuredPkg = JSON.parse(await readFile(pkgPath, "utf8"));
+  await writeFile(
+    pkgPath,
+    `${JSON.stringify(
+      { ...configuredPkg, cen: { ...configuredPkg.cen, bootstrapped: true } },
+      null,
+      2,
+    )}\n`,
+  );
+  console.log("✓ Bootstrap complete");
+
   // --- done -----------------------------------------------------------------
   console.log(`
 Next steps:
   pnpm dev          # database + api + web, hot reload
+  pnpm verify       # full configured-project baseline
   http://localhost:5173
 
 Working with an AI agent? Point it at this repo — AGENTS.md tells it everything,
-including how to finish configuration (flavors) and add your first resource.`);
+including how to verify and finalize setup before adding your first resource.`);
 }
 
 main();

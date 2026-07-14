@@ -9,6 +9,7 @@
   "cen": {
     "templateVersion": "0.3.0",
     "flavors": [],
+    "bootstrapped": false,
     "finalized": false
   },
   "scripts": {

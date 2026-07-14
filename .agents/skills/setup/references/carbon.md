@@ -12,7 +12,7 @@ IBM (Carbon-flavored theme on shadcn) while every component stays owned, editabl
 The trade: Carbon components are a dependency you style within, not code you own.
 
 **Combines with `oauth-proxy`** — the classic IBM-internal setup (Carbon UI behind company
-SSO): `pnpm flavor apply oauth-proxy carbon`, in that order (carbon composes on top; a combo
+SSO): pass `--flavors oauth-proxy,carbon` to bootstrap, in that order (carbon composes on top; a combo
 variant of the layout drops the login/settings/admin pages the proxy flavor removes).
 **Conflicts with `no-database` and `backend-only`** — if one of those matters more, apply it
 and restyle by hand using the template repo's `carbon` overlay as the reference.

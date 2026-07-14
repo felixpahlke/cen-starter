@@ -36,7 +36,11 @@ exemplary: it gets copied into every project resource, flaws included.
 3. Declare supported combinations with `combinesWith`; `pnpm verify:flavors` discovers them.
 4. Write `.agents/skills/setup/references/<name>.md`: when to choose it, what it changes,
    post-apply checks, late-retrofit notes.
-5. Run `pnpm verify:flavors`, then boot the result and verify `finalize` still works.
+5. If the flavor makes a feature skill inapplicable, delete
+   `scaffold/agent-skills/<skill>/**` in its manifest. Feature skills stay staged there until
+   finalization; do not put them directly in `.agents/skills/`.
+6. Run `pnpm verify:flavors`; it verifies bootstrap, the configured app, finalization, and
+   promotion of every compatible staged skill.
 
 ## Releasing
 

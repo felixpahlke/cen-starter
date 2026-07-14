@@ -6,6 +6,10 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
 
 ## [Unreleased]
 
+- Added an idempotent, development-only `pnpm db:seed` that gives every database-backed auth
+  variant the same ready-to-use admin (`admin@example.com` / `ChangeMe`). `pnpm dev` runs it
+  after migrations; the OAuth flavor aligns Dex and the local role row, while `no-database`
+  removes the seed and retains API-key auth.
 - Added a structural setup gate for agents: post-setup feature skills remain staged and
   undiscoverable until a successfully bootstrapped, clean, verified project is finalized.
   Flavor finalization promotes only compatible skills; the flavor matrix now tests the full

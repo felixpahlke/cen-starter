@@ -121,9 +121,24 @@ After bootstrap, run the post-apply checks from each selected flavor's
 
 ## 5. Boot, verify, and commit
 
-Check configured ports for conflicts, run `pnpm dev`, verify `/api/health`, and smoke-test the
-frontend and auth path that remain. Then run the full baseline verification and commit the
-configured state:
+Check configured ports for conflicts and run `pnpm dev`. For every database-backed variant,
+this applies migrations and repeat-safely creates the development admin
+`admin@example.com` / `ChangeMe` if it is missing; it never resets an existing user's
+password and refuses to seed outside local development.
+
+Verify `/api/health`, load the frontend if present, and exercise the actual auth boundary:
+
+- **Base/local auth:** log in with the development admin and confirm the authenticated admin
+  experience (or, for `backend-only`, its cookie-auth session through `/api/auth/*`).
+- **`oauth-proxy`:** enter through http://localhost:4180, log in to Dex with the development
+  admin, and confirm `/api/me` reports that user with the `admin` role. Do not treat opening
+  Vite directly on :5173 as an auth test.
+- **`no-database`:** there is deliberately no human account; verify a protected endpoint
+  with `x-api-key: $API_KEY` instead.
+
+Do not finalize merely because typechecking and builds pass: the configured runtime login or
+API-key path must work. Then run the full baseline verification and commit the configured
+state:
 
 ```bash
 pnpm verify

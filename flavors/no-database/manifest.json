@@ -80,17 +80,17 @@
     },
     {
       "file": "package.json",
-      "find": "    \"dev\": \"docker compose up -d --wait && pnpm db:migrate && pnpm --recursive --parallel dev\",\n",
+      "find": "    \"dev\": \"docker compose up -d --wait && pnpm db:migrate && pnpm db:seed && pnpm --recursive --parallel dev\",\n",
       "replace": "    \"dev\": \"pnpm --recursive --parallel dev\",\n"
     },
     {
       "file": "package.json",
-      "find": "    \"db:generate\": \"pnpm --filter @cen/backend db:generate\",\n    \"db:migrate\": \"pnpm --filter @cen/backend db:migrate\",\n    \"db:studio\": \"pnpm --filter @cen/backend db:studio\",\n",
+      "find": "    \"db:generate\": \"pnpm --filter @cen/backend db:generate\",\n    \"db:migrate\": \"pnpm --filter @cen/backend db:migrate\",\n    \"db:seed\": \"pnpm --filter @cen/backend db:seed\",\n    \"db:studio\": \"pnpm --filter @cen/backend db:studio\",\n",
       "replace": ""
     },
     {
       "file": "backend/package.json",
-      "find": "    \"typecheck\": \"tsc --noEmit\",\n    \"db:generate\": \"drizzle-kit generate\",\n    \"db:migrate\": \"drizzle-kit migrate\",\n    \"db:studio\": \"drizzle-kit studio\"\n",
+      "find": "    \"typecheck\": \"tsc --noEmit\",\n    \"db:generate\": \"drizzle-kit generate\",\n    \"db:migrate\": \"drizzle-kit migrate\",\n    \"db:seed\": \"tsx src/db/seed.ts\",\n    \"db:studio\": \"drizzle-kit studio\"\n",
       "replace": "    \"typecheck\": \"tsc --noEmit\"\n"
     }
   ],

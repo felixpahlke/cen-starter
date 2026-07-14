@@ -22,7 +22,7 @@ async function main() {
   try {
     for (const names of variants) {
       const label = names.length ? names.join(" + ") : "base";
-      const workspace = path.join(temporaryRoot, names.length ? names.join("--") : "base");
+      const workspace = path.join(temporaryRoot, names.length ? names.join("--") : "cen-starter");
       console.log(`\n=== Verifying ${label} ===`);
       await copySource(workspace);
 
@@ -39,6 +39,13 @@ async function main() {
             workspace,
             "Refusing to finalize before `pnpm bootstrap`",
           );
+          expectFailure(
+            pnpm,
+            ["bootstrap", "--flavors", "none"],
+            workspace,
+            "Choose a project name",
+            "\n",
+          );
         }
 
         run(
@@ -46,7 +53,7 @@ async function main() {
           [
             "bootstrap",
             "--name",
-            `flavor-check-${label.replaceAll(" + ", "-")}`,
+            names.length ? `flavor-check-${label.replaceAll(" + ", "-")}` : "cen-starter",
             "--flavors",
             names.length ? names.join(",") : "none",
           ],
@@ -176,11 +183,18 @@ function run(command: string, args: string[], cwd: string) {
   }
 }
 
-function expectFailure(command: string, args: string[], cwd: string, expected: string) {
+function expectFailure(
+  command: string,
+  args: string[],
+  cwd: string,
+  expected: string,
+  input?: string,
+) {
   const result = spawnSync(command, args, {
     cwd,
     env: { ...process.env, CI: "true" },
     encoding: "utf8",
+    input,
   });
   if (result.error) throw result.error;
   const output = `${result.stdout ?? ""}${result.stderr ?? ""}`;

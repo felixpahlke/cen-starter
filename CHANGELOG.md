@@ -12,7 +12,9 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
   bootstrap-to-finalize lifecycle.
 - Made guided setup outcome-focused for beginners, clarified the OAuth proxy decision and
   self-contained local IdP, and required agents starting from empty workspaces to choose a
-  durable visible project location before cloning.
+  user-named project in a durable visible location before cloning. Interactive bootstrap no
+  longer silently inherits `cen-starter`, while an explicit `--name cen-starter` remains valid
+  for template work or intentionally named projects.
 - Added a concise workstation-preparation skill covering Git, NVM, pnpm, Rancher Desktop,
   IBM Bob, editor support, and the OpenShift and IBM Cloud deployment CLIs.
 - Removed skill-discovery instructions from `AGENTS.md`; coding harnesses discover skills.

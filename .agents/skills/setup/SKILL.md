@@ -48,8 +48,7 @@ missing, use the `prepare-workstation` skill before continuing.
 Open with the project, not the tech: **what are you building, and who is it for?** Then
 recommend a configuration with reasons — act like an experienced colleague, not a form. Run
 `pnpm flavor list` to see what exists; read `references/<flavor>.md` for any flavor you're
-about to recommend. When choosing between local auth and `oauth-proxy`, always read
-`references/oauth-proxy.md`; it documents the default and the exceptions.
+about to recommend.
 
 ### Adapt to the user
 
@@ -75,64 +74,48 @@ never-exiting command as a blocking command (see step 5). If the role is skipped
 ambiguous, mirror the technical depth of the user's own language and default to plain
 language. Use the question tool for the other interview decisions with fixed options too.
 
-- Treat what the user already said as a constraint. "I want to build a web app" settles that
-  a frontend is needed; never infer `backend-only` or ask them to choose it.
-- Ask about visible product behavior, not flavor names, packages, or architecture. Say "Should
-  the app remember data people create?" rather than "persistent state or stateless?" Explain
-  PostgreSQL/Drizzle only if the user wants the technical detail.
-- Recommend one option and its user-visible reason instead of presenting an unranked menu.
-  Always allow "I'm not sure — choose the sensible default." Introduce the flavor command only
-  after the decision is understood.
-- Ask only when the answer would change the configuration. Do not quiz the user on every
-  flavor axis, and do not start setup mutations while waiting for an answer.
+### The decision tree — the only configurations that exist
 
-Use these beginner-friendly decision questions when the context has not already answered them:
+The configuration space is exactly: **base**, `carbon`, `oauth-proxy`, `backend-only`,
+`no-database`, and the combos `oauth-proxy,carbon` and `backend-only,no-database`. Every
+recommendation is one of these outcomes. Never offer or accept an option outside them — in
+particular there is **no "no auth" configuration** for browser apps: every browser variant
+ships working sign-in (local auth with a seeded development account, or the OAuth proxy),
+and it costs the user nothing.
 
-- **Frontend:** "Will people use this through pages in a browser, or will only other software
-  call it?" Default to the full web app.
-- **Database:** "Should it remember anything users create after a restart?" If unsure, keep
-  the database.
-- **Design system:** "Does it have to use the official IBM Carbon components?" If not, keep
-  the editable default UI.
-- **Authentication:** lead with the recommendation, not a menu: "I'd set this up with the
-  OAuth proxy — it's the production-ready path, it plugs into your (or the client's)
-  identity provider later without rebuilding the account system, and local development is
-  fully self-contained (a bundled test identity provider; no company IdP setup needed)."
-  The one question that routes away from it is account ownership: "Will the people signing
-  in be from your company or the client's, or is this a public app where anyone creates
-  their own account?" Company/client, unsure, or a demo → `oauth-proxy`. Public
-  self-sign-up with app-owned accounts → local auth. Never present local auth as "easier"
-  or "fine for now": swapping the account system later is the expensive path; configuring
-  the production IdP early is cheap.
+Walk the tree one question at a time with the question tool, recommendation first, phrased
+as visible product behavior — never flavor names, packages, or architecture. Always allow
+"I'm not sure — choose the sensible default." Skip any question the user's context already
+answered ("I want to build a web app" settles question 1 — never re-ask it or infer
+`backend-only` against it). Do not start setup mutations while a question is open.
 
-Typical CEN scenarios and what to recommend:
+1. **Browser app or service?** "Will people use this through pages in a browser, or is
+   this a service other software calls (an API, agent tools, watsonx Orchestrate)?"
+   - Browser app → the database stays; do not offer to remove it (sign-in and the admin
+     area need it, and a UI without persistence is almost never right). Continue with 2.
+   - Service → `backend-only`. Skip to 4.
+2. **Who signs in?** Lead with the recommendation: "I'd use the OAuth proxy — it's the
+   production path, it plugs into your (or the client's) identity provider later without
+   rebuilding the account system, and local development is fully self-contained." Read
+   `references/oauth-proxy.md` before recommending. Only account ownership routes away
+   from it: public users creating their own accounts (app-owned credential lifecycle) →
+   base local auth. Company/client users, unsure, or a demo → `oauth-proxy`. A
+   personal/internal tool is still base local auth — present that as "you'll sign in with
+   the built-in development account," never as "no auth," and never present local auth as
+   "easier" or "fine for now." (User profiles, roles, or ownership data do not choose
+   auth — both variants keep a local `user` row; only credential ownership decides.)
+3. **Which look?** "Does it need the official IBM Carbon design, or should the UI carry
+   your (or the client's) own brand?" IBM-internal asset or Carbon compliance → `carbon`
+   (with the proxy from 2: `--flavors oauth-proxy,carbon`). Client-branded or unsure →
+   keep the base shadcn/ui; it's ownable code, restyled freely to the client's brand.
+4. **Service state?** (service path only) "Does the service store data of its own?"
+   Yes → keep the database (`backend-only`). Stateless tools or pure orchestration →
+   `--flavors backend-only,no-database`.
 
-- **App for a client, branded as theirs** → keep the base. The shadcn/ui components are
-  ownable code — restyle them to the client's brand so the solution feels like the client's
-  own product.
-- **IBM-internal asset or tool, or Carbon compliance is a requirement** → `carbon`. Real
-  `@carbon/react`; it looks like an IBM product out of the box.
-- **Browser app with human users that requires company SSO or could plausibly reach
-  production** → `oauth-proxy`. This is the default when production likelihood is unknown;
-  bundled Dex keeps local development self-contained. For the classic internal-tool setup,
-  combine it with Carbon by passing `--flavors oauth-proxy,carbon` to bootstrap.
-- **Product-owned accounts** (public self-sign-up across customers with no shared IdP,
-  app-owned password/account lifecycle) → keep the base local auth. This is the only case
-  where local auth is the recommendation; for a throwaway demo, still prefer `oauth-proxy`
-  unless the user explicitly rules production out and asks for local auth.
-- **Backend service — tools for watsonx Orchestrate, an agent backend, another team's
-  frontend** → `backend-only`. If it holds no state of its own (stateless tools, pure
-  orchestration), drop the database too with `--flavors backend-only,no-database`.
-- **User profiles, roles, preferences, ownership, or other user-linked product data** → do
-  not use this to choose auth. Both variants keep a local `user` row; choose based on who owns
-  identity and credentials.
-
-Ask one or two clarifying questions at most, one at a time, and only about decisions a flavor
-exists for (database? frontend? design system? auth?). When in doubt, keep the base —
-subtracting later is documented in each reference file; re-adding is manual work. The
-exception is auth for a human-facing pilot that may reach production: default to
-`oauth-proxy`, because moving an established account system later is usually more disruptive
-than configuring the production IdP early.
+When in doubt, keep the base: subtracting later is documented in each reference file,
+re-adding is manual work. The one deliberate bias is question 2 — default to `oauth-proxy`
+whenever production is plausible, because moving an established account system later is
+far more disruptive than configuring the production IdP early.
 
 ## 4. Bootstrap the chosen configuration
 

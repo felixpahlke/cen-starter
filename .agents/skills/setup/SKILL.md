@@ -67,8 +67,10 @@ Do not ask people to rate their technical skill; the role is enough. Calibrate e
 after it: **developer** → technical terms, commands as-is. **Designer or product/business**
 → plain language, jargon defined on first use, every terminal step spelled out ("open the
 Terminal app, paste this line, press Enter"), and run whatever you can yourself instead of
-delegating steps to the user. If the role is skipped or ambiguous, mirror the technical
-depth of the user's own language and default to plain language.
+delegating steps to the user — with one exception: never run `pnpm dev` or any other
+never-exiting command as a blocking command (see step 5). If the role is skipped or
+ambiguous, mirror the technical depth of the user's own language and default to plain
+language.
 
 - Treat what the user already said as a constraint. "I want to build a web app" settles that
   a frontend is needed; never infer `backend-only` or ask them to choose it.
@@ -151,9 +153,15 @@ After bootstrap, run the post-apply checks from each selected flavor's
 
 ## 5. Boot, verify, and commit
 
-Run `pnpm dev`. It checks every selected port before starting. If it reports conflicts,
-update all affected `.env` values together (including `DATABASE_URL` when changing
-`DB_PORT`) and rerun it. Do not stop services belonging to other projects.
+Start the app with `pnpm dev` — but note it runs until stopped and **never exits**. Do not
+run it as a blocking foreground command; a sandboxed agent will hang on it indefinitely.
+Start it in the background if your environment supports that (keep access to its output),
+otherwise ask the user to run `pnpm dev` in their own terminal — spelled out step by step
+for non-technical users — and continue once `/api/health` answers.
+
+`pnpm dev` checks every selected port before starting. If it reports conflicts, update all
+affected `.env` values together (including `DATABASE_URL` when changing `DB_PORT`) and
+rerun it. Do not stop services belonging to other projects.
 
 For local auth, `pnpm dev` applies migrations and repeat-safely creates the development admin
 `admin@example.com` / `ChangeMe` if missing; it never resets an existing password and refuses

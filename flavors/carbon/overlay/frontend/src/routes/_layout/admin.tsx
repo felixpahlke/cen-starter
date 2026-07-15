@@ -117,7 +117,7 @@ function AdminPage() {
   const rows = users.map(toUserRow);
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <div className="space-y-2">
         <h1 className="cds--type-heading-05">Admin</h1>
         <p className="cds--type-body-01 text-text-secondary">
@@ -421,7 +421,7 @@ function UserSkeletonRows() {
 
 function AdminSkeleton() {
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="space-y-6">
       <div className="space-y-2">
         <SkeletonText heading width="8rem" />
         <SkeletonText width="20rem" />

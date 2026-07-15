@@ -76,7 +76,7 @@ function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6">
+    <div className="flex max-w-4xl flex-col gap-6">
       <div className="space-y-2">
         <h1 className="cds--type-heading-05">Settings</h1>
         <p className="cds--type-body-01 text-text-secondary">

@@ -13,28 +13,47 @@ One maximal base app: every variation (Carbon, oauth-proxy, no database, backend
 the sensible combinations) is a small, CI-tested transformation you — or your AI agent —
 apply in seconds instead of a template branch you're stuck with.
 
+## How this works
+
+This repo is **agent-first**. The intended path: clone it, open it in your AI coding tool,
+and tell the agent what you want to build. The agent interviews you in product terms (no
+flavor or package names), applies the matching configuration, boots and verifies the app,
+and finalizes — you approve the decisions, it runs the commands.
+
+Under the hood the template has two states. It starts as a **maximal base app** — database,
+auth, admin panel, shadcn/ui frontend, an example resource — plus `flavors/`: small,
+CI-tested transformations that subtract or swap parts (Carbon UI, OAuth proxy,
+backend-only, no database). `pnpm flavor finalize` locks the chosen shape: it strips all
+template machinery and swaps AGENTS.md for the project's own working conventions. What's
+left is exactly your app, nothing more.
+
 ## Start a project
 
-```bash
-pnpm create cen-app@latest /path/to/my-app
-```
+**With an agent (recommended):** point it at this repository and say what you want to
+build. It reads [AGENTS.md](AGENTS.md) and takes it from there — including asking what the
+project is called and confirming a durable location before cloning (`cen-starter` is the
+template's name, not a default for your project).
 
-Choose a normal, visible development folder you intend to keep. `cen-starter` is the template
-repository's name, not a default name for your project. If an agent starts this for you from
-a URL or empty workspace, it should ask what the project is called and confirm the complete
-`<folder>/<project-name>` destination before cloning or installing anything.
-
-Or set up a clone of this repo directly:
+**Manually:**
 
 ```bash
+pnpm create cen-app@latest ~/dev/my-app   # clone + install + bootstrap in one step
+# or, from a plain clone of this repo:
 pnpm install
-pnpm bootstrap   # naming, git remotes, .env — the same step create-cen-app runs for you
-pnpm dev
+pnpm bootstrap        # asks for a project name, then a numbered menu of valid setups
+
+pnpm dev              # port check → dev containers → migrations → seed → api + web
+# open http://localhost:5173 (base) or http://localhost:4180 (OAuth proxy)
+# sign in: admin@example.com / ChangeMe
+
+git add -A && git commit -m "Configure CEN Starter"    # finalize requires a clean tree
+pnpm flavor finalize  # reruns pnpm verify, then strips the template machinery
+git add -A && git commit -m "Finalize template setup"
 ```
 
 Requires Node ≥ 22, pnpm, and Docker (for the dev database). If a port is taken on your
-machine, adjust `.env`. Before feature work, verify the configured app and run
-`pnpm flavor finalize`; finalization activates the compatible feature skills for AI agents.
+machine, adjust `.env`. Finalization is reversible only through git; after it, the feature
+skills for AI agents are active and the template is out of your way.
 
 ## Choose authentication
 

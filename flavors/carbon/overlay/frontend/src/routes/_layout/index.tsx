@@ -13,14 +13,14 @@ function Dashboard() {
   const name = session.data?.user.name ?? "there";
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <div className="space-y-2">
         <h1 className="cds--type-heading-05">Welcome, {name}</h1>
         <p className="cds--type-body-01 text-text-secondary">
           CEN Starter is ready for authenticated product work.
         </p>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid max-w-4xl gap-4 sm:grid-cols-2">
         <ClickableTile href="/items" renderIcon={ArrowRight} className="min-h-40">
           <div className="flex h-full flex-col justify-between gap-6">
             <Package size={20} />

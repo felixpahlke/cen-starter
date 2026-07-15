@@ -84,12 +84,18 @@ function ProtectedLayout() {
         </HeaderGlobalBar>
         <HeaderPanel aria-label="Account panel" expanded={panelOpen}>
           <div className="flex h-full flex-col gap-4 p-4">
-            <div className="space-y-1">
+            <div className="flex flex-col items-start gap-1">
               <p className="font-semibold text-sm">{user.name}</p>
-              <p className="text-sm text-text-secondary">{user.email}</p>
-              {user.role === "admin" && <Tag type="purple">admin</Tag>}
+              {user.email !== user.name && (
+                <p className="text-sm text-text-secondary">{user.email}</p>
+              )}
+              {user.role === "admin" && (
+                <Tag type="purple" className="self-start">
+                  admin
+                </Tag>
+              )}
             </div>
-            <div>
+            <div className="border-border-subtle-01 border-t pt-4">
               <Button kind="ghost" size="sm" renderIcon={Logout} onClick={signOut}>
                 Sign out
               </Button>
@@ -97,7 +103,7 @@ function ProtectedLayout() {
           </div>
         </HeaderPanel>
       </Header>
-      <main className="mx-auto max-w-5xl px-4 pt-16 pb-12">
+      <main className="mx-auto w-full max-w-[99rem] px-4 pt-20 pb-12">
         <Outlet />
       </main>
     </div>

@@ -82,7 +82,7 @@ function ItemsPage() {
   const rows = items.map(toItemRow);
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <div className="space-y-2">
         <h1 className="cds--type-heading-05">Items</h1>
         <p className="cds--type-body-01 text-text-secondary">
@@ -137,11 +137,8 @@ function ItemsPage() {
                 {!itemsQuery.isPending && !itemsQuery.isError && tableRows.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={headers.length}>
-                      <div className="flex flex-col items-center justify-center gap-4 py-8 text-center text-text-secondary">
+                      <div className="py-8 text-center text-text-secondary">
                         <p>No items yet</p>
-                        <Button renderIcon={Add} onClick={() => setCreateOpen(true)}>
-                          New item
-                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>

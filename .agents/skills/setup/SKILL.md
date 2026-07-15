@@ -52,25 +52,26 @@ about to recommend. When choosing between local auth and `oauth-proxy`, always r
 
 ### Adapt to the user
 
-Early in the interview, ask for the user's role and offer the common answers so they can
-just pick one — as clickable options if your client supports them, otherwise a short list
-they can answer with one word:
+Early in the interview, ask for the user's role. If your environment has a question tool
+(structured options the user clicks), you **must** use it for this — never a numbered list
+in prose. Offer exactly these options (a plain one-word-answer list only when no such tool
+exists):
 
 **"So I can pitch this right — what's your background?"**
 
-1. Developer
-2. Designer
-3. Product / business
-4. Something else
+- Technical — developer, architect, AI engineer
+- Design — UX/UI
+- Product / business — PM, consulting, sales
+- Something else
 
 Do not ask people to rate their technical skill; the role is enough. Calibrate everything
-after it: **developer** → technical terms, commands as-is. **Designer or product/business**
-→ plain language, jargon defined on first use, every terminal step spelled out ("open the
-Terminal app, paste this line, press Enter"), and run whatever you can yourself instead of
+after it: **technical** → technical terms, commands as-is. **Everyone else** → plain
+language, jargon defined on first use, every terminal step spelled out ("open the Terminal
+app, paste this line, press Enter"), and run whatever you can yourself instead of
 delegating steps to the user — with one exception: never run `pnpm dev` or any other
 never-exiting command as a blocking command (see step 5). If the role is skipped or
 ambiguous, mirror the technical depth of the user's own language and default to plain
-language.
+language. Use the question tool for the other interview decisions with fixed options too.
 
 - Treat what the user already said as a constraint. "I want to build a web app" settles that
   a frontend is needed; never infer `backend-only` or ask them to choose it.

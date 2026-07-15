@@ -83,9 +83,12 @@ particular there is **no "no auth" configuration** for browser apps: every brows
 ships working sign-in (local auth with a seeded development account, or the OAuth proxy),
 and it costs the user nothing.
 
-Walk the tree one question at a time with the question tool, recommendation first, phrased
-as visible product behavior — never flavor names, packages, or architecture. Always allow
-"I'm not sure — choose the sensible default." Skip any question the user's context already
+Walk the tree one question at a time with the question tool, phrased as visible product
+behavior — never flavor names, packages, or architecture. In the question tool, the
+recommended outcome is always the **first** option and its label ends with
+"(recommended)"; the one-line why goes in that option's description, not only in prose
+above the question. Always allow "I'm not sure — choose the sensible default." Skip any
+question the user's context already
 answered ("I want to build a web app" settles question 1 — never re-ask it or infer
 `backend-only` against it). Do not start setup mutations while a question is open.
 
@@ -94,16 +97,20 @@ answered ("I want to build a web app" settles question 1 — never re-ask it or 
    - Browser app → the database stays; do not offer to remove it (sign-in and the admin
      area need it, and a UI without persistence is almost never right). Continue with 2.
    - Service → `backend-only`. Skip to 4.
-2. **Who signs in?** Lead with the recommendation: "I'd use the OAuth proxy — it's the
-   production path, it plugs into your (or the client's) identity provider later without
-   rebuilding the account system, and local development is fully self-contained." Read
-   `references/oauth-proxy.md` before recommending. Only account ownership routes away
-   from it: public users creating their own accounts (app-owned credential lifecycle) →
-   base local auth. Company/client users, unsure, or a demo → `oauth-proxy`. A
-   personal/internal tool is still base local auth — present that as "you'll sign in with
-   the built-in development account," never as "no auth," and never present local auth as
-   "easier" or "fine for now." (User profiles, roles, or ownership data do not choose
-   auth — both variants keep a local `user` row; only credential ownership decides.)
+2. **Who manages the accounts?** Recommend the OAuth proxy, and give the user the why:
+   adding it at the start makes the app production-ready from day one — if this ever goes
+   over to a customer, they plug in their identity provider (IBM SSO, Entra, …) and their
+   users can sign in without changing a line of code, while local development stays fully
+   self-contained. Read `references/oauth-proxy.md` before recommending. Offer exactly
+   these options, in this order:
+   - "People sign in with accounts that already exist somewhere — a company, team, or
+     client identity provider, or just me (recommended)" → `oauth-proxy`. A personal or
+     internal tool takes this path too.
+   - "The app manages its own accounts — people sign up themselves, or admins invite and
+     manage users inside the app" → base local auth. During development this means "you'll
+     sign in with the built-in development account" — never call it "no auth," and never
+     present it as "easier" or "fine for now."
+   - "Not sure" → take the recommended.
 3. **Which look?** "Does it need the official IBM Carbon design, or should the UI carry
    your (or the client's) own brand?" IBM-internal asset or Carbon compliance → `carbon`
    (with the proxy from 2: `--flavors oauth-proxy,carbon`). Client-branded or unsure →
@@ -114,8 +121,9 @@ answered ("I want to build a web app" settles question 1 — never re-ask it or 
 
 When in doubt, keep the base: subtracting later is documented in each reference file,
 re-adding is manual work. The one deliberate bias is question 2 — default to `oauth-proxy`
-whenever production is plausible, because moving an established account system later is
-far more disruptive than configuring the production IdP early.
+unless the app must own its accounts, because handing the app over later means plugging in
+the customer's identity provider, while migrating an established account system is far
+more disruptive.
 
 ## 4. Bootstrap the chosen configuration
 

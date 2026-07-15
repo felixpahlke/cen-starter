@@ -26,8 +26,9 @@ them.
 
 Before any setup mutation, confirm both the user-chosen project name and its complete
 durable path. If either is unknown, stop before installing dependencies, applying flavors,
-or editing files, and ask one plain question: **"What should the project be called, and
-where would you like me to create it?"** If useful, inspect the home directory for an
+or editing files, and ask: **"What should the project be called, and where would you like
+me to create it?"** (The role question from section 3 always comes first, on its own —
+ask this one after it.) If useful, inspect the home directory for an
 existing visible development folder and recommend one concrete `<folder>/<project-name>`
 path. Do not infer the name from the template URL or invent several arbitrary locations.
 
@@ -52,10 +53,11 @@ about to recommend. When choosing between local auth and `oauth-proxy`, always r
 
 ### Adapt to the user
 
-Early in the interview, ask for the user's role. If your environment has a question tool
-(structured options the user clicks), you **must** use it for this — never a numbered list
-in prose. Offer exactly these options (a plain one-word-answer list only when no such tool
-exists):
+The user's role is your **first question, asked on its own** — before the project name,
+before anything else, and never bundled with another question in the same message. If your
+environment has a question tool (structured options the user clicks), you **must** use it
+for this — never a numbered list in prose. Offer exactly these options (a plain
+one-word-answer list only when no such tool exists):
 
 **"So I can pitch this right — what's your background?"**
 

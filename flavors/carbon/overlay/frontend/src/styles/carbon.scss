@@ -1,6 +1,9 @@
 // Carbon Design System styles. Font-face emission is disabled — IBM Plex Sans is
 // self-hosted via @fontsource-variable (imported in index.css); Carbon's tokens
-// reference the same family name.
+// reference the same family name. Carbon's global reset is disabled too: it is
+// UNLAYERED and would defeat every layered Tailwind utility (padding/margin/
+// border/font on reset-listed elements); Tailwind's preflight covers the reset.
 @use "@carbon/react" with (
-  $css--font-face: false
+  $css--font-face: false,
+  $css--reset: false
 );

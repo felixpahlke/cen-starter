@@ -62,7 +62,21 @@ async function main() {
     );
   }
 
+  // Answers come from readline's async iterator, not question(): with piped stdin,
+  // question() drops lines that arrive while no question is pending, silently answering
+  // later questions wrong. The iterator queues every line, and EOF fails loudly.
   const rl = createInterface({ input: process.stdin, output: process.stdout });
+  const lines = rl[Symbol.asyncIterator]();
+  async function ask(prompt: string): Promise<string> {
+    process.stdout.write(prompt);
+    const next = await lines.next();
+    if (next.done) {
+      fail(
+        "Input ended before the setup questions were answered — for non-interactive use pass --name and --flavors.",
+      );
+    }
+    return next.value;
+  }
 
   // --- project name -------------------------------------------------------
   let name = flag("name");
@@ -72,7 +86,7 @@ async function main() {
     const prompt = isTemplateName
       ? "Project name (required; cen-starter is only the template name): "
       : `Project name [${directoryName}]: `;
-    const answer = (await rl.question(prompt)).trim();
+    const answer = (await ask(prompt)).trim();
     if (!answer && isTemplateName) {
       fail("Choose a project name, or pass one explicitly with `--name <project-name>`.");
     }
@@ -125,26 +139,53 @@ async function main() {
   }
 
   // --- flavors (optional here; the agent-guided interview is the main path) -
+  // Humans pick from the closed set of valid configurations — free-form flavor lists (with
+  // their ordering rules) stay available via --flavors for agents and scripts.
+  const presets = [
+    {
+      label: "Full app — company/client SSO (OAuth proxy), shadcn/ui (recommended)",
+      flavors: ["oauth-proxy"],
+    },
+    {
+      label: "Full app — company/client SSO (OAuth proxy), IBM Carbon UI",
+      flavors: ["oauth-proxy", "carbon"],
+    },
+    { label: "Full app — local auth (better-auth, app-managed accounts), shadcn/ui", flavors: [] },
+    { label: "Full app — local auth (better-auth), IBM Carbon UI", flavors: ["carbon"] },
+    { label: "API only — with database, no frontend", flavors: ["backend-only"] },
+    {
+      label: "API only — stateless, no frontend or database",
+      flavors: ["backend-only", "no-database"],
+    },
+  ];
   const flavorsArg = flag("flavors");
   let chosen: string[] = [];
+  let available: string[] = [];
   try {
     const entries = await readdir(path.join(root, "flavors"), { withFileTypes: true });
-    const available = entries.filter((e) => e.isDirectory()).map((e) => e.name);
-    if (flavorsArg !== undefined) {
-      chosen = flavorsArg === "none" ? [] : flavorsArg.split(",").map((f) => f.trim());
-      const unknown = chosen.filter((f) => !available.includes(f));
-      if (unknown.length)
-        fail(`Unknown flavor(s): ${unknown.join(", ")}. Available: ${available.join(", ")}`);
-    } else if (available.length) {
-      console.log(`\nAvailable flavors: ${available.join(", ")}`);
-      console.log("Tip: skip this and let your AI agent walk you through it (it reads");
-      console.log(".agents/skills/setup/) — or answer with a comma-separated list.");
-      const answer = await rl.question("Apply flavors now? [none]: ");
-      chosen =
-        answer.trim() && answer.trim() !== "none" ? answer.split(",").map((f) => f.trim()) : [];
-    }
+    available = entries.filter((e) => e.isDirectory()).map((e) => e.name);
   } catch {
     // flavors/ gone — nothing to offer
+  }
+  if (flavorsArg !== undefined) {
+    chosen = flavorsArg === "none" ? [] : flavorsArg.split(",").map((f) => f.trim());
+    const unknown = chosen.filter((f) => !available.includes(f));
+    if (unknown.length)
+      fail(`Unknown flavor(s): ${unknown.join(", ")}. Available: ${available.join(", ")}`);
+  } else if (available.length) {
+    const menu = presets.filter((p) => p.flavors.every((f) => available.includes(f)));
+    console.log("\nWhich setup do you want?");
+    for (const [i, preset] of menu.entries()) console.log(`  ${i + 1}) ${preset.label}`);
+    console.log("Tip: or let your AI agent walk you through it (it reads .agents/skills/setup/).");
+    let picked: string[] | undefined;
+    while (picked === undefined) {
+      const answer = (await ask("Choice [1]: ")).trim();
+      const index = answer === "" ? 1 : Number(answer);
+      const preset = Number.isInteger(index) ? menu[index - 1] : undefined;
+      if (preset) picked = preset.flavors;
+      else console.log(`Enter a number between 1 and ${menu.length}.`);
+    }
+    chosen = picked;
   }
 
   rl.close();

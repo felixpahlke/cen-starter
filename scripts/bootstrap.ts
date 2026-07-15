@@ -82,6 +82,31 @@ async function main() {
     fail(`"${name}" is not a valid package name (lowercase letters, digits, ".", "_", "-").`);
   }
 
+  // Stale Docker volumes from an earlier project with the same Compose project name would be
+  // silently reused by `docker compose up` — Postgres then holds foreign tables and
+  // `db:migrate` hangs without an error. Catch the collision while the name is still cheap
+  // to change.
+  if (dockerUp) {
+    try {
+      const volumes = execFileSync("docker", ["volume", "ls", "--format", "{{.Name}}"], {
+        encoding: "utf8",
+      })
+        .split("\n")
+        .filter((volume) => volume.startsWith(`${name}_`));
+      if (volumes.length) {
+        fail(
+          `Docker volume(s) from a previous project named "${name}" exist: ${volumes.join(", ")}.\n` +
+            `  Reusing them makes database migrations hang on stale data. Either confirm with\n` +
+            `  the user and wipe the old project's data:\n` +
+            `    docker compose -p ${name} down -v\n` +
+            `  or re-run bootstrap with a different --name.`,
+        );
+      }
+    } catch {
+      // docker volume ls failed — don't block bootstrap on it
+    }
+  }
+
   pkg.name = name;
   const composePath = path.join(root, "docker-compose.yml");
   try {

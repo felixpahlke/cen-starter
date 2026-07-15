@@ -1,6 +1,0 @@
-pre-commit:
-  jobs:
-    - name: biome
-      run: pnpm exec biome check --staged --no-errors-on-unmatched
-    - name: typecheck
-      run: pnpm --recursive --include-workspace-root --if-present typecheck

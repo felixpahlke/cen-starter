@@ -57,6 +57,14 @@ exemplary: it gets copied into every project resource, flaws included.
    changes projects must react to).
 3. Tag: `git tag v<version> && git push --tags`.
 
+## No git hooks — deliberate
+
+The template ships no git hooks (lefthook was removed 2026-07): IBM-managed machines set a
+global `core.hooksPath` for Vault Radar secret scanning, which breaks hook managers on
+`pnpm install` and silently disables repo-managed hooks anyway. Quality gates are
+`pnpm check` / `pnpm verify` (agents run them; finalize enforces them) — don't reintroduce
+a hook manager without solving the hooksPath conflict.
+
 ## Dependency bumps
 
 Versions are pinned once in the `pnpm-workspace.yaml` catalog. Bump there, `pnpm install`,

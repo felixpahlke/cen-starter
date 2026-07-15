@@ -85,7 +85,7 @@
     },
     {
       "file": "package.json",
-      "find": "    \"db:generate\": \"pnpm --filter @cen/backend db:generate\",\n    \"db:migrate\": \"pnpm --filter @cen/backend db:migrate\",\n    \"db:seed\": \"pnpm --filter @cen/backend db:seed\",\n    \"db:studio\": \"pnpm --filter @cen/backend db:studio\",\n",
+      "find": "    \"db:generate\": \"node scripts/guard-setup.mjs && pnpm --filter @cen/backend db:generate\",\n    \"db:migrate\": \"pnpm --filter @cen/backend db:migrate\",\n    \"db:seed\": \"pnpm --filter @cen/backend db:seed\",\n    \"db:studio\": \"pnpm --filter @cen/backend db:studio\",\n",
       "replace": ""
     },
     {

@@ -4,9 +4,11 @@
 `.agents/skills/setup/SKILL.md` first: interview your user (database? design system?
 frontend? auth?), apply the matching flavors, and only then start building features.
 
-Post-setup feature skills live in `scaffold/agent-skills/` while this directory exists, so
-agents cannot discover and invoke them before setup is complete. Flavors delete incompatible
-staged skills. Finalization promotes the remainder into `.agents/skills/` in one operation.
+Post-setup feature skills live in `scaffold/agent-skills/` as inert `SKILL.md.template`
+files while this directory exists, so agents cannot discover and invoke them before setup is
+complete. Flavors delete incompatible staged skills. Finalization promotes the remainder
+into `.agents/skills/`, restores their `SKILL.md` names, and installs `scaffold/AGENTS.md`
+as the project's working `AGENTS.md` — all in one operation.
 
 ## What this is
 

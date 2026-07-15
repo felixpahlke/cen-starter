@@ -163,8 +163,8 @@ Next steps:
   pnpm dev          # validate ports, then start the configured local stack
   pnpm verify       # full configured-project baseline
 
-Working with an AI agent? Point it at this repo — AGENTS.md tells it everything,
-including how to verify and finalize setup before adding your first resource.`);
+Working with an AI agent? Point it at this repo — AGENTS.md routes it through the
+remaining setup steps (verify, approve, finalize) before adding your first resource.`);
 }
 
 main();

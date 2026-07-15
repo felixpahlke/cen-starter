@@ -153,29 +153,23 @@ After bootstrap, run the post-apply checks from each selected flavor's
 
 ## 5. Boot, verify, and commit
 
-Start the app with `pnpm dev` — but note it runs until stopped and **never exits**. Do not
-run it as a blocking foreground command; a sandboxed agent will hang on it indefinitely.
-The reliable pattern is to background it with its output fully detached into a file:
+`pnpm dev` never exits — never run it as a plain blocking command. Background it with both
+output streams detached (a bare `&` still hangs sandboxes: they wait on the inherited
+output pipe), and keep the log outside the repo (an untracked file blocks finalize's
+clean-tree check):
 
 ```bash
 pnpm dev > /tmp/cen-dev.log 2>&1 &
 ```
 
-Redirecting **both** stdout and stderr to a file is what makes this work: with a bare
-`pnpm dev &` the background process inherits the command's output pipe, and sandboxes wait
-for that pipe to close — which looks like an indefinite hang. Keep the log outside the
-project (an untracked log file makes the git tree dirty, and finalization refuses a dirty
-tree). Then poll `curl -s http://localhost:3000/api/health` (the `API_PORT` from `.env`)
-with a few retries, and read the log file when anything fails. First start may take a
-couple of minutes while Docker images download — poll patiently before concluding failure.
+Poll `curl -s http://localhost:3000/api/health` (`API_PORT` from `.env`) — the first boot
+downloads Docker images, so allow a couple of minutes — and read the log on failure.
 
-Only if backgrounding is truly impossible in your environment, hand exactly this step to
-the user with click-level directions, not just the command. In IBM Bob or VS Code: top
-menu bar → **Terminal → New Terminal** — the panel opens at the project folder already —
-then paste `pnpm dev`, press Enter, and leave that panel running (closing it stops the
-app). Outside an IDE, name the OS terminal app and give a `cd` line to the project folder
-first. Tell the user what success looks like (services start, the ports line appears) and
-to paste back anything red if it fails.
+If your environment cannot background at all, have the user run `pnpm dev` with
+click-level directions: in IBM Bob or VS Code, top menu bar → **Terminal → New Terminal**
+(it opens at the project folder), paste `pnpm dev`, press Enter, keep the panel open. Say
+what success looks like (the ports line, services starting) and ask them to paste back
+anything red.
 
 `pnpm dev` checks every selected port before starting. If it reports conflicts, update all
 affected `.env` values together (including `DATABASE_URL` when changing `DB_PORT`) and

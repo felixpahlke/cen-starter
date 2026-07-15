@@ -82,7 +82,11 @@ function ProtectedLayout() {
             <UserAvatar size={20} />
           </HeaderGlobalAction>
         </HeaderGlobalBar>
-        <HeaderPanel aria-label="Account panel" expanded={panelOpen}>
+        <HeaderPanel
+          aria-label="Account panel"
+          expanded={panelOpen}
+          className="border-border-subtle-01 border-l"
+        >
           <div className="flex h-full flex-col gap-4 p-4">
             <div className="flex flex-col items-start gap-1">
               <p className="font-semibold text-sm">{user.name}</p>

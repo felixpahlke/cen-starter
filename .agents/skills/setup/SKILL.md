@@ -156,8 +156,15 @@ After bootstrap, run the post-apply checks from each selected flavor's
 Start the app with `pnpm dev` — but note it runs until stopped and **never exits**. Do not
 run it as a blocking foreground command; a sandboxed agent will hang on it indefinitely.
 Start it in the background if your environment supports that (keep access to its output),
-otherwise ask the user to run `pnpm dev` in their own terminal — spelled out step by step
-for non-technical users — and continue once `/api/health` answers.
+otherwise ask the user to run `pnpm dev` in their own terminal and continue once
+`/api/health` answers.
+
+When handing this step to the user, give click-level directions, not just the command. In
+IBM Bob or VS Code: top menu bar → **Terminal → New Terminal** — the panel opens at the
+project folder already — then paste `pnpm dev`, press Enter, and leave that panel running
+(closing it stops the app). Outside an IDE, name the OS terminal app and give a `cd` line
+to the project folder first. Tell the user what success looks like (services start, the
+ports line appears) and to paste back anything red if it fails.
 
 `pnpm dev` checks every selected port before starting. If it reports conflicts, update all
 affected `.env` values together (including `DATABASE_URL` when changing `DB_PORT`) and

@@ -17,8 +17,11 @@ Keep the base local auth only when one of these is intentional:
 - the product must own credentials and the account lifecycle, such as public self-sign-up for
   users who do not share an IdP;
 - the environment must be self-contained without an external IdP in production; or
-- the work is a deliberately throwaway demo and production identity is explicitly out of
-  scope.
+- the user explicitly rules production out for a throwaway demo *and* asks for local auth.
+
+Never present local auth as the easier starting point — it merely front-loads less
+configuration while making the later swap expensive. When in doubt, this flavor is the
+recommendation.
 
 **Do not choose local auth merely because the app needs more user data.** Authentication and
 product data are separate concerns. The proxy flavor still has a local `user` row and can keep

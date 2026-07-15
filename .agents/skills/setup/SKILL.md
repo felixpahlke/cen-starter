@@ -155,16 +155,27 @@ After bootstrap, run the post-apply checks from each selected flavor's
 
 Start the app with `pnpm dev` — but note it runs until stopped and **never exits**. Do not
 run it as a blocking foreground command; a sandboxed agent will hang on it indefinitely.
-Start it in the background if your environment supports that (keep access to its output),
-otherwise ask the user to run `pnpm dev` in their own terminal and continue once
-`/api/health` answers.
+The reliable pattern is to background it with its output fully detached into a file:
 
-When handing this step to the user, give click-level directions, not just the command. In
-IBM Bob or VS Code: top menu bar → **Terminal → New Terminal** — the panel opens at the
-project folder already — then paste `pnpm dev`, press Enter, and leave that panel running
-(closing it stops the app). Outside an IDE, name the OS terminal app and give a `cd` line
-to the project folder first. Tell the user what success looks like (services start, the
-ports line appears) and to paste back anything red if it fails.
+```bash
+pnpm dev > /tmp/cen-dev.log 2>&1 &
+```
+
+Redirecting **both** stdout and stderr to a file is what makes this work: with a bare
+`pnpm dev &` the background process inherits the command's output pipe, and sandboxes wait
+for that pipe to close — which looks like an indefinite hang. Keep the log outside the
+project (an untracked log file makes the git tree dirty, and finalization refuses a dirty
+tree). Then poll `curl -s http://localhost:3000/api/health` (the `API_PORT` from `.env`)
+with a few retries, and read the log file when anything fails. First start may take a
+couple of minutes while Docker images download — poll patiently before concluding failure.
+
+Only if backgrounding is truly impossible in your environment, hand exactly this step to
+the user with click-level directions, not just the command. In IBM Bob or VS Code: top
+menu bar → **Terminal → New Terminal** — the panel opens at the project folder already —
+then paste `pnpm dev`, press Enter, and leave that panel running (closing it stops the
+app). Outside an IDE, name the OS terminal app and give a `cd` line to the project folder
+first. Tell the user what success looks like (services start, the ports line appears) and
+to paste back anything red if it fails.
 
 `pnpm dev` checks every selected port before starting. If it reports conflicts, update all
 affected `.env` values together (including `DATABASE_URL` when changing `DB_PORT`) and

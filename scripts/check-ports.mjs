@@ -14,6 +14,12 @@ try {
 }
 
 const pkg = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
+if (pkg.cen?.finalized === false) {
+  console.warn(
+    "⚠ setup mode: this template is not finalized. Booting to verify setup is fine, but do not\n" +
+      "  build features yet — follow .agents/skills/setup/SKILL.md through finalization.",
+  );
+}
 const flavors = new Set(pkg.cen?.flavors ?? []);
 const ports = [
   ...(!flavors.has("no-database") ? [port("DB_PORT", "PostgreSQL", 5432, "db")] : []),

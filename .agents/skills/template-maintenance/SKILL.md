@@ -8,6 +8,12 @@ description: Maintain the CEN Starter template repository itself — keep flavor
 Only applies in the **template repository** (`cen-starter` itself). If this is a project created
 from the template, stop — this skill is not for you (finalize removes it).
 
+The template repository never finalizes, so the root `AGENTS.md` stays the setup gate
+permanently. The working conventions for finished projects live in `scaffold/AGENTS.md`
+(installed as the project's `AGENTS.md` at finalization) — keep that file accurate when the
+base changes. The root `pnpm db:generate` is guarded while `cen.finalized` is false; for
+base-schema work run `CEN_TEMPLATE_MAINTENANCE=1 pnpm db:generate`.
+
 ## Changing the base app
 
 Every base change can break flavors — their edit anchors match exact strings, their overlays
@@ -37,8 +43,9 @@ exemplary: it gets copied into every project resource, flaws included.
 4. Write `.agents/skills/setup/references/<name>.md`: when to choose it, what it changes,
    post-apply checks, late-retrofit notes.
 5. If the flavor makes a feature skill inapplicable, delete
-   `scaffold/agent-skills/<skill>/**` in its manifest. Feature skills stay staged there until
-   finalization; do not put them directly in `.agents/skills/`.
+   `scaffold/agent-skills/<skill>/**` in its manifest. Feature skills stay staged there as
+   `SKILL.md.template` files until finalization renames them back; do not put them directly
+   in `.agents/skills/`, and do not name a staged file `SKILL.md`.
 6. Run `pnpm verify:flavors`; it verifies bootstrap, the configured app, finalization, and
    promotion of every compatible staged skill.
 

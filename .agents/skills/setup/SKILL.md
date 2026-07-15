@@ -1,10 +1,11 @@
 ---
 name: setup
 description: >-
-  Configure a freshly cloned CEN Starter template: guide the user through outcome-focused
-  choices at an appropriate technical depth, apply the matching flavors, verify, and
-  finalize. Use when flavors/ exists (cen.finalized is false in package.json) — this project
-  has not been set up yet.
+  Mandatory first workflow for ANY task in an unfinalized CEN Starter checkout (flavors/
+  exists; cen.finalized is false in package.json) — including direct feature requests such
+  as "build a todo app" or "add a page". Pause feature work, guide the user through
+  outcome-focused configuration choices, apply the matching flavors, bootstrap, verify the
+  running app, and finalize with explicit approval before building anything.
 ---
 
 # Template setup
@@ -18,13 +19,23 @@ project none of this applies.
 
 ## 1. Confirm the project location
 
-Before any setup mutation, apply the **Project location** gate in `AGENTS.md`. Confirm both
-the user-chosen project name and its complete durable path; never inherit `cen-starter` merely
-because it is the template repository's name. A clone inside a hidden agent playground or
-temporary directory is not a durable project. If either name or destination is unknown, ask,
-confirm the absolute target, and continue there. Do not install dependencies or configure a
-scratch or ambiguously named clone first. A checkout named `cen-starter` is fine when the task
-is maintaining this template or the user explicitly chose that project name.
+`cen-starter` is the source template's name, not a default project name, and hidden agent
+workspaces or temporary paths (for example `~/.bob/`, `~/.codex/`, `/tmp/`, macOS
+`/var/folders/`) are scratch space, not a project home, unless the user explicitly chose
+them.
+
+Before any setup mutation, confirm both the user-chosen project name and its complete
+durable path. If either is unknown, stop before installing dependencies, applying flavors,
+or editing files, and ask one plain question: **"What should the project be called, and
+where would you like me to create it?"** If useful, inspect the home directory for an
+existing visible development folder and recommend one concrete `<folder>/<project-name>`
+path. Do not infer the name from the template URL or invent several arbitrary locations.
+
+If the repository is already cloned into scratch space, or into a folder named `cen-starter`
+the user did not deliberately choose, preserve any work, move or recreate the clone at the
+confirmed destination, and continue there. Do not delete the scratch copy without
+permission. A checkout named `cen-starter` is correct only for template maintenance or when
+the user explicitly picked that name.
 
 ## 2. Check the basics
 
@@ -131,7 +142,8 @@ to seed outside local development. With `oauth-proxy`, Dex owns those credential
 backend creates the local admin profile from the real authenticated subject on first login.
 This rule matches the named local identity, not the first person to log in.
 
-Verify `/api/health`, load the frontend if present, and exercise the actual auth boundary:
+Verify `/api/health` returns `{"status":"ok"}` (Swagger UI is at `/api/docs`), load the
+frontend if present, and exercise the actual auth boundary:
 
 - **Base/local auth:** log in with the development admin and confirm the authenticated admin
   experience (or, for `backend-only`, its cookie-auth session through `/api/auth/*`).

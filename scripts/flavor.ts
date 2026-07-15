@@ -208,18 +208,31 @@ async function finalize() {
   await rm(abs("scripts/verify-flavors.ts"), { force: true });
   await rm(abs(".agents/skills/setup"), { recursive: true, force: true });
   await rm(abs(".agents/skills/template-maintenance"), { recursive: true, force: true });
+  await installProjectAgentsFile();
   await activateStagedSkills();
+  await rm(abs("scripts/guard-setup.mjs"), { force: true });
   if (hadBootstrap) await rm(abs("scripts/bootstrap.ts"), { force: true });
   // The root tsconfig only covers scripts/, which is gone after finalize.
   await rm(abs("tsconfig.json"), { force: true });
 
-  delete objectAt(pkg, "scripts").flavor;
-  delete objectAt(pkg, "scripts").typecheck;
-  delete objectAt(pkg, "scripts")["verify:flavors"];
-  if (hadBootstrap) delete objectAt(pkg, "scripts").bootstrap;
+  const scripts = objectAt(pkg, "scripts");
+  delete scripts.flavor;
+  delete scripts.typecheck;
+  delete scripts["verify:flavors"];
+  if (hadBootstrap) delete scripts.bootstrap;
+  const dbGenerate = scripts["db:generate"];
+  if (typeof dbGenerate === "string") {
+    scripts["db:generate"] = dbGenerate.replace("node scripts/guard-setup.mjs && ", "");
+  }
   metadata.finalized = true;
   await writeJson("package.json", pkg);
   await removeEmptyScriptsDir();
+}
+
+// The root AGENTS.md is only the setup gate; the project's working guide ships staged.
+async function installProjectAgentsFile() {
+  const staged = abs("scaffold/AGENTS.md");
+  if (await exists(staged)) await rename(staged, abs("AGENTS.md"));
 }
 
 async function activateStagedSkills() {
@@ -239,6 +252,9 @@ async function activateStagedSkills() {
   for (const entry of entries) {
     const destination = path.join(active, entry.name);
     await rename(path.join(staged, entry.name), destination);
+    // Staged skills are inert `SKILL.md.template` files so agents cannot discover them pre-setup.
+    const inert = path.join(destination, "SKILL.md.template");
+    if (await exists(inert)) await rename(inert, path.join(destination, "SKILL.md"));
   }
 
   await removeEmptyDirectory(staged);

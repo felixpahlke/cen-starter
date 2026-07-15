@@ -83,10 +83,11 @@ relinked. The guided setup skill covers the detailed decision and production cav
 
 ## For AI agents
 
-Read [AGENTS.md](AGENTS.md) before touching anything — it has the first-time setup runbook,
-the conventions, and the pitfalls. During template setup, only setup-time workflows are
-discoverable. `pnpm flavor finalize` activates the compatible guided workflows for adding
-resources, migrations, deployment, and debugging in `.agents/skills/`.
+Read [AGENTS.md](AGENTS.md) before touching anything. In an unconfigured clone it is a
+single gate that routes you into the guided setup; finalization replaces it with the
+project's working conventions and pitfalls. During template setup, only setup-time workflows
+are discoverable. `pnpm flavor finalize` activates the compatible guided workflows for
+adding resources, migrations, deployment, and debugging in `.agents/skills/`.
 
 ## Stack
 

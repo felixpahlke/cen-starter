@@ -46,6 +46,7 @@ async function main() {
             "Choose a project name",
             "\n",
           );
+          expectFailure(pnpm, ["db:generate"], workspace, "setup mode");
         }
 
         run(
@@ -110,9 +111,10 @@ async function skillNames(directory: string) {
 async function assertFinalized(workspace: string, stagedSkills: string[]) {
   for (const relative of [
     "flavors",
-    "scaffold/agent-skills",
+    "scaffold",
     ".agents/skills/setup",
     ".agents/skills/template-maintenance",
+    "scripts/guard-setup.mjs",
   ]) {
     if (await exists(path.join(workspace, relative))) {
       throw new Error(`Finalization did not remove ${relative}.`);
@@ -123,6 +125,14 @@ async function assertFinalized(workspace: string, stagedSkills: string[]) {
     if (!(await exists(path.join(workspace, ".agents/skills", skill, "SKILL.md")))) {
       throw new Error(`Finalization did not activate skill "${skill}".`);
     }
+    if (await exists(path.join(workspace, ".agents/skills", skill, "SKILL.md.template"))) {
+      throw new Error(`Finalization left skill "${skill}" staged as SKILL.md.template.`);
+    }
+  }
+
+  const agents = await readFile(path.join(workspace, "AGENTS.md"), "utf8");
+  if (agents.includes("not set up yet")) {
+    throw new Error("Finalization did not install the project AGENTS.md.");
   }
 
   const pkg = JSON.parse(await readFile(path.join(workspace, "package.json"), "utf8"));

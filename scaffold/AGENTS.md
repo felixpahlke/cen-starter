@@ -18,7 +18,7 @@ Dev services run in Docker Compose; the apps themselves run natively.
 ## Commands
 
 ```bash
-pnpm dev          # check ports and start everything
+pnpm dev          # check ports and start everything — never exits; agents: run in background or let the user run it
 pnpm check        # typecheck + lint — run this before considering any task done
 pnpm verify       # check + test + production build
 pnpm fix          # auto-fix lint/format

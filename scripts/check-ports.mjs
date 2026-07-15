@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
-import { createServer } from "node:net";
+import { connect } from "node:net";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -53,17 +53,23 @@ if (!flavors.has("no-database")) {
   }
 }
 
+const published = dockerPublishedPorts();
 const availability = await Promise.all(
-  ports.map(async (entry) => ({
-    ...entry,
-    available: ownsPort(entry) || (await isFree(entry.value)),
-  })),
+  ports.map(async (entry) => {
+    if (ownsPort(entry)) return { ...entry, available: true };
+    const container = published.get(entry.value);
+    if (container) return { ...entry, available: false, culprit: `container ${container}` };
+    return { ...entry, available: await isFree(entry.value) };
+  }),
 );
 const conflicts = availability.filter(({ available }) => !available);
 if (conflicts.length) {
   fail(
     `Local ports are occupied:\n${conflicts
-      .map(({ env, label, value }) => `- ${env}=${value} (${label})`)
+      .map(
+        ({ env, label, value, culprit }) =>
+          `- ${env}=${value} (${label})${culprit ? ` — published by ${culprit}` : ""}`,
+      )
       .join("\n")}\nUpdate all affected values in .env, then run pnpm dev again.`,
   );
 }
@@ -97,14 +103,34 @@ function ownsPort({ value, composeService, containerPort }) {
   );
 }
 
+// Ports published by any running container, so conflicts can name the culprit. A bind
+// probe alone is not enough: on macOS SO_REUSEADDR lets 127.0.0.1 bind while Docker's
+// proxy holds 0.0.0.0 on the same port.
+function dockerPublishedPorts() {
+  const result = spawnSync("docker", ["ps", "--format", "{{.Names}}\t{{.Ports}}"], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+  });
+  const map = new Map();
+  if (result.status !== 0) return map;
+  for (const line of result.stdout.trim().split("\n")) {
+    const [name, portList = ""] = line.split("\t");
+    for (const match of portList.matchAll(/:(\d+)->/g)) map.set(Number(match[1]), name);
+  }
+  return map;
+}
+
+// Probe by connecting, not binding: anything listening on the port answers regardless of
+// which interface it bound.
 function isFree(value) {
   return new Promise((resolve) => {
-    const server = createServer();
-    server.unref();
-    server.once("error", () => resolve(false));
-    server.listen({ host: "127.0.0.1", port: value, exclusive: true }, () =>
-      server.close(() => resolve(true)),
-    );
+    const socket = connect({ host: "127.0.0.1", port: value });
+    socket.unref();
+    socket.once("connect", () => {
+      socket.destroy();
+      resolve(false);
+    });
+    socket.once("error", (error) => resolve(error.code === "ECONNREFUSED"));
   });
 }
 

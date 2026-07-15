@@ -52,11 +52,23 @@ about to recommend. When choosing between local auth and `oauth-proxy`, always r
 
 ### Adapt to the user
 
-Infer the appropriate depth from the user's language and mirror it. Do not make users rate
-their own technical experience: beginners may not know the categories, and experts usually
-signal their context naturally. If the preferred depth is genuinely unclear, ask once:
-**"Would you like me to choose sensible defaults, or walk you through the technical
-trade-offs?"** Default to plain language and sensible recommendations.
+Early in the interview, ask for the user's role and offer the common answers so they can
+just pick one — as clickable options if your client supports them, otherwise a short list
+they can answer with one word:
+
+**"So I can pitch this right — what's your background?"**
+
+1. Developer
+2. Designer
+3. Product / business
+4. Something else
+
+Do not ask people to rate their technical skill; the role is enough. Calibrate everything
+after it: **developer** → technical terms, commands as-is. **Designer or product/business**
+→ plain language, jargon defined on first use, every terminal step spelled out ("open the
+Terminal app, paste this line, press Enter"), and run whatever you can yourself instead of
+delegating steps to the user. If the role is skipped or ambiguous, mirror the technical
+depth of the user's own language and default to plain language.
 
 - Treat what the user already said as a constraint. "I want to build a web app" settles that
   a frontend is needed; never infer `backend-only` or ask them to choose it.
@@ -77,10 +89,16 @@ Use these beginner-friendly decision questions when the context has not already 
   the database.
 - **Design system:** "Does it have to use the official IBM Carbon components?" If not, keep
   the editable default UI.
-- **Authentication:** "Will people sign in with a company account, and could this pilot become
-  a real production app?" If yes or maybe, recommend the OAuth proxy. Explain that local
-  development uses the included test identity provider and needs no company IdP setup; client
-  registration is a production deployment task.
+- **Authentication:** lead with the recommendation, not a menu: "I'd set this up with the
+  OAuth proxy — it's the production-ready path, it plugs into your (or the client's)
+  identity provider later without rebuilding the account system, and local development is
+  fully self-contained (a bundled test identity provider; no company IdP setup needed)."
+  The one question that routes away from it is account ownership: "Will the people signing
+  in be from your company or the client's, or is this a public app where anyone creates
+  their own account?" Company/client, unsure, or a demo → `oauth-proxy`. Public
+  self-sign-up with app-owned accounts → local auth. Never present local auth as "easier"
+  or "fine for now": swapping the account system later is the expensive path; configuring
+  the production IdP early is cheap.
 
 Typical CEN scenarios and what to recommend:
 
@@ -94,8 +112,9 @@ Typical CEN scenarios and what to recommend:
   bundled Dex keeps local development self-contained. For the classic internal-tool setup,
   combine it with Carbon by passing `--flavors oauth-proxy,carbon` to bootstrap.
 - **Product-owned accounts** (public self-sign-up across customers with no shared IdP,
-  app-owned password/account lifecycle) → keep the base local auth. Also acceptable for a
-  deliberately throwaway demo where production identity is explicitly out of scope.
+  app-owned password/account lifecycle) → keep the base local auth. This is the only case
+  where local auth is the recommendation; for a throwaway demo, still prefer `oauth-proxy`
+  unless the user explicitly rules production out and asks for local auth.
 - **Backend service — tools for watsonx Orchestrate, an agent backend, another team's
   frontend** → `backend-only`. If it holds no state of its own (stateless tools, pure
   orchestration), drop the database too with `--flavors backend-only,no-database`.

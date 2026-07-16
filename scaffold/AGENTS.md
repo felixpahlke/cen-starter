@@ -18,7 +18,7 @@ Dev services run in Docker Compose; the apps themselves run natively.
 ## Commands
 
 ```bash
-pnpm dev          # check ports and start everything — never exits; agents: run in background or let the user run it
+pnpm dev          # start everything; Ctrl-C also stops the dev containers
 pnpm check        # typecheck + lint — run this before considering any task done
 pnpm verify       # check + test + production build
 pnpm fix          # auto-fix lint/format
@@ -27,6 +27,7 @@ pnpm db:migrate   # apply migrations (needs the db container running)
 ```
 
 Fresh clone: `pnpm install`, copy `.env.example` to `.env`, then `pnpm dev`.
+Database data survives `pnpm dev` shutdowns in the Compose volume.
 
 ## Rules
 

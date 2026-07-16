@@ -6,6 +6,8 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
 
 ## [Unreleased]
 
+- `pnpm dev` now owns the complete local lifecycle: Ctrl-C or termination stops the native
+  app processes and runs `docker compose down`, while preserving database data in its volume.
 - Added the same ready-to-use development admin (`admin@example.com` / `ChangeMe`) to every
   database-backed auth variant. Local auth uses an idempotent `pnpm db:seed`; OAuth assigns
   the role when that exact Dex identity first authenticates, using its real OIDC subject.

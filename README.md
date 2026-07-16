@@ -51,6 +51,7 @@ pnpm bootstrap        # asks for a project name, then a numbered menu of valid s
 pnpm dev              # port check → dev containers → migrations → seed → api + web
 # open http://localhost:5173 (base) or http://localhost:4180 (OAuth proxy)
 # sign in: admin@example.com / ChangeMe
+# Ctrl-C stops the apps and dev containers; database data remains in its Docker volume
 
 git add -A && git commit -m "Configure CEN Starter"    # finalize requires a clean tree
 pnpm flavor finalize  # reruns pnpm verify, then strips the template machinery
@@ -126,7 +127,7 @@ OpenShift and Code Engine scripts included.
 ## Everyday commands
 
 ```bash
-pnpm dev          # database + migrations + development seed + api + web, hot reload
+pnpm dev          # database + migrations + seed + api + web; Ctrl-C stops everything
 pnpm check        # typecheck + lint — green means done
 pnpm test         # backend tests (in-memory Postgres, real migrations)
 pnpm verify       # check + test + production build

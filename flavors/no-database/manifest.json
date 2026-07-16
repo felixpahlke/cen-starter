@@ -80,13 +80,8 @@
     },
     {
       "file": "package.json",
-      "find": "    \"dev\": \"node scripts/check-ports.mjs && docker compose up -d --wait && pnpm db:migrate && pnpm db:seed && pnpm --recursive --parallel dev\",\n",
-      "replace": "    \"dev\": \"node scripts/check-ports.mjs && pnpm --recursive --parallel dev\",\n"
-    },
-    {
-      "file": "package.json",
-      "find": "    \"db:generate\": \"node scripts/guard-setup.mjs && pnpm --filter @cen/backend db:generate\",\n    \"db:migrate\": \"pnpm --filter @cen/backend db:migrate\",\n    \"db:seed\": \"pnpm --filter @cen/backend db:seed\",\n    \"db:studio\": \"pnpm --filter @cen/backend db:studio\",\n",
-      "replace": ""
+      "find": "    \"verify:flavors\": \"tsx scripts/verify-flavors.ts\",\n    \"db:generate\": \"node scripts/guard-setup.mjs && pnpm --filter @cen/backend db:generate\",\n    \"db:migrate\": \"pnpm --filter @cen/backend db:migrate\",\n    \"db:seed\": \"pnpm --filter @cen/backend db:seed\",\n    \"db:studio\": \"pnpm --filter @cen/backend db:studio\"\n",
+      "replace": "    \"verify:flavors\": \"tsx scripts/verify-flavors.ts\"\n"
     },
     {
       "file": "backend/package.json",

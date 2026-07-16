@@ -33,7 +33,7 @@ left is exactly your app, nothing more.
 **With an agent (recommended):**
 
 ```bash
-git clone <template-repo-url> my-app   # a real folder you keep — name it after your project
+git clone https://github.com/felixpahlke/cen-starter.git my-app   # name the folder after your project
 ```
 
 Open `my-app` in your AI coding tool and say what you want to build. The agent reads

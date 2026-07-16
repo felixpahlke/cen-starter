@@ -15,10 +15,11 @@ apply in seconds instead of a template branch you're stuck with.
 
 ## How this works
 
-This repo is **agent-first**. The intended path: clone it, open it in your AI coding tool,
-and tell the agent what you want to build. The agent interviews you in product terms (no
-flavor or package names), applies the matching configuration, boots and verifies the app,
-and finalizes — you approve the decisions, it runs the commands.
+This repo is **agent-first**. The intended path: clone it yourself to where the project
+should live, open that folder in your AI coding tool, and tell the agent what you want to
+build. The agent interviews you in product terms (no flavor or package names), applies the
+matching configuration, boots and verifies the app, and finalizes — you approve the
+decisions, it runs the commands.
 
 Under the hood the template has two states. It starts as a **maximal base app** — database,
 auth, admin panel, shadcn/ui frontend, an example resource — plus `flavors/`: small,
@@ -29,10 +30,15 @@ left is exactly your app, nothing more.
 
 ## Start a project
 
-**With an agent (recommended):** point it at this repository and say what you want to
-build. It reads [AGENTS.md](AGENTS.md) and takes it from there — including asking what the
-project is called and confirming a durable location before cloning (`cen-starter` is the
-template's name, not a default for your project).
+**With an agent (recommended):**
+
+```bash
+git clone <template-repo-url> my-app   # a real folder you keep — name it after your project
+```
+
+Open `my-app` in your AI coding tool and say what you want to build. The agent reads
+[AGENTS.md](AGENTS.md) and takes it from there — interview, bootstrap, verify, finalize.
+Don't keep `cen-starter` as the folder name; it's the template's name, not your project's.
 
 **Manually:**
 

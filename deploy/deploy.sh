@@ -19,6 +19,7 @@ in_cluster_db_used=false
 external_db_used=false
 database_url=""
 route_url=""
+derived_env_summary=()
 
 tmp_files=()
 
@@ -261,6 +262,34 @@ configure_database() {
   in_cluster_db_used=true
 }
 
+ensure_route() {
+  oc apply -n "$namespace" -f "$OPENSHIFT_DIR/route.yaml"
+}
+
+derive_env_values() {
+  local env_secret_file="$1"
+  local auth_url=""
+  local derived_env_file="${env_secret_file}.derived"
+
+  auth_url=$(env_file_value BETTER_AUTH_URL "$env_secret_file" || true)
+  if [[ -n "$auth_url" && "$auth_url" != "https://cen-starter.example.com" ]]; then
+    return
+  fi
+
+  if [[ -z "$route_url" ]]; then
+    warning "could not derive BETTER_AUTH_URL because the OpenShift route URL is unavailable"
+    return
+  fi
+
+  tmp_files+=("$derived_env_file")
+  sed '/^BETTER_AUTH_URL=/d;/^export BETTER_AUTH_URL=/d' "$env_secret_file" > "$derived_env_file"
+  printf '\nBETTER_AUTH_URL=%s\n' "$route_url" >> "$derived_env_file"
+  mv "$derived_env_file" "$env_secret_file"
+
+  derived_env_summary+=("BETTER_AUTH_URL=$route_url")
+  info "derived BETTER_AUTH_URL=$route_url (set it in $ENV_FILE to override)"
+}
+
 create_app_secret() {
   local env_secret_file
 
@@ -272,6 +301,8 @@ create_app_secret() {
   else
     sed '/^GITHUB_TOKEN=/d' "$ENV_FILE" > "$env_secret_file"
   fi
+
+  derive_env_values "$env_secret_file"
 
   oc create secret generic "$APP_SECRET" \
     --from-env-file="$env_secret_file" \
@@ -580,6 +611,8 @@ capture_route_url() {
 }
 
 print_summary() {
+  local derived_value=""
+
   capture_route_url
 
   info ""
@@ -601,11 +634,19 @@ print_summary() {
   if [[ "$autodeploy" == "true" ]]; then
     info "Autodeploy: git push to main now builds and deploys automatically"
   fi
+
+  if ((${#derived_env_summary[@]} > 0)); then
+    for derived_value in "${derived_env_summary[@]}"; do
+      info "Derived env: $derived_value"
+    done
+  fi
 }
 
 parse_args "$@"
 check_preconditions
 configure_database
+ensure_route
+capture_route_url
 create_app_secret
 
 oc apply -n "$namespace" -k "$OPENSHIFT_DIR"

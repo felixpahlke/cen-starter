@@ -32,9 +32,12 @@ image itself (BuildConfig + webhook), no local Docker needed:
 
 ```bash
 # 1. Production env — never commit this file
-cp .env.production.example .env.production   # fill in BETTER_AUTH_SECRET (openssl rand -hex 32)
-                                             # and BETTER_AUTH_URL (the route URL);
-                                             # leave DATABASE_URL unset for the in-cluster db
+cp .env.production.example .env.production   # fill in the values only you can know (secrets,
+                                             # IdP client config); leave DATABASE_URL unset for
+                                             # the in-cluster db. URL-dependent values
+                                             # (BETTER_AUTH_URL — or OAUTH2_PROXY_REDIRECT_URL
+                                             # and the cookie secret on the oauth-proxy flavor)
+                                             # are derived by deploy.sh; set them only to override.
 
 # 2. One command
 export GITHUB_TOKEN=<token>                  # or put GITHUB_TOKEN= in .env.production
@@ -65,9 +68,11 @@ oc get route -n <namespace>                       # note the host
 curl -s https://<route-host>/api/health           # {"status":"ok"}
 ```
 
-Then open the route in a browser: sign-up must work end-to-end (`BETTER_AUTH_URL` must equal
-the route URL, or auth requests fail). Check the pod log for the migration line on first
-boot. Promote the first admin: set `role = 'admin'` on the user's row in the database.
+Then open the route in a browser: sign-in must work end-to-end. The deploy summary prints
+every derived value (`Derived env: …`) — if auth fails, compare those against the route URL
+first; an explicit override in `.env.production` that drifted from the route is the usual
+cause. Check the pod log for the migration line on first boot. Promote the first admin: set
+`role = 'admin'` on the user's row in the database.
 
 ## Update an existing deployment
 

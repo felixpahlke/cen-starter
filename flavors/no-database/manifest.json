@@ -70,8 +70,18 @@
     },
     {
       "file": ".env.production.example",
-      "find": "# PostgreSQL connection string reachable from the runtime platform.\nDATABASE_URL=postgres://USER:PASSWORD@HOST:5432/DATABASE\n\n# Generate a real secret with: openssl rand -hex 32\nBETTER_AUTH_SECRET=replace-with-at-least-32-random-characters\n\n# Public origin of the deployed app, without a trailing slash.\nBETTER_AUTH_URL=https://cen-starter.example.com\n\n# Migrations auto-apply at boot in production. Set to \"false\" to manage them manually.\n# MIGRATE_ON_START=false\n",
+      "find": "# PostgreSQL connection string reachable from the runtime platform.\nDATABASE_URL=postgres://USER:PASSWORD@HOST:5432/DATABASE\n\n# Generate a real secret with: openssl rand -hex 32\nBETTER_AUTH_SECRET=replace-with-at-least-32-random-characters\n\n# Public origin of the deployed app, without a trailing slash. Deploy scripts derive it\n# automatically when left on this example value.\nBETTER_AUTH_URL=https://cen-starter.example.com\n\n# Migrations auto-apply at boot in production. Set to \"false\" to manage them manually.\n# MIGRATE_ON_START=false\n",
       "replace": "# API key accepted by the no-database auth stub. Generate: openssl rand -hex 32\nAPI_KEY=replace-with-a-real-api-key\n"
+    },
+    {
+      "file": "deploy/ce-deploy.sh",
+      "find": "require_database_url() {\n  database_url=$(env_file_value DATABASE_URL \"$ENV_FILE\" || true)\n\n  if [[ -z \"$database_url\" ]]; then\n    error \"DATABASE_URL is missing or empty in $ENV_FILE; provision IBM Cloud Databases for PostgreSQL and add its connection string\"\n    exit 1\n  fi\n}\n",
+      "replace": ""
+    },
+    {
+      "file": "deploy/ce-deploy.sh",
+      "find": "require_database_url\n",
+      "replace": ""
     },
     {
       "file": "deploy/Dockerfile",

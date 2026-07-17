@@ -1,72 +1,75 @@
 ---
 name: deploy-code-engine
-description: Deploy this app to IBM Cloud Code Engine — build and push the image, create the secret and app with ibmcloud ce, verify. For broken deployments use debug-code-engine instead.
+description: Deploy this app to IBM Cloud Code Engine — one-command cloud-side build via deploy/ce-deploy.sh, derived URLs, verification. For broken deployments use debug-code-engine instead.
 ---
 
 # Deploy to IBM Cloud Code Engine
 
 Same single container as everywhere else (API + SPA, port 8080), run as a Code Engine app.
+The entry point is `deploy/ce-deploy.sh` — idempotent, safe to rerun, builds the image in
+the cloud from the working tree (no local Docker). Details: `deploy/README.md`.
+
+Things that happen automatically so you don't handle them:
+
+- **Project, registry namespace, registry secret**: created if missing. The registry secret
+  needs an IAM API key the first time — `IBMCLOUD_API_KEY` in the environment or
+  `IAM_API_KEY=` in `.env.production` (the script keeps it out of the app secret).
+- **Migrations**: the image migrates its own schema at boot (`MIGRATE_ON_START`, production
+  default, advisory-locked). No manual step.
+- **URL-dependent env**: the script reads the real app URL from Code Engine and injects
+  derived values into the `app-env` secret, then rolls a revision — `BETTER_AUTH_URL`, or on
+  the oauth-proxy flavor `OAUTH2_PROXY_REDIRECT_URL` + `OAUTH2_PROXY_UPSTREAMS` + a
+  generated-once cookie secret. `.env.production` is never modified; explicit values there
+  override derivation.
 
 ## Preconditions (ask the user, don't guess)
 
-- `ibmcloud` CLI with the `code-engine` plugin, logged in, correct resource group targeted
-- A Code Engine project: `ibmcloud ce project select --name <project>` (create if missing)
-- A registry Code Engine can pull from — IBM Container Registry (`icr.io`) is the default fit;
-  private registries need a registry secret (`ibmcloud ce registry create`)
-- A reachable PostgreSQL — typically IBM Cloud Databases for PostgreSQL; get its connection
-  string for `DATABASE_URL`
+- `ibmcloud` CLI with `code-engine` + `container-registry` plugins, logged in
+  (`ibmcloud login --sso` is interactive — the user runs it, not you), resource group
+  targeted (or pass `-g`)
+- A reachable PostgreSQL — typically IBM Cloud Databases for PostgreSQL; its connection
+  string in `DATABASE_URL`. Code Engine has no in-cluster database convention: the script
+  refuses to deploy without `DATABASE_URL`.
 
-## First deploy
+## Deploy — first time and every time
 
 ```bash
 # 1. Production env — never commit this file
-cp .env.production.example .env.production        # DATABASE_URL, BETTER_AUTH_SECRET,
-                                                  # BETTER_AUTH_URL (fill after first deploy, see below)
+cp .env.production.example .env.production   # fill in DATABASE_URL and the values only you
+                                             # can know (secrets, IdP client config); leave
+                                             # URL-dependent values on their example values
 
-# 2. Build + push
-docker build -f deploy/Dockerfile -t icr.io/<namespace>/cen-starter:<tag> .
-docker push icr.io/<namespace>/cen-starter:<tag>
-
-# 3. Migrations — nothing to do: the image migrates its own schema at boot
-#    (MIGRATE_ON_START, production default). To manage them manually instead, set
-#    MIGRATE_ON_START=false in .env.production and run:
-#    DATABASE_URL='<production url>' pnpm --filter @cen/backend db:migrate
-
-# 4. Secret + app
-ibmcloud ce secret create --name app-env --from-env-file .env.production
-ibmcloud ce app create --name cen-starter \
-  --image icr.io/<namespace>/cen-starter:<tag> \
-  --port 8080 --env-from-secret app-env \
-  --min-scale 1 --cpu 0.5 --memory 1G
+# 2. One command
+./deploy/ce-deploy.sh -p <project>           # -g <resource-group>, -r <registry-namespace>
 ```
 
-`--min-scale 1` because scale-to-zero cold-starts hurt an app with auth sessions; drop to 0
-only if the user asks for it. The create command prints the app URL — set `BETTER_AUTH_URL`
-to exactly that URL, update the secret, and restart:
-
-```bash
-ibmcloud ce secret update --name app-env --from-env-file .env.production
-ibmcloud ce app update --name cen-starter       # new revision picks up the secret
-```
+First run: expect the cloud-side build to take a few minutes, and on the base flavor a
+placeholder `BETTER_AUTH_URL` is seeded so the first revision can boot — the script swaps in
+the real URL and rolls a fresh revision before it exits. On the oauth-proxy flavor the
+script also deploys an `oauth2-proxy` front app and makes the main app project-only
+(identity headers can't be spoofed from the internet); the URL to share is the proxy's.
 
 ## Verify — before telling the user it's live
 
+The deploy summary prints the application URL and every `Derived env:` value.
+
 ```bash
-ibmcloud ce app get --name cen-starter          # Ready, and note the URL
-curl -s https://<app-url>/api/health        # {"status":"ok"}
+ibmcloud ce app get --name cen-starter          # Ready
+curl -s https://<app-url>/api/health            # {"status":"ok"}
 ```
 
-Open the URL: sign-up must work end-to-end. Promote the first admin by setting
-`role = 'admin'` on the user's row in the database.
+Open the URL: sign-in must work end-to-end. If auth fails, compare the `Derived env:` lines
+against the real URL — an explicit override in `.env.production` that drifted is the usual
+cause. Promote the first admin by setting `role = 'admin'` on the user's row in the database.
 
 ## Update an existing deployment
 
-New code: build + push a new tag, `ibmcloud ce app update --name cen-starter --image <new-ref>`.
-Schema changed? Nothing extra — the new image migrates the schema at boot before serving
-traffic (unless `MIGRATE_ON_START=false`, in which case run step 3's manual command first).
-Env change: `ibmcloud ce secret update ... && ibmcloud ce app update --name cen-starter`.
-Every update creates a new revision — rollback is `ibmcloud ce app get` (list revisions) and
-routing traffic back.
+Rerun `./deploy/ce-deploy.sh -p <project>` — new code gets a fresh cloud build, env changes
+re-apply the secret, and every update is a new revision. Schema changes need nothing extra
+(boot-time migration). Rollback is `ibmcloud ce app get` (list revisions) and routing
+traffic back. To manage migrations manually instead: set `MIGRATE_ON_START=false` in
+`.env.production` and run `DATABASE_URL='<production url>' pnpm --filter @cen/backend db:migrate`
+from a checkout before deploying.
 
 ## When something is broken
 

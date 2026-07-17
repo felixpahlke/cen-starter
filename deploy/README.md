@@ -44,6 +44,12 @@ GITHUB_TOKEN=<token> ./deploy/deploy.sh -n <namespace> --autodeploy
 Either way the script creates/updates the `app-env` secret from `.env.production` (filtering
 out `GITHUB_TOKEN`), applies the kustomize base in `deploy/openshift`, and waits for rollout.
 
+**Derived values**: the script applies the route first to reserve the hostname, then fills in
+what depends on it — `BETTER_AUTH_URL` (or, on the oauth-proxy flavor,
+`OAUTH2_PROXY_REDIRECT_URL` plus a generated-once `OAUTH2_PROXY_COOKIE_SECRET`) — directly in
+the `app-env` secret. `.env.production` is never modified; every derived value is printed in
+the deploy summary, and setting one explicitly in `.env.production` overrides derivation.
+
 **Database convention**: if `.env.production` contains no `DATABASE_URL`, the script deploys
 an in-cluster PostgreSQL (`deploy/openshift/postgres.yaml`, pilot/demo grade) and injects the
 generated `DATABASE_URL` into `app-env`. Set `DATABASE_URL` to use a managed PostgreSQL
@@ -51,34 +57,26 @@ instead — recommended for production engagements.
 
 ## Code Engine
 
-Create or update the secret first:
+Create `.env.production` from `.env.production.example` (requires `DATABASE_URL` — Code
+Engine has no in-cluster database convention), then:
 
 ```bash
-ibmcloud ce secret create --name app-env --from-env-file .env.production
-ibmcloud ce secret update --name app-env --from-env-file .env.production
+./deploy/ce-deploy.sh -p <project>    # -g <resource-group>, -r <registry-namespace>
 ```
 
-Create the app:
+Idempotent, first time and every time after. The script selects or creates the Code Engine
+project, ensures the ICR namespace and registry secret (first run needs `IBMCLOUD_API_KEY`
+in the environment or `IAM_API_KEY=` in `.env.production` — filtered out of the app
+secret), builds the image cloud-side from the working tree (`--build-source`, no local
+Docker), creates/updates the `app-env` secret and the app (`--min-scale 1` — cold starts
+hurt an app with auth sessions), and applies the same derived-values convention as the
+OpenShift script: the real app URL is read from Code Engine and injected into the secret
+(`BETTER_AUTH_URL`; on the oauth-proxy flavor `OAUTH2_PROXY_REDIRECT_URL` +
+`OAUTH2_PROXY_UPSTREAMS` + a generated-once cookie secret), followed by a fresh revision.
 
-```bash
-ibmcloud ce app create --name cen-starter \
-  --image <registry>/<repo>/cen-starter:<tag> \
-  --port 8080 \
-  --env-from-secret app-env \
-  --min-scale 1
-```
-
-Update an existing app:
-
-```bash
-ibmcloud ce app update --name cen-starter \
-  --image <registry>/<repo>/cen-starter:<tag> \
-  --port 8080 \
-  --env-from-secret app-env \
-  --min-scale 1
-```
-
-Use `--min-scale 1` for production web traffic to avoid cold starts. For lower-cost non-production environments, `--min-scale 0` is acceptable if cold starts are tolerable.
+On the oauth-proxy flavor the script additionally runs oauth2-proxy as its own public Code
+Engine app in front, and deploys the main app with `--visibility project` so the forwarded
+identity headers cannot be spoofed from the internet.
 
 ## Migrations
 

@@ -21,7 +21,8 @@ Read these before writing anything: `shared/src/schemas/items.ts`, `backend/src/
 3. **Migration** — `pnpm db:generate`, review the generated SQL, then `pnpm db:migrate`
    (database must be running: `docker compose up -d --wait`).
 4. **Route** — `backend/src/routes/<resource>.ts`: copy `items.ts` structure exactly — one
-   `createRoute` per operation, one chained `OpenAPIHono`, `requireAuth` middleware, a
+   `createRoute` per operation, one chained sub-router from `protectedRouter()` (in
+   `routes/lib.ts` — it applies `requireAuth` for you), a
    `serialize` helper for `Date → string`. Register it in `backend/src/index.ts` on the chained
    `api` (`.route("/<resource>", …)`) — the chain is what carries types to the frontend.
 5. **Frontend** — use the typed client: `api.<resource>.$get(...)` etc. with TanStack Query;

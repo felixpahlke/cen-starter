@@ -30,15 +30,18 @@ function Dashboard() {
             </div>
           </div>
         </ClickableTile>
-        <ClickableTile href="/api/docs" renderIcon={ArrowRight} className="min-h-40">
-          <div className="flex h-full flex-col justify-between gap-6">
-            <Api size={20} />
-            <div className="space-y-2">
-              <h2 className="cds--type-heading-03">API docs</h2>
-              <p className="cds--type-body-01 text-text-secondary">View the OpenAPI reference.</p>
+        {/* The backend serves Swagger UI only outside production. */}
+        {import.meta.env.DEV && (
+          <ClickableTile href="/api/docs" renderIcon={ArrowRight} className="min-h-40">
+            <div className="flex h-full flex-col justify-between gap-6">
+              <Api size={20} />
+              <div className="space-y-2">
+                <h2 className="cds--type-heading-03">API docs</h2>
+                <p className="cds--type-body-01 text-text-secondary">View the OpenAPI reference.</p>
+              </div>
             </div>
-          </div>
-        </ClickableTile>
+          </ClickableTile>
+        )}
       </div>
     </div>
   );

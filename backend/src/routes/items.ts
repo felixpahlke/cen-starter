@@ -1,10 +1,9 @@
 import { ItemCreateSchema, ItemSchema, ItemUpdateSchema, PaginationSchema } from "@cen/shared";
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, z } from "@hono/zod-openapi";
 import { and, eq } from "drizzle-orm";
-import { type AuthEnv, requireAuth } from "../auth";
 import { db } from "../db";
 import { items } from "../db/schema";
-import { json, notFound } from "./lib";
+import { json, notFound, protectedRouter } from "./lib";
 
 // The canonical resource. Every new resource copies this file's structure:
 // schemas from @cen/shared, shared route helpers from ./lib, createRoute
@@ -58,10 +57,7 @@ function serialize(row: typeof items.$inferSelect) {
   return { ...row, createdAt: row.createdAt.toISOString() };
 }
 
-const app = new OpenAPIHono<AuthEnv>();
-app.use(requireAuth);
-
-export const itemsRoute = app
+export const itemsRoute = protectedRouter()
   .openapi(listItems, async (c) => {
     const { limit, offset } = c.req.valid("query");
     const userId = c.get("session").user.id;

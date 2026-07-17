@@ -33,7 +33,7 @@ Database data survives `pnpm dev` shutdowns in the Compose volume.
 
 1. **Copy the canonical resource.** `shared/src/schemas/items.ts` + `backend/src/routes/items.ts` show the pattern for every resource: schemas in shared, `createRoute` definitions, one chained `OpenAPIHono`. Don't invent a second style.
 2. **Schemas live in `shared/`.** The zod schema is the single source of truth — API validation, OpenAPI docs, and frontend forms all derive from it. Never duplicate a schema on one side.
-3. **Auth is a seam.** Feature code goes through the seam only: `getSession` / `requireAuth` / `Session` from `backend/src/auth` on the server, `frontend/src/lib/auth` in the browser. Never import the auth implementation anywhere else (the seam files and the auth mount in `backend/src/index.ts` are the only exceptions) — it is swappable and feature code must not know which one is installed.
+3. **Auth is a seam.** Feature code goes through the seam only: `protectedRouter()` from `backend/src/routes/lib.ts` for route files, `getSession` / `Session` from `backend/src/auth` on the server, `frontend/src/lib/auth` in the browser. Never import the auth implementation anywhere else (the seam files, `routes/lib.ts`, and the auth mount in `backend/src/index.ts` are the only exceptions) — it is swappable and feature code must not know which one is installed.
 4. **Database changes**: edit `backend/src/db/schema.ts` → `pnpm db:generate` → `pnpm db:migrate`. Never edit generated migration files by hand.
 5. **New env vars** go into `backend/src/env.ts` (zod-validated, the server refuses to boot without them) *and* `.env.example`, always both.
 6. **Register new routes** on the chained `api` in `backend/src/index.ts` — the chain is what makes RPC types reach the frontend.

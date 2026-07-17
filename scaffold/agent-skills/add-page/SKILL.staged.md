@@ -37,11 +37,15 @@ dialogs), `_layout/index.tsx` the minimal one.
      queryKey: ["reports"],
      queryFn: async () => {
        const res = await api.reports.$get({ query: { limit: 50, offset: 0 } });
-       if (!res.ok) throw new Error(errorMessage(await res.json()));
+       if (!res.ok) throw new Error(`Could not load reports (${res.status})`);
        return res.json();
      },
    });
    ```
+
+   (Throw with the status like `items.tsx` does. `errorMessage(await res.json())` only
+   typechecks on routes that declare error response schemas — the json union has no
+   `message` field otherwise.)
 
    If the page needs a new API resource, do `.agents/skills/add-resource/` first.
 

@@ -6,6 +6,18 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
 
 ## [Unreleased]
 
+- Deploy scripts now derive URL-dependent configuration themselves: `deploy/deploy.sh`
+  reserves the OpenShift route hostname before the first deploy and injects
+  `BETTER_AUTH_URL` — or, on the oauth-proxy flavor, `OAUTH2_PROXY_REDIRECT_URL` plus a
+  generated-once `OAUTH2_PROXY_COOKIE_SECRET` — directly into the `app-env` secret. No more
+  deploy-once-then-fix-the-URL dance; `.env.production` is never modified, derived values
+  are printed in the summary, and explicit values always override.
+- Added `deploy/ce-deploy.sh`: one-command, idempotent IBM Cloud Code Engine deployment
+  with cloud-side image builds (no local Docker). It creates the project, ICR namespace,
+  and registry secret as needed, requires an external `DATABASE_URL`, and derives
+  URL-dependent values from the real app URL. On the oauth-proxy flavor it deploys
+  oauth2-proxy as a public front app and makes the main app project-only so identity
+  headers cannot be spoofed from the internet.
 - `pnpm dev` now owns the complete local lifecycle: Ctrl-C or termination stops the native
   app processes and runs `docker compose down`, while preserving database data in its volume.
 - Added the same ready-to-use development admin (`admin@example.com` / `ChangeMe`) to every

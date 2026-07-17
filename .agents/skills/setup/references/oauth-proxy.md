@@ -94,9 +94,11 @@ state — that's expected, headers only exist behind the proxy.
 ## Production
 
 The OpenShift deployment gains an oauth2-proxy sidecar configured via `OAUTH2_PROXY_*`
-values in `.env.production` (issuer URL, client id/secret from the IdP registration, cookie
-secret, redirect URL = the route URL + `/oauth2/callback`). The service targets the proxy
-port (4180), not the app port. Get the OIDC client registered early — it's the long pole.
+values in `.env.production`. Only the IdP registration values are yours to provide (issuer
+URL, client id, client secret) — `deploy/deploy.sh` derives the redirect URL from the route
+(route URL + `/oauth2/callback`, printed so you can register it with the IdP) and generates
+the cookie secret. The service targets the proxy port (4180), not the app port. Get the
+OIDC client registered early — it's the long pole.
 
 The production advantage is that the application code and trust boundary stay the same when
 the OIDC provider changes. Do not describe that as "just exchange the IdP," though: every

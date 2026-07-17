@@ -24,8 +24,9 @@ cp .env.production.example .env.production    # never commit this file
 ```
 
 - `BETTER_AUTH_SECRET` — generate one: `openssl rand -hex 32`
-- `BETTER_AUTH_URL` — the public URL of the app. You often don't know it before the first
-  deploy: deploy once, read the route (`oc get route`), set it, rerun the deploy.
+- `BETTER_AUTH_URL` — **leave it on the example value.** The script reserves the route
+  hostname before the first deploy and injects the real URL into the app secret itself
+  (it prints what it derived). Set it only to override, e.g. for a custom domain.
 - `DATABASE_URL` — **leave it unset** to get an in-cluster PostgreSQL (pilot/demo grade),
   deployed and wired up automatically. For real engagements, set it to a managed
   PostgreSQL and nothing extra is deployed.
@@ -69,7 +70,8 @@ curl https://<route-host>/api/health     # {"status":"ok"}
 ```
 
 Open the route in the browser and log in end-to-end. If auth requests fail, the usual
-cause is `BETTER_AUTH_URL` not matching the route URL exactly. Promote the first admin by
+cause is an overridden `BETTER_AUTH_URL` that doesn't match the route URL exactly — the
+deploy summary prints the derived value it actually used. Promote the first admin by
 setting `role = 'admin'` on that user's row in the database.
 
 ## Updating

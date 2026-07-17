@@ -44,8 +44,9 @@ exemplary: it gets copied into every project resource, flaws included.
    post-apply checks, late-retrofit notes.
 5. If the flavor makes a feature skill inapplicable, delete
    `scaffold/agent-skills/<skill>/**` in its manifest. Feature skills stay staged there as
-   `SKILL.md.template` files until finalization renames them back; do not put them directly
-   in `.agents/skills/`, and do not name a staged file `SKILL.md`.
+   `SKILL.staged.md` files until finalization renames them back; do not put them directly
+   in `.agents/skills/`, and do not name a staged file `SKILL.md` (skill scanners glob for
+   that exact name).
 6. Run `pnpm verify:flavors`; it verifies bootstrap, the configured app, finalization, and
    promotion of every compatible staged skill.
 

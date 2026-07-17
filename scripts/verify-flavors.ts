@@ -63,6 +63,17 @@ async function main() {
         const stagedSkills = await skillNames(path.join(workspace, "scaffold/agent-skills"));
         if (!stagedSkills.length)
           throw new Error(`${label} left no post-setup skills to activate.`);
+        for (const skill of stagedSkills) {
+          const dir = path.join(workspace, "scaffold/agent-skills", skill);
+          if (await exists(path.join(dir, "SKILL.md"))) {
+            throw new Error(
+              `Staged skill "${skill}" ships a plain SKILL.md — skill scanners can discover it pre-setup; name it SKILL.staged.md.`,
+            );
+          }
+          if (!(await exists(path.join(dir, "SKILL.staged.md")))) {
+            throw new Error(`Staged skill "${skill}" has no SKILL.staged.md.`);
+          }
+        }
 
         run(pnpm, ["verify"], workspace);
         commit(workspace, `Configure ${label}`);

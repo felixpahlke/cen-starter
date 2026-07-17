@@ -35,12 +35,15 @@ function Dashboard() {
               <ArrowRight />
             </Link>
           </Button>
-          <Button asChild variant="outline">
-            <a href="/api/docs">
-              <BookOpen />
-              Swagger UI
-            </a>
-          </Button>
+          {/* The backend serves Swagger UI only outside production. */}
+          {import.meta.env.DEV && (
+            <Button asChild variant="outline">
+              <a href="/api/docs">
+                <BookOpen />
+                Swagger UI
+              </a>
+            </Button>
+          )}
         </CardContent>
       </Card>
     </div>

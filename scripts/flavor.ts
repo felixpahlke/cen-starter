@@ -252,8 +252,9 @@ async function activateStagedSkills() {
   for (const entry of entries) {
     const destination = path.join(active, entry.name);
     await rename(path.join(staged, entry.name), destination);
-    // Staged skills are inert `SKILL.md.template` files so agents cannot discover them pre-setup.
-    const inert = path.join(destination, "SKILL.md.template");
+    // Staged skills are inert `SKILL.staged.md` files (not `SKILL.md`, so skill scanners
+    // cannot discover them pre-setup; still `.md`, so editors highlight them).
+    const inert = path.join(destination, "SKILL.staged.md");
     if (await exists(inert)) await rename(inert, path.join(destination, "SKILL.md"));
   }
 

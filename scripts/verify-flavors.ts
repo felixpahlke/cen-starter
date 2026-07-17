@@ -125,8 +125,8 @@ async function assertFinalized(workspace: string, stagedSkills: string[]) {
     if (!(await exists(path.join(workspace, ".agents/skills", skill, "SKILL.md")))) {
       throw new Error(`Finalization did not activate skill "${skill}".`);
     }
-    if (await exists(path.join(workspace, ".agents/skills", skill, "SKILL.md.template"))) {
-      throw new Error(`Finalization left skill "${skill}" staged as SKILL.md.template.`);
+    if (await exists(path.join(workspace, ".agents/skills", skill, "SKILL.staged.md"))) {
+      throw new Error(`Finalization left skill "${skill}" staged as SKILL.staged.md.`);
     }
   }
 

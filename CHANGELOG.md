@@ -6,6 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
 
 ## [Unreleased]
 
+- The default shadcn theme now matches IBM's refreshed design language: pill-shaped buttons,
+  generously rounded cards (~16px) and inputs, white cards on a near-white page in light
+  mode, deep blue `#0043CE` primary, and a near-black dark mode whose focus rings are blue
+  (previously white, per classic Carbon). The stock shadcn look remains available by
+  swapping `themes/neutral.css` in `frontend/src/styles/index.css`. The `carbon` flavor
+  (`@carbon/react`) keeps the classic Carbon look until IBM ships the refresh in the
+  component library itself.
 - All setup-only machinery now lives in a single `.template/` directory: flavors, the staged
   project `AGENTS.md` + feature skills (formerly `scaffold/`), and the setup scripts
   (bootstrap, flavor engine, setup guard, flavor verification). A fresh clone's visible tree

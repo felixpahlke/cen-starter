@@ -60,11 +60,13 @@ async function main() {
           ],
           workspace,
         );
-        const stagedSkills = await skillNames(path.join(workspace, "scaffold/agent-skills"));
+        const stagedSkills = await skillNames(
+          path.join(workspace, ".template/scaffold/agent-skills"),
+        );
         if (!stagedSkills.length)
           throw new Error(`${label} left no post-setup skills to activate.`);
         for (const skill of stagedSkills) {
-          const dir = path.join(workspace, "scaffold/agent-skills", skill);
+          const dir = path.join(workspace, ".template/scaffold/agent-skills", skill);
           if (await exists(path.join(dir, "SKILL.md"))) {
             throw new Error(
               `Staged skill "${skill}" ships a plain SKILL.md — skill scanners can discover it pre-setup; name it SKILL.staged.md.`,
@@ -121,11 +123,9 @@ async function skillNames(directory: string) {
 
 async function assertFinalized(workspace: string, stagedSkills: string[]) {
   for (const relative of [
-    "flavors",
-    "scaffold",
+    ".template",
     ".agents/skills/setup",
     ".agents/skills/template-maintenance",
-    "scripts/guard-setup.mjs",
   ]) {
     if (await exists(path.join(workspace, relative))) {
       throw new Error(`Finalization did not remove ${relative}.`);
@@ -153,7 +153,7 @@ async function assertFinalized(workspace: string, stagedSkills: string[]) {
 }
 
 async function readManifests() {
-  const flavorsDirectory = path.join(root, "flavors");
+  const flavorsDirectory = path.join(root, ".template/flavors");
   const entries = await readdir(flavorsDirectory, { withFileTypes: true });
   const directories = entries
     .filter((entry) => entry.isDirectory())
@@ -164,7 +164,9 @@ async function readManifests() {
       const file = path.join(flavorsDirectory, directory.name, "manifest.json");
       const manifest = JSON.parse(await readFile(file, "utf8")) as FlavorManifest;
       if (manifest.name !== directory.name) {
-        throw new Error(`Manifest name "${manifest.name}" must match flavors/${directory.name}.`);
+        throw new Error(
+          `Manifest name "${manifest.name}" must match .template/flavors/${directory.name}.`,
+        );
       }
       if (
         manifest.combinesWith !== undefined &&

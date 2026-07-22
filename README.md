@@ -6,27 +6,37 @@
 
 # CEN Starter
 
-**The full-stack starter for the agent era.** TypeScript end-to-end, type-safe from database to
-browser, and running in under five minutes — one branch, one command, zero config.
+**The full-stack starter for the agent era.** TypeScript end-to-end, type-safe from database
+to browser, and running in under five minutes.
 
-One maximal base app: every variation (Carbon, oauth-proxy, no database, backend-only — and
-the sensible combinations) is a small, CI-tested transformation you — or your AI agent —
-apply in seconds instead of a template branch you're stuck with.
+This template **morphs into exactly the app you need** — full-stack or backend-only, shadcn
+or IBM Carbon, company SSO or local auth. It arrives in **setup mode**: a complete, runnable
+base app, plus one `.template/` folder holding the setup machinery. Your AI agent interviews
+you in product terms, applies the matching configuration, verifies the running app, and
+finalizes — deleting `.template/` and leaving exactly your app, nothing more.
 
 ## How this works
 
-This repo is **agent-first**. The intended path: clone it yourself to where the project
-should live, open that folder in your AI coding tool, and tell the agent what you want to
-build. The agent interviews you in product terms (no flavor or package names), applies the
-matching configuration, boots and verifies the app, and finalizes — you approve the
-decisions, it runs the commands.
+The repo is **agent-first** and has two states:
 
-Under the hood the template has two states. It starts as a **maximal base app** — database,
-auth, admin panel, shadcn/ui frontend, an example resource — plus `flavors/`: small,
-CI-tested transformations that subtract or swap parts (Carbon UI, OAuth proxy,
-backend-only, no database). `pnpm flavor finalize` locks the chosen shape: it strips all
-template machinery and swaps AGENTS.md for the project's own working conventions. What's
-left is exactly your app, nothing more.
+- **Setup mode** (as cloned): the maximal base app — database, auth, admin panel, shadcn/ui
+  frontend, an example resource. `.template/` contains small, CI-tested transformations
+  ("flavors") that subtract or swap parts: Carbon UI, OAuth proxy, backend-only, no database.
+- **Your project** (after `pnpm flavor finalize`): the machinery is gone, AGENTS.md becomes
+  the project's own working guide, and the agent feature skills are active. Every file left
+  is one you keep.
+
+Clone it to where the project should live, open that folder in your AI coding tool, and say
+what you want to build — the agent runs the interview, bootstrap, verification, and
+finalization; you approve the decisions.
+
+Just want to look around first? The base app runs as-is, before any setup:
+
+```bash
+pnpm install
+cp .env.example .env
+pnpm dev    # http://localhost:5173 — sign in: admin@example.com / ChangeMe
+```
 
 ## Start a project
 

@@ -52,7 +52,7 @@ type FlavorPlan = {
 };
 
 const root = process.cwd();
-const flavorsDir = path.join(root, "flavors");
+const flavorsDir = path.join(root, ".template/flavors");
 const skippedDirs = new Set([".git", "node_modules"]);
 
 async function main() {
@@ -202,18 +202,13 @@ async function finalize() {
   console.log("Verifying the configured project before finalization...");
   run("pnpm verify");
 
-  const hadBootstrap = await exists(abs("scripts/bootstrap.ts"));
-  await rm(abs("flavors"), { recursive: true, force: true });
-  await rm(abs("scripts/flavor.ts"), { force: true });
-  await rm(abs("scripts/verify-flavors.ts"), { force: true });
+  const hadBootstrap = await exists(abs(".template/scripts/bootstrap.ts"));
   await rm(abs(".agents/skills/setup"), { recursive: true, force: true });
   await rm(abs(".agents/skills/template-maintenance"), { recursive: true, force: true });
   await installProjectAgentsFile();
   await activateStagedSkills();
-  await rm(abs("scripts/guard-setup.mjs"), { force: true });
-  if (hadBootstrap) await rm(abs("scripts/bootstrap.ts"), { force: true });
-  // The root tsconfig only covers scripts/, which is gone after finalize.
-  await rm(abs("tsconfig.json"), { force: true });
+  // Everything else that is setup-only lives under .template/ — one deletion strips it all.
+  await rm(abs(".template"), { recursive: true, force: true });
 
   const scripts = objectAt(pkg, "scripts");
   delete scripts.flavor;
@@ -222,7 +217,7 @@ async function finalize() {
   if (hadBootstrap) delete scripts.bootstrap;
   const dbGenerate = scripts["db:generate"];
   if (typeof dbGenerate === "string") {
-    scripts["db:generate"] = dbGenerate.replace("node scripts/guard-setup.mjs && ", "");
+    scripts["db:generate"] = dbGenerate.replace("node .template/scripts/guard-setup.mjs && ", "");
   }
   metadata.finalized = true;
   await writeJson("package.json", pkg);
@@ -231,12 +226,12 @@ async function finalize() {
 
 // The root AGENTS.md is only the setup gate; the project's working guide ships staged.
 async function installProjectAgentsFile() {
-  const staged = abs("scaffold/AGENTS.md");
+  const staged = abs(".template/scaffold/AGENTS.md");
   if (await exists(staged)) await rename(staged, abs("AGENTS.md"));
 }
 
 async function activateStagedSkills() {
-  const staged = abs("scaffold/agent-skills");
+  const staged = abs(".template/scaffold/agent-skills");
   if (!(await exists(staged))) return;
 
   const active = abs(".agents/skills");
@@ -259,7 +254,7 @@ async function activateStagedSkills() {
   }
 
   await removeEmptyDirectory(staged);
-  await removeEmptyDirectory(abs("scaffold"));
+  await removeEmptyDirectory(abs(".template/scaffold"));
 }
 
 async function allManifests() {
@@ -310,7 +305,7 @@ async function readManifest(name: string) {
     await readJson(path.join(flavorsDir, name, "manifest.json")),
   );
   if (manifest.name !== name) {
-    throw new Error(`Manifest name "${manifest.name}" must match flavors/${name}.`);
+    throw new Error(`Manifest name "${manifest.name}" must match .template/flavors/${name}.`);
   }
   return manifest;
 }
@@ -394,7 +389,9 @@ async function validateComboOverlays(name: string, combinesWith: string[], appli
     const info = await stat(source).catch(() => null);
     if (!info) continue;
     if (!info.isDirectory()) {
-      throw new Error(`Combo overlay must be a directory: flavors/${name}/combo/${combined}`);
+      throw new Error(
+        `Combo overlay must be a directory: .template/flavors/${name}/combo/${combined}`,
+      );
     }
     await rejectSymlinks(source);
     overlays.push(source);
@@ -488,7 +485,7 @@ async function packageFiles(relativeDir: string): Promise<string[]> {
   const files: string[] = [];
   for (const entry of await readdir(abs(relativeDir), { withFileTypes: true })) {
     const relative = posix(path.join(relativeDir, entry.name));
-    if (entry.isDirectory() && !skippedDirs.has(entry.name) && entry.name !== "flavors") {
+    if (entry.isDirectory() && !skippedDirs.has(entry.name) && entry.name !== ".template") {
       files.push(...(await packageFiles(relative)));
     } else if (entry.isFile() && entry.name === "package.json") {
       files.push(relative);

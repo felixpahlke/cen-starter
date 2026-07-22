@@ -10,7 +10,7 @@ import { createInterface } from "node:readline/promises";
 // ("setup" would shadow pnpm's own builtin `pnpm setup` command — don't rename it back.)
 // Usage: pnpm bootstrap [--name <project-name>] [--flavors <a,b|none>]
 
-const root = path.resolve(import.meta.dirname, "..");
+const root = path.resolve(import.meta.dirname, "../..");
 
 const args = process.argv.slice(2);
 function flag(name: string) {
@@ -162,10 +162,10 @@ async function main() {
   let chosen: string[] = [];
   let available: string[] = [];
   try {
-    const entries = await readdir(path.join(root, "flavors"), { withFileTypes: true });
+    const entries = await readdir(path.join(root, ".template/flavors"), { withFileTypes: true });
     available = entries.filter((e) => e.isDirectory()).map((e) => e.name);
   } catch {
-    // flavors/ gone — nothing to offer
+    // .template/flavors/ gone — nothing to offer
   }
   if (flavorsArg !== undefined) {
     chosen = flavorsArg === "none" ? [] : flavorsArg.split(",").map((f) => f.trim());

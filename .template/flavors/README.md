@@ -4,11 +4,12 @@
 `.agents/skills/setup/SKILL.md` first: interview your user (database? design system?
 frontend? auth?), apply the matching flavors, and only then start building features.
 
-Post-setup feature skills live in `scaffold/agent-skills/` as inert `SKILL.staged.md`
-files while this directory exists, so agents cannot discover and invoke them before setup is
-complete. Flavors delete incompatible staged skills. Finalization promotes the remainder
-into `.agents/skills/`, restores their `SKILL.md` names, and installs `scaffold/AGENTS.md`
-as the project's working `AGENTS.md` — all in one operation.
+Post-setup feature skills live in `.template/scaffold/agent-skills/` as inert
+`SKILL.staged.md` files while this directory exists, so agents cannot discover and invoke
+them before setup is complete. Flavors delete incompatible staged skills. Finalization
+promotes the remainder into `.agents/skills/`, restores their `SKILL.md` names, installs
+`.template/scaffold/AGENTS.md` as the project's working `AGENTS.md`, and deletes all of
+`.template/` — all in one operation.
 
 ## What this is
 
@@ -48,6 +49,6 @@ A failing workspace is retained under the printed temporary path for inspection.
 A broken edit anchor fails the apply step loudly (every `find` must match exactly once). When
 touching manifests, prefer `delete` + `overlay` over `edits` — anchors are the fragile part.
 If a flavor makes a feature workflow inapplicable, delete it from
-`scaffold/agent-skills/<skill>/**` in the manifest. New flavor? Declare its supported
+`.template/scaffold/agent-skills/<skill>/**` in the manifest. New flavor? Declare its supported
 combinations in `combinesWith`, write its `references/<flavor>.md`, and run
 `pnpm verify:flavors`.

@@ -1,7 +1,7 @@
 ---
 name: setup
 description: >-
-  Mandatory first workflow for ANY task in an unfinalized CEN Starter checkout (flavors/
+  Mandatory first workflow for ANY task in an unfinalized CEN Starter checkout (.template/
   exists; cen.finalized is false in package.json) — including direct feature requests such
   as "build a todo app" or "add a page". Pause feature work, guide the user through
   outcome-focused configuration choices, apply the matching flavors, bootstrap, verify the
@@ -14,8 +14,8 @@ This repo is a **maximal base app** (database, local auth, admin panel, shadcn/u
 example `items` resource). Flavors subtract or swap parts of it. Your job: find out what your
 user actually needs, apply the matching flavors, then hand over a running app.
 
-This skill and the `flavors/` machinery are deleted by `pnpm flavor finalize` — in a finalized
-project none of this applies.
+This skill and the `.template/` machinery are deleted by `pnpm flavor finalize` — in a
+finalized project none of this applies.
 
 ## 1. Confirm the project location
 

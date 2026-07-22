@@ -13,8 +13,8 @@
     "backend/src/routes/items.ts",
     "backend/src/routes/items.test.ts",
     "shared/src/schemas/items.ts",
-    "scaffold/agent-skills/db-migrations/**",
-    "scaffold/agent-skills/add-resource/**",
+    ".template/scaffold/agent-skills/db-migrations/**",
+    ".template/scaffold/agent-skills/add-resource/**",
     "frontend/src/routes/_layout/items.tsx",
     "frontend/src/routes/login.tsx",
     "frontend/src/routes/signup.tsx",
@@ -90,8 +90,8 @@
     },
     {
       "file": "package.json",
-      "find": "    \"verify:flavors\": \"tsx scripts/verify-flavors.ts\",\n    \"db:generate\": \"node scripts/guard-setup.mjs && pnpm --filter @cen/backend db:generate\",\n    \"db:migrate\": \"pnpm --filter @cen/backend db:migrate\",\n    \"db:seed\": \"pnpm --filter @cen/backend db:seed\",\n    \"db:studio\": \"pnpm --filter @cen/backend db:studio\"\n",
-      "replace": "    \"verify:flavors\": \"tsx scripts/verify-flavors.ts\"\n"
+      "find": "    \"verify:flavors\": \"tsx .template/scripts/verify-flavors.ts\",\n    \"db:generate\": \"node .template/scripts/guard-setup.mjs && pnpm --filter @cen/backend db:generate\",\n    \"db:migrate\": \"pnpm --filter @cen/backend db:migrate\",\n    \"db:seed\": \"pnpm --filter @cen/backend db:seed\",\n    \"db:studio\": \"pnpm --filter @cen/backend db:studio\"\n",
+      "replace": "    \"verify:flavors\": \"tsx .template/scripts/verify-flavors.ts\"\n"
     },
     {
       "file": "backend/package.json",

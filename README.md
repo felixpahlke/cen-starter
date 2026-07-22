@@ -134,6 +134,14 @@ adding resources, migrations, deployment, and debugging in `.agents/skills/`.
 Production ships as a single container: the API serves the built SPA. One image, one deploy —
 OpenShift and Code Engine scripts included.
 
+## What it looks like
+
+![The dashboard: app shell, navigation, and the signed-in state](docs/images/dashboard-light.png)
+
+| The example resource | Dark mode, one toggle away |
+| --- | --- |
+| ![The items page: a typed CRUD table](docs/images/items-light.png) | ![The same items page in dark mode](docs/images/items-dark.png) |
+
 ## Everyday commands
 
 ```bash

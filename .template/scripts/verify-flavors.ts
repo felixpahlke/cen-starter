@@ -53,8 +53,11 @@ async function main() {
           pnpm,
           [
             "bootstrap",
+            // Never bootstrap with the template's own name: a dev machine that has run
+            // `pnpm dev` in this checkout owns cen-starter_* Docker volumes, and
+            // bootstrap's stale-volume guard would (correctly) refuse.
             "--name",
-            names.length ? `flavor-check-${label.replaceAll(" + ", "-")}` : "cen-starter",
+            names.length ? `flavor-check-${label.replaceAll(" + ", "-")}` : "flavor-check-base",
             "--flavors",
             names.length ? names.join(",") : "none",
           ],

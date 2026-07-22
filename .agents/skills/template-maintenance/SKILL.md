@@ -9,7 +9,9 @@ Only applies in the **template repository** (`cen-starter` itself). If this is a
 from the template, stop — this skill is not for you (finalize removes it).
 
 The template repository never finalizes, so the root `AGENTS.md` stays the setup gate
-permanently. The working conventions for finished projects live in `scaffold/AGENTS.md`
+permanently. All setup-only machinery (flavors, staged skills, setup scripts) lives under
+`.template/`, which finalize deletes wholesale. The working conventions for finished
+projects live in `.template/scaffold/AGENTS.md`
 (installed as the project's `AGENTS.md` at finalization) — keep that file accurate when the
 base changes. The root `pnpm db:generate` is guarded while `cen.finalized` is false; for
 base-schema work run `CEN_TEMPLATE_MAINTENANCE=1 pnpm db:generate`.
@@ -34,7 +36,7 @@ exemplary: it gets copied into every project resource, flaws included.
 
 ## Adding a flavor
 
-1. `flavors/<name>/manifest.json` — bias delete+overlay over edits; declare `conflicts` in
+1. `.template/flavors/<name>/manifest.json` — bias delete+overlay over edits; declare `conflicts` in
    BOTH directions (this manifest and the conflicting ones).
 2. Overlay `.ts`/`.tsx` files start with the `// @ts-nocheck — template overlay; …` line
    (stripped on apply). Exception: files that already carry their own `@ts-nocheck` (e.g.
@@ -43,7 +45,7 @@ exemplary: it gets copied into every project resource, flaws included.
 4. Write `.agents/skills/setup/references/<name>.md`: when to choose it, what it changes,
    post-apply checks, late-retrofit notes.
 5. If the flavor makes a feature skill inapplicable, delete
-   `scaffold/agent-skills/<skill>/**` in its manifest. Feature skills stay staged there as
+   `.template/scaffold/agent-skills/<skill>/**` in its manifest. Feature skills stay staged there as
    `SKILL.staged.md` files until finalization renames them back; do not put them directly
    in `.agents/skills/`, and do not name a staged file `SKILL.md` (skill scanners glob for
    that exact name).

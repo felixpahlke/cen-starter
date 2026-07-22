@@ -11,7 +11,7 @@ below serves that one test.
 ## Checklist
 
 1. **Confirm setup is finalized.** `package.json` must have `cen.finalized: true`, and
-   `flavors/` must be absent. If not, stop and complete the setup workflow first.
+   `.template/` must be absent. If not, stop and complete the setup workflow first.
 2. **README rewrite.** The README still sells the template; the client needs it to describe
    *their project*: what it does, how to run it (3 commands), where it's deployed, who to
    contact. Keep the agent pointer to AGENTS.md. Delete template marketing.

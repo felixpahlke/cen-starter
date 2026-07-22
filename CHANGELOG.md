@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
 
 ## [Unreleased]
 
+- All setup-only machinery now lives in a single `.template/` directory: flavors, the staged
+  project `AGENTS.md` + feature skills (formerly `scaffold/`), and the setup scripts
+  (bootstrap, flavor engine, setup guard, flavor verification). A fresh clone's visible tree
+  now contains only files that survive finalization, and `pnpm flavor finalize` deletes
+  `.template/` wholesale. Command entry points (`pnpm bootstrap`, `pnpm flavor …`,
+  `pnpm verify:flavors`) are unchanged.
 - Deploy scripts now derive URL-dependent configuration themselves: `deploy/deploy.sh`
   reserves the OpenShift route hostname before the first deploy and injects
   `BETTER_AUTH_URL` — or, on the oauth-proxy flavor, `OAUTH2_PROXY_REDIRECT_URL` plus a

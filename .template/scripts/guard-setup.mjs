@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import process from "node:process";
 
-const pkg = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+const pkg = JSON.parse(await readFile(new URL("../../package.json", import.meta.url), "utf8"));
 if (pkg.cen?.finalized === false && !process.env.CEN_TEMPLATE_MAINTENANCE) {
   console.error(
     "\n✗ setup mode: this template is not finalized, and new migrations are feature work.\n" +

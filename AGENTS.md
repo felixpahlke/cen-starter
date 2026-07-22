@@ -2,7 +2,7 @@
 
 ## STOP — this template is not set up yet
 
-This is an unconfigured clone of the CEN Starter template: `flavors/` exists and
+This is an unconfigured clone of the CEN Starter template: `.template/` exists and
 `package.json` → `cen.finalized` is `false`.
 
 Whatever the user asked for — even a concrete feature like "build a todo list" — the first
@@ -16,4 +16,4 @@ this file with the project's real working guide and activates the feature skills
 
 Maintaining the CEN Starter template itself, not starting a project from it? Use
 `.agents/skills/template-maintenance/SKILL.md`; the post-setup working conventions live in
-`scaffold/AGENTS.md`.
+`.template/scaffold/AGENTS.md`.

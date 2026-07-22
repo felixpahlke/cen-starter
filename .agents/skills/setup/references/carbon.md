@@ -47,6 +47,6 @@ and restyle by hand using the template repo's `carbon` overlay as the reference.
 
 ## Retrofitting late
 
-Feasible by hand: the template repo's `flavors/carbon/overlay/` shows the target state of
+Feasible by hand: the template repo's `.template/flavors/carbon/overlay/` shows the target state of
 every touched file. Biggest chunks are the layout (UI Shell) and any pages built on vendored
 shadcn components in the meantime.

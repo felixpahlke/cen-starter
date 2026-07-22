@@ -1,52 +1,51 @@
 /*
- * Carbon-flavored theme: IBM Carbon Design System tokens mapped onto the shadcn
- * variable set (light = Carbon White, dark = Carbon Gray 100). This gets the IBM
- * look with plain shadcn components; the full Carbon component library is
- * available as the `carbon` flavor.
+ * Carbon-flavored theme: IBM's current design language mapped onto the shadcn
+ * variable set. This gets the IBM look with plain shadcn components; the full
+ * Carbon component library is available as the `carbon` flavor.
  */
 
 :root {
-  --radius: 0rem;
+  --radius: 0.75rem;
 
-  --background: #ffffff;
+  --background: #f7f7f7;
   --foreground: #161616; /* text-primary */
-  --card: #f4f4f4; /* layer-01 */
+  --card: #ffffff;
   --card-foreground: #161616;
   --popover: #ffffff;
   --popover-foreground: #161616;
-  --primary: #0f62fe; /* blue-60 / interactive */
+  --primary: #0043ce; /* interactive */
   --primary-foreground: #ffffff;
-  --secondary: #393939; /* button-secondary */
+  --secondary: #161616;
   --secondary-foreground: #ffffff;
-  --muted: #e0e0e0; /* layer-accent-01 */
-  --muted-foreground: #525252; /* text-secondary */
-  --accent: #e8e8e8; /* layer-hover-01 */
+  --muted: #f0f0f0;
+  --muted-foreground: #6f6f6f;
+  --accent: #f0f0f0;
   --accent-foreground: #161616;
   --destructive: #da1e28; /* support-error / red-60 */
   --destructive-foreground: #ffffff;
-  --border: #e0e0e0; /* border-subtle-01 */
-  --input: #8d8d8d; /* border-strong-01 */
-  --ring: #0f62fe; /* focus */
+  --border: #e8e8e8;
+  --input: #c6c6c6;
+  --ring: #0043ce;
 }
 
 .dark {
-  --background: #161616; /* gray-100 */
+  --background: #0b0b0b;
   --foreground: #f4f4f4;
-  --card: #262626; /* layer-01 */
+  --card: #1c1c1c;
   --card-foreground: #f4f4f4;
-  --popover: #262626;
+  --popover: #1c1c1c;
   --popover-foreground: #f4f4f4;
   --primary: #0f62fe;
   --primary-foreground: #ffffff;
-  --secondary: #6f6f6f;
-  --secondary-foreground: #ffffff;
-  --muted: #393939;
-  --muted-foreground: #c6c6c6;
-  --accent: #353535; /* layer-hover-01 */
+  --secondary: #f4f4f4;
+  --secondary-foreground: #161616;
+  --muted: #262626;
+  --muted-foreground: #a8a8a8;
+  --accent: #2a2a2a;
   --accent-foreground: #f4f4f4;
   --destructive: #fa4d56; /* red-50 (dark surfaces) */
   --destructive-foreground: #ffffff;
-  --border: #393939; /* border-subtle-01 */
-  --input: #6f6f6f;
-  --ring: #ffffff; /* Carbon focus on dark is white */
+  --border: #2a2a2a;
+  --input: #525252;
+  --ring: #0f62fe;
 }

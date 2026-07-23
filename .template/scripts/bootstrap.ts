@@ -1,6 +1,7 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import { constants } from "node:fs";
 import { copyFile, readdir, readFile, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import path from "node:path";
 import process from "node:process";
 import { createInterface } from "node:readline/promises";
@@ -11,6 +12,10 @@ import { createInterface } from "node:readline/promises";
 // Usage: pnpm bootstrap [--name <project-name>] [--flavors <a,b|none>]
 
 const root = path.resolve(import.meta.dirname, "../..");
+const require = createRequire(import.meta.url);
+const { resolveContainerEngine } = require("../../scripts/container-engine.cjs") as {
+  resolveContainerEngine(options?: { required?: boolean }): "docker" | "podman" | undefined;
+};
 
 const args = process.argv.slice(2);
 function flag(name: string) {
@@ -54,10 +59,16 @@ async function main() {
   if (spawnSync("pnpm", ["--version"], { stdio: "ignore" }).status !== 0) {
     fail("pnpm not found. Enable it with `corepack enable` and re-run.");
   }
-  const dockerUp = spawnSync("docker", ["info"], { stdio: "ignore" }).status === 0;
-  if (!dockerUp) {
+  try {
+    process.loadEnvFile(path.join(root, ".env"));
+  } catch {
+    // A fresh clone does not have .env yet; auto-detection remains the default.
+  }
+  const containerEngine = resolveContainerEngine({ required: false });
+  if (!containerEngine) {
     console.warn(
-      "⚠ Docker is not running. The default stack needs it for the dev database — start it\n" +
+      "⚠ Docker or Podman is not ready. The default stack needs a container engine for\n" +
+        "  the dev database — start one and ensure its Compose provider is installed\n" +
         "  before `pnpm dev` (not needed if you apply the no-database flavor).",
     );
   }
@@ -96,28 +107,28 @@ async function main() {
     fail(`"${name}" is not a valid package name (lowercase letters, digits, ".", "_", "-").`);
   }
 
-  // Stale Docker volumes from an earlier project with the same Compose project name would be
-  // silently reused by `docker compose up` — Postgres then holds foreign tables and
+  // Stale container volumes from an earlier project with the same Compose project name would be
+  // silently reused by `compose up` — Postgres then holds foreign tables and
   // `db:migrate` hangs without an error. Catch the collision while the name is still cheap
   // to change.
-  if (dockerUp) {
+  if (containerEngine) {
     try {
-      const volumes = execFileSync("docker", ["volume", "ls", "--format", "{{.Name}}"], {
+      const volumes = execFileSync(containerEngine, ["volume", "ls", "--format", "{{.Name}}"], {
         encoding: "utf8",
       })
         .split("\n")
         .filter((volume) => volume.startsWith(`${name}_`));
       if (volumes.length) {
         fail(
-          `Docker volume(s) from a previous project named "${name}" exist: ${volumes.join(", ")}.\n` +
+          `Container volume(s) from a previous project named "${name}" exist: ${volumes.join(", ")}.\n` +
             `  Reusing them makes database migrations hang on stale data. Either confirm with\n` +
             `  the user and wipe the old project's data:\n` +
-            `    docker compose -p ${name} down -v\n` +
+            `    ${containerEngine} compose -p ${name} down -v\n` +
             `  or re-run bootstrap with a different --name.`,
         );
       }
     } catch {
-      // docker volume ls failed — don't block bootstrap on it
+      // volume listing failed — don't block bootstrap on it
     }
   }
 
@@ -134,7 +145,12 @@ async function main() {
   const origin = tryGit(["remote", "get-url", "origin"]);
   if (origin && tryGit(["remote", "get-url", "upstream"]) === null) {
     tryGit(["remote", "rename", "origin", "upstream"]);
-    console.log(`✓ Renamed remote origin → upstream (template updates stay pullable);`);
+    tryGit(["remote", "set-url", "--push", "upstream", "DISABLED"]);
+    const branch = tryGit(["branch", "--show-current"]);
+    if (branch && tryGit(["config", "--get", `branch.${branch}.remote`]) === "upstream") {
+      tryGit(["branch", "--unset-upstream"]);
+    }
+    console.log(`✓ Kept the template as fetch-only remote upstream;`);
     console.log("  add your project's own repo as origin when you have one.");
   }
 

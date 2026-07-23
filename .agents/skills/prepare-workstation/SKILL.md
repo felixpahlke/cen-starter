@@ -20,11 +20,11 @@ time and explain what each action does.
   summarize the action and get the user's confirmation.
 - On managed devices, prefer the company software portal or IT instructions. Never bypass
   device policy, proxies, certificates, or endpoint protection.
-- Do not install Docker Desktop on IBM-managed machines. Prefer Rancher Desktop with the Moby
-  engine where a local container runtime is required.
+- Do not install Docker Desktop on IBM-managed machines. Use the approved Docker-compatible
+  runtime or Podman where a local container engine is required.
 - Use official installers and documentation. Do not pipe a downloaded script into a shell
   without showing the command and getting confirmation.
-- Do not uninstall an existing runtime, reset Docker, or stop unrelated containers without
+- Do not uninstall an existing runtime, reset its storage, or stop unrelated containers without
   explicit permission.
 
 ## 1. Audit
@@ -38,6 +38,9 @@ pnpm --version
 docker --version
 docker compose version
 docker info
+podman --version
+podman compose version
+podman info
 oc version --client
 ibmcloud --version
 ibmcloud plugin show code-engine
@@ -45,8 +48,8 @@ ibmcloud plugin show container-registry
 ```
 
 Node must satisfy `package.json` and should match `.nvmrc`. pnpm should match the
-`packageManager` field. `docker info` must reach a running daemon; having only the CLI is not
-enough.
+`packageManager` field. One configured engine must pass both `info` and `compose version`;
+having only a CLI is not enough. Do not require both engines.
 
 ## 2. Install what is missing
 

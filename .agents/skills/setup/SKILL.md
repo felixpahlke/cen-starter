@@ -157,7 +157,7 @@ pnpm dev > /tmp/cen-dev.log 2>&1 &
 ```
 
 Poll `curl -s http://localhost:3000/api/health` (`API_PORT` from `.env`) — the first boot
-downloads Docker images, so allow a couple of minutes — and read the log on failure.
+downloads container images, so allow a couple of minutes — and read the log on failure.
 
 If your environment cannot background at all, have the user run `pnpm dev` with
 click-level directions: in IBM Bob or VS Code, top menu bar → **Terminal → New Terminal**

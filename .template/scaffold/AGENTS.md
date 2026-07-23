@@ -13,7 +13,7 @@ tree is what applies:
   backend with no codegen.
 - `shared/` — zod schemas used by both sides.
 
-Dev services run in Docker Compose; the apps themselves run natively.
+Dev services run through Docker or Podman Compose; the apps themselves run natively.
 
 ## Commands
 

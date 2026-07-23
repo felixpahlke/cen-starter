@@ -10,6 +10,8 @@
   that Rancher uses Moby/dockerd, then inspect `docker context ls`; do not reset or delete data.
 - **`docker compose` is missing:** install the Compose plugin. Do not silently substitute the
   legacy `docker-compose` command.
+- **`podman compose` is missing:** install or configure a supported Compose provider; do not
+  create a `docker` symlink as a workaround.
 - **Permission denied on Docker:** use the official platform guidance. Do not make the socket
   world-writable.
 - **Proxy or certificate failure:** use company proxy and CA instructions. Never disable TLS

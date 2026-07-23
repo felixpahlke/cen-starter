@@ -31,6 +31,9 @@ company standard; otherwise install Docker Engine, the CLI, Buildx, and Compose 
 [official Engine guide](https://docs.docker.com/engine/install/). Docker Desktop is not needed.
 Avoid Docker's convenience script unless the user explicitly approves it after reviewing it.
 
+Podman with a working Compose provider is equally supported when it is installed or preferred
+by company policy; verify it with `podman info` and `podman compose version` instead.
+
 Start the daemon if necessary, then verify:
 
 ```bash

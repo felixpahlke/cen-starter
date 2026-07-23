@@ -10,14 +10,15 @@ doing it yourself, and for understanding what the agent does.
 |---|---|---|
 | Node.js ≥ 22 | runs everything | `brew install nvm && nvm install 22` |
 | pnpm | package manager (never npm/yarn) | `corepack enable` |
-| Docker runtime | dev database (and Dex/proxy with the OAuth flavor) | Rancher Desktop (Moby engine) — use the company software portal on managed machines |
+| Container engine | dev database (and Dex/proxy with OAuth) | Docker or Podman with Compose; use the company software portal on managed machines |
 | Git | you know why | `brew install git` |
 
 > 🤖 **With your agent:** "Check my machine for CEN Starter development and install what's
 > missing." — it audits and fixes one tool at a time (the `prepare-workstation` skill).
 
-On IBM-managed machines, don't install Docker Desktop — Rancher Desktop with the Moby
-engine is the supported route.
+On IBM-managed machines, don't install Docker Desktop. Use an approved Docker-compatible
+runtime or Podman. `CEN_CONTAINER_ENGINE=auto` in `.env` selects the first ready engine; set
+it to `docker` or `podman` when both are installed.
 
 ## Set up the project
 
@@ -39,7 +40,7 @@ pnpm dev
 
 This checks that all ports are free, starts the dev containers, applies database
 migrations, seeds the development admin, and starts API + frontend with hot reload.
-First run downloads Docker images — give it a couple of minutes. Ctrl-C stops everything;
+First run downloads container images — give it a couple of minutes. Ctrl-C stops everything;
 your data stays in the database volume.
 
 | URL | What |
@@ -85,11 +86,11 @@ agent skills for the everyday workflows (add a resource, add a page, migrations,
   the values in `.env` (change `DB_PORT` together with the port inside `DATABASE_URL`).
   Never stop containers you don't recognize; they belong to other projects.
 - **`db:migrate` hangs silently** — the database volume probably belongs to an old project
-  with the same name. Reset it: `docker compose down -v` (destroys only *this* project's
-  local data), then `pnpm dev` again.
+  with the same name. Reset it with `<docker|podman> compose down -v` (destroys only *this*
+  project's local data), then run `pnpm dev` again.
 - **API won't start** — it validates every env var at boot and tells you which one is
   missing or malformed. Fix `.env`, don't fight the validation.
-- **Docker disk fills up over time** — `docker system prune` clears unused images and
-  containers from old projects.
+- **Container storage fills up over time** — `<docker|podman> system prune` clears unused
+  images and containers from old projects.
 - **Something else** — paste the exact error to your agent; the debug skills know this
   stack.

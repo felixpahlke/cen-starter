@@ -50,5 +50,9 @@ In Rancher Desktop, select the **Moby/dockerd** container engine and disable Kub
 the project specifically needs it. Wait until the engine is running, then verify with
 `docker info` and `docker compose version`.
 
+If Podman is already installed or is the approved choice, start its machine and verify
+`podman info` and `podman compose version` instead. Do not install a second engine when one
+working option already exists.
+
 Use [Colima](https://github.com/abiosoft/colima) only when Rancher Desktop is unavailable and
 company policy approves it.

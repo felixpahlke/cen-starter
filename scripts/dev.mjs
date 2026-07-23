@@ -2,6 +2,9 @@ import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import containerEngine from "./container-engine.cjs";
+
+const { resolveContainerEngine } = containerEngine;
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const pnpm = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
@@ -19,13 +22,16 @@ for (const signal of Object.keys(signalExitCodes)) {
 }
 
 let composeStarted = false;
+let engine;
 let exitCode = 0;
 
 try {
   await required(process.execPath, ["scripts/check-ports.mjs"]);
 
   if (existsSync(new URL("../docker-compose.yml", import.meta.url))) {
-    await required("docker", ["compose", "up", "-d", "--wait"]);
+    process.loadEnvFile(new URL("../.env", import.meta.url));
+    engine = resolveContainerEngine();
+    await required(engine, ["compose", "up", "-d", "--wait"]);
     composeStarted = true;
     await required(pnpm, ["db:migrate"]);
     await required(pnpm, ["db:seed"]);
@@ -42,7 +48,7 @@ try {
   if (composeStarted) {
     cleaningUp = true;
     console.log("\nStopping development services…");
-    const result = await run("docker", ["compose", "down"]);
+    const result = await run(engine, ["compose", "down"]);
     if (result.code !== 0 && exitCode === 0) exitCode = result.code ?? 1;
   }
 }

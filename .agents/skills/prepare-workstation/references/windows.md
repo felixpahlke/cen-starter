@@ -35,6 +35,9 @@ wsl --install
 Restart when prompted. In Rancher Desktop, select the **Moby/dockerd** engine and disable
 Kubernetes unless the project specifically needs it.
 
+If Podman is already installed or is the approved choice, start its machine and use
+`podman info` and `podman compose version` instead of installing another engine.
+
 If development happens inside WSL, install Git and NVM inside that distribution, run
 `nvm install`, and enable pnpm there. Store the repository in the Linux filesystem, not under
 `/mnt/c`, for better file performance.

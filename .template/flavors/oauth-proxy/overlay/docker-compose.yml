@@ -29,7 +29,7 @@ services:
     ports:
       - "${DEX_PORT:-5556}:5556"
     volumes:
-      - ./dev/dex/config.yaml:/etc/dex/config.docker.yaml:ro
+      - ./dev/dex/config.yaml:/etc/dex/config.docker.yaml:ro,Z
 
   oauth2-proxy:
     image: quay.io/oauth2-proxy/oauth2-proxy:v7.7.1

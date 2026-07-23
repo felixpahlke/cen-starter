@@ -61,16 +61,18 @@ pnpm bootstrap        # asks for a project name, then a numbered menu of valid s
 pnpm dev              # port check → dev containers → migrations → seed → api + web
 # open http://localhost:5173 (base) or http://localhost:4180 (OAuth proxy)
 # sign in: admin@example.com / ChangeMe
-# Ctrl-C stops the apps and dev containers; database data remains in its Docker volume
+# Ctrl-C stops the apps and dev containers; database data remains in its container volume
 
 git add -A && git commit -m "Configure CEN Starter"    # finalize requires a clean tree
 pnpm flavor finalize  # reruns pnpm verify, then strips the template machinery
 git add -A && git commit -m "Finalize template setup"
 ```
 
-Requires Node ≥ 22, pnpm, and Docker (for the dev database). If a port is taken on your
-machine, adjust `.env`. Finalization is reversible only through git; after it, the feature
-skills for AI agents are active and the template is out of your way.
+Requires Node ≥ 22, pnpm, and Docker or Podman with Compose (for the dev database). The
+default `CEN_CONTAINER_ENGINE=auto` uses the first ready engine; set it explicitly in `.env`
+when both are installed. If a port is taken, adjust `.env`. Finalization is reversible only
+through git; after it, the feature skills for AI agents are active and the template is out of
+your way.
 
 ## Choose authentication
 

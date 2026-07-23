@@ -4,6 +4,9 @@ import { connect } from "node:net";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import containerEngine from "./container-engine.cjs";
+
+const { resolveContainerEngine } = containerEngine;
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 
@@ -21,6 +24,7 @@ if (pkg.cen?.finalized === false) {
   );
 }
 const flavors = new Set(pkg.cen?.flavors ?? []);
+const engine = resolveContainerEngine({ required: !flavors.has("no-database") });
 const ports = [
   ...(!flavors.has("no-database") ? [port("DB_PORT", "PostgreSQL", 5432, "db")] : []),
   port("API_PORT", "API", 3000),
@@ -53,7 +57,7 @@ if (!flavors.has("no-database")) {
   }
 }
 
-const published = dockerPublishedPorts();
+const published = containerPublishedPorts();
 const availability = await Promise.all(
   ports.map(async (entry) => {
     if (ownsPort(entry)) return { ...entry, available: true };
@@ -88,8 +92,8 @@ function port(env, label, fallback, composeService) {
 }
 
 function ownsPort({ value, composeService, containerPort }) {
-  if (!composeService) return false;
-  const result = spawnSync("docker", ["compose", "port", composeService, String(containerPort)], {
+  if (!engine || !composeService) return false;
+  const result = spawnSync(engine, ["compose", "port", composeService, String(containerPort)], {
     cwd: root,
     encoding: "utf8",
     stdio: ["ignore", "pipe", "ignore"],
@@ -104,10 +108,11 @@ function ownsPort({ value, composeService, containerPort }) {
 }
 
 // Ports published by any running container, so conflicts can name the culprit. A bind
-// probe alone is not enough: on macOS SO_REUSEADDR lets 127.0.0.1 bind while Docker's
+// probe alone is not enough: on macOS SO_REUSEADDR lets 127.0.0.1 bind while a container
 // proxy holds 0.0.0.0 on the same port.
-function dockerPublishedPorts() {
-  const result = spawnSync("docker", ["ps", "--format", "{{.Names}}\t{{.Ports}}"], {
+function containerPublishedPorts() {
+  if (!engine) return new Map();
+  const result = spawnSync(engine, ["ps", "--format", "{{.Names}}\t{{.Ports}}"], {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "ignore"],
   });

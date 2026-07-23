@@ -6,7 +6,7 @@ description: Deploy this app to OpenShift — auto-deploy pipeline (git push = d
 # Deploy to OpenShift
 
 One container: the API serves the built SPA on port 8080. Manifests live in
-`deploy/openshift/` (kustomize), the entry point is `deploy/deploy.sh` — idempotent, safe to
+`infra/deploy/openshift/` (kustomize), the entry point is `infra/deploy/deploy.sh` — idempotent, safe to
 rerun. Details: `deploy/README.md`.
 
 Two things happen automatically so you don't handle them:
@@ -42,10 +42,10 @@ cp .env.production.example .env.production   # fill in the values only you can k
 # 2. One command
 export GITHUB_TOKEN=<token>                  # or put GITHUB_TOKEN= in .env.production
                                              # (deploy.sh keeps it out of the app secret)
-./deploy/deploy.sh -n <namespace> --autodeploy
+./infra/deploy/deploy.sh -n <namespace> --autodeploy
 ```
 
-This sets up ImageStream + BuildConfig (from `deploy/Dockerfile`), registers the webhook on
+This sets up ImageStream + BuildConfig (from `infra/deploy/Dockerfile`), registers the webhook on
 the repo, starts the first build, and waits for rollout. If webhook creation fails (token
 scope, GHE policy), the script prints the webhook URL to add manually in repo settings —
 everything else still works.
@@ -55,10 +55,10 @@ everything else still works.
 ```bash
 cp .env.production.example .env.production   # as above; set DATABASE_URL for managed Postgres
 
-docker build -f deploy/Dockerfile -t <registry>/<repo>/cen-starter:<tag> .
+docker build -f infra/deploy/Dockerfile -t <registry>/<repo>/cen-starter:<tag> .
 docker push <registry>/<repo>/cen-starter:<tag>
 
-./deploy/deploy.sh -n <namespace> -i <registry>/<repo>/cen-starter:<tag>
+./infra/deploy/deploy.sh -n <namespace> -i <registry>/<repo>/cen-starter:<tag>
 ```
 
 ## Verify — before telling the user it's live
@@ -83,7 +83,7 @@ cause. Check the pod log for the migration line on first boot. Promote the first
 - **Pilot db → managed db**: set `DATABASE_URL` in `.env.production`, rerun `deploy.sh`,
   restart. The schema is recreated by migrate-on-start; moving existing *data* is a manual
   `pg_dump`/`pg_restore`. Remove the pilot db with
-  `oc delete -f deploy/openshift/postgres.yaml` and `oc delete secret postgres-env` when done.
+  `oc delete -f infra/deploy/openshift/postgres.yaml` and `oc delete secret postgres-env` when done.
 
 ## When something is broken
 

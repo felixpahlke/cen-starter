@@ -7,23 +7,23 @@ description: Add a complete CRUD resource — zod schema, database table, migrat
 
 Use this when the user asks for a new entity ("add projects", "we need customers"). The `items`
 resource is the canonical pattern — you are copying its structure, not inventing one.
-Read these before writing anything: `shared/src/schemas/items.ts`, `backend/src/routes/items.ts`,
-`backend/src/db/schema.ts`.
+Read these before writing anything: `app/shared/src/schemas/items.ts`, `app/backend/src/routes/items.ts`,
+`app/backend/src/db/schema.ts`.
 
 ## Steps
 
-1. **Schema** — `shared/src/schemas/<resource>.ts`: `XSchema` (full shape), `XCreateSchema`,
+1. **Schema** — `app/shared/src/schemas/<resource>.ts`: `XSchema` (full shape), `XCreateSchema`,
    `XUpdateSchema`, derived with `.pick`/`.partial` like the items file. Export from
-   `shared/src/index.ts`.
-2. **Table** — add the drizzle table to `backend/src/db/schema.ts`. Follow the existing column
+   `app/shared/src/index.ts`.
+2. **Table** — add the drizzle table to `app/backend/src/db/schema.ts`. Follow the existing column
    style (`uuid` pk with `defaultRandom()`, `timestamp` `createdAt` with `defaultNow()`, owner
    references `user.id` with `onDelete: "cascade"` if the resource is user-owned).
 3. **Migration** — `pnpm db:generate`, review the generated SQL, then `pnpm db:migrate`
    (database must be running: `docker compose up -d --wait`).
-4. **Route** — `backend/src/routes/<resource>.ts`: copy `items.ts` structure exactly — one
+4. **Route** — `app/backend/src/routes/<resource>.ts`: copy `items.ts` structure exactly — one
    `createRoute` per operation, one chained sub-router from `protectedRouter()` (in
    `routes/lib.ts` — it applies `requireAuth` for you), a
-   `serialize` helper for `Date → string`. Register it in `backend/src/index.ts` on the chained
+   `serialize` helper for `Date → string`. Register it in `app/backend/src/index.ts` on the chained
    `api` (`.route("/<resource>", …)`) — the chain is what carries types to the frontend.
 5. **Frontend** — use the typed client: `api.<resource>.$get(...)` etc. with TanStack Query;
    reuse the shared zod schemas for form validation. If an items page exists, copy its pattern.

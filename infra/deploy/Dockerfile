@@ -8,16 +8,16 @@ ENV LEFTHOOK=0
 RUN corepack enable
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY backend/package.json backend/package.json
-COPY frontend/package.json frontend/package.json
-COPY shared/package.json shared/package.json
+COPY app/backend/package.json backend/package.json
+COPY app/frontend/package.json frontend/package.json
+COPY app/shared/package.json shared/package.json
 
 RUN pnpm install --frozen-lockfile
 
 COPY tsconfig.base.json tsconfig.base.json
-COPY backend backend
-COPY frontend frontend
-COPY shared shared
+COPY app/backend backend
+COPY app/frontend frontend
+COPY app/shared shared
 
 RUN pnpm build
 # Legacy deploy keeps this workspace compatible without changing pnpm-workspace.yaml.

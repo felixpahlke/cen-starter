@@ -1,7 +1,7 @@
 packages:
-  - backend
-  - frontend
-  - shared
+  - app/backend
+  - app/frontend
+  - app/shared
 
 allowBuilds:
   esbuild: true

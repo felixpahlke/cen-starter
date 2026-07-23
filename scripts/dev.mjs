@@ -28,7 +28,7 @@ let exitCode = 0;
 try {
   await required(process.execPath, ["scripts/check-ports.mjs"]);
 
-  if (existsSync(new URL("../docker-compose.yml", import.meta.url))) {
+  if (existsSync(new URL("../infra/docker-compose.yml", import.meta.url))) {
     process.loadEnvFile(new URL("../.env", import.meta.url));
     engine = resolveContainerEngine();
     await required(engine, ["compose", "up", "-d", "--wait"]);

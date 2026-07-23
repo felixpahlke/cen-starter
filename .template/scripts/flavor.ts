@@ -170,7 +170,7 @@ async function applyFlavorPlan(plan: FlavorPlan) {
 
 // Overlays ship the template's compose `name:`; a bootstrap-renamed project must keep its own.
 async function preserveComposeProjectName() {
-  const compose = abs("docker-compose.yml");
+  const compose = abs("infra/docker-compose.yml");
   if (!(await exists(compose))) return;
   const pkgName = (await readJson("package.json")).name;
   if (typeof pkgName !== "string" || !pkgName) return;

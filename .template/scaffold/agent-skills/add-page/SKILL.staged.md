@@ -6,15 +6,15 @@ description: Add a page to the frontend — file-based route, navigation entry, 
 # Add a page
 
 Use this when the user asks for a new screen ("add a reports page"). Routing is file-based
-(TanStack Router): a file under `frontend/src/routes/` *is* the route. Read one existing page
-first — `frontend/src/routes/_layout/items.tsx` is the full-featured reference (data, forms,
+(TanStack Router): a file under `app/frontend/src/routes/` *is* the route. Read one existing page
+first — `app/frontend/src/routes/_layout/items.tsx` is the full-featured reference (data, forms,
 dialogs), `_layout/index.tsx` the minimal one.
 
 ## Steps
 
-1. **Route file.** Protected page (the normal case): `frontend/src/routes/_layout/<name>.tsx`
+1. **Route file.** Protected page (the normal case): `app/frontend/src/routes/_layout/<name>.tsx`
    — it inherits the auth guard, sidebar, and header from `_layout.tsx`. Public page (rare):
-   top-level `frontend/src/routes/<name>.tsx` like `login.tsx`.
+   top-level `app/frontend/src/routes/<name>.tsx` like `login.tsx`.
 
    ```tsx
    export const Route = createFileRoute("/_layout/reports")({
@@ -25,7 +25,7 @@ dialogs), `_layout/index.tsx` the minimal one.
 2. **`routeTree.gen.ts` regenerates itself** on `dev`/`build` — never edit it. If types don't
    pick the new route up, the dev server isn't running.
 
-3. **Navigation.** In `frontend/src/routes/_layout.tsx`: add the path to the `AppRoute` union,
+3. **Navigation.** In `app/frontend/src/routes/_layout.tsx`: add the path to the `AppRoute` union,
    then an entry in `navItems` (lucide icon; `admin: true` to show it to admins only — that
    flag only hides the link, real protection belongs in the backend route).
 

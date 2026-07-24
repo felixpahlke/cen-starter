@@ -28,10 +28,11 @@ let exitCode = 0;
 try {
   await required(process.execPath, ["scripts/check-ports.mjs"]);
 
+
   if (existsSync(new URL("../infra/docker-compose.yml", import.meta.url))) {
     process.loadEnvFile(new URL("../.env", import.meta.url));
     engine = resolveContainerEngine();
-    await required(engine, ["compose", "up", "-d", "--wait"]);
+    await required(engine, ["compose", "-f", "./infra/docker-compose.yml", "up", "-d", "--wait"]);
     composeStarted = true;
     await required(pnpm, ["db:migrate"]);
     await required(pnpm, ["db:seed"]);
@@ -48,7 +49,7 @@ try {
   if (composeStarted) {
     cleaningUp = true;
     console.log("\nStopping development services…");
-    const result = await run(engine, ["compose", "down"]);
+    const result = await run(engine, ["compose", "-f", "./infra/docker-compose.yml", "down"]);
     if (result.code !== 0 && exitCode === 0) exitCode = result.code ?? 1;
   }
 }

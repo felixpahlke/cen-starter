@@ -35,14 +35,17 @@ Create `.env.production` from `.env.production.example` and set production value
 ```bash
 # Auto-deploy (recommended for internal tools/pilots): one-time setup, then git push = deploy.
 # The cluster builds the image itself (ImageStream + BuildConfig + GitHub webhook).
-GITHUB_TOKEN=<token> ./deploy/deploy.sh -n <namespace> --autodeploy
+# Uses the existing gh login; deploy.sh installs a scoped read-only SSH deploy key.
+./deploy/deploy.sh -n <namespace> --autodeploy
 
 # Explicit: build/push yourself, deploy a specific image.
 ./deploy/deploy.sh -n <namespace> -i <registry>/<repo>/cen-starter:<tag>
 ```
 
-Either way the script creates/updates the `app-env` secret from `.env.production` (filtering
-out `GITHUB_TOKEN`), applies the kustomize base in `deploy/openshift`, and waits for rollout.
+Either way the script creates/updates the `app-env` secret from `.env.production`, applies the
+kustomize base in `deploy/openshift`, and waits for rollout. Auto-deploy uses the existing
+GitHub CLI login to register a generated read-only SSH deploy key and webhook; no GitHub token
+belongs in `.env.production`.
 
 **Derived values**: the script applies the route first to reserve the hostname, then fills in
 what depends on it — `BETTER_AUTH_URL` (or, on the oauth-proxy flavor,

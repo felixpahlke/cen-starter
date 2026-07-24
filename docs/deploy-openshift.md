@@ -11,7 +11,8 @@ is safe to rerun. Reference details live in [deploy/README.md](../deploy/README.
 ## Before you start
 
 1. **Cluster access.** You need an OpenShift namespace you may deploy to — for CE
-   engagements, ask your tech lead which cluster/namespace to use.
+   engagements, ask your engagement or tech lead which cluster/namespace to use. The starter
+   does not provision a cluster.
 2. **`oc` CLI** — `brew install openshift-cli`.
 3. **Log in:** open the OpenShift web console → your name (top right) → **Copy login
    command** → paste the `oc login --token=… --server=…` line into your terminal. Check
@@ -36,19 +37,19 @@ cp .env.production.example .env.production    # never commit this file
 One-time setup; afterwards **`git push` to `main` is the deploy**. The cluster builds the
 image itself — no local Docker needed.
 
-You need a GitHub token so the script can register the webhook:
-
-- IBM GHE: https://github.ibm.com/settings/tokens → **Generate new token (classic)** →
-  scopes `repo` + `admin:repo_hook` → copy it.
+The repository must be pushed, and GitHub CLI must be logged in to its host. IBM project
+repositories normally use `github.ibm.com`, but an existing `origin` is respected:
 
 ```bash
-export GITHUB_TOKEN=<token>
+gh auth status --hostname github.ibm.com
+# If needed: gh auth login --hostname github.ibm.com --web
 ./deploy/deploy.sh -n <namespace> --autodeploy
 ```
 
-The script creates the build pipeline, registers the webhook, starts the first build, and
-waits for rollout. If webhook creation fails (token scope, GHE policy), it prints the
-webhook URL to add manually under repo **Settings → Hooks** — everything else still works.
+The script generates and registers a read-only SSH deploy key, creates the build pipeline,
+grants the namespace-scoped webhook role, registers the webhook through `gh`, verifies GitHub
+can reach it, starts the first build, and waits for rollout. No GitHub token goes in chat or
+`.env.production`.
 
 ## Path B — explicit image deploys (client projects, release gates)
 
@@ -73,6 +74,9 @@ Open the route in the browser and log in end-to-end. If auth requests fail, the 
 cause is an overridden `BETTER_AUTH_URL` that doesn't match the route URL exactly — the
 deploy summary prints the derived value it actually used. Promote the first admin by
 setting `role = 'admin'` on that user's row in the database.
+
+With IBM App ID, add the printed `/oauth2/callback` URL under the App ID instance →
+**Manage Authentication → Authentication settings → Add web redirect URI**.
 
 ## Updating
 

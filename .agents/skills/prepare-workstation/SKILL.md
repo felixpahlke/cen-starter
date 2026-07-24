@@ -2,8 +2,8 @@
 name: prepare-workstation
 description: >-
   Prepare a computer for CEN Starter development by diagnosing and installing the standard
-  workstation baseline: Git, Node.js, pnpm, Rancher Desktop, OpenShift and IBM Cloud CLIs,
-  IBM Bob, and supporting editor extensions. Use when prerequisites are missing, containers
+  workstation baseline: Git, GitHub CLI, Node.js, pnpm, Rancher Desktop, OpenShift and IBM
+  Cloud CLIs, IBM Bob, and supporting editor extensions. Use when prerequisites are missing, containers
   are unavailable, setup fails before the app starts, or a user needs beginner-friendly
   workstation help on macOS, Windows, WSL, Linux, or a managed company device.
 ---
@@ -33,6 +33,7 @@ Run what is available:
 
 ```bash
 git --version
+gh --version
 node --version
 pnpm --version
 docker --version
@@ -49,7 +50,9 @@ ibmcloud plugin show container-registry
 
 Node must satisfy `package.json` and should match `.nvmrc`. pnpm should match the
 `packageManager` field. One configured engine must pass both `info` and `compose version`;
-having only a CLI is not enough. Do not require both engines.
+having only a CLI is not enough. Do not require both engines. Only check `gh` authentication
+when a workflow needs to publish or administer a repository; workstation preparation does not
+log users in preemptively.
 
 ## 2. Install what is missing
 

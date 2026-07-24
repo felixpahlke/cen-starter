@@ -94,11 +94,17 @@ state — that's expected, headers only exist behind the proxy.
 ## Production
 
 The OpenShift deployment gains an oauth2-proxy sidecar configured via `OAUTH2_PROXY_*`
-values in `.env.production`. Only the IdP registration values are yours to provide (issuer
-URL, client id, client secret) — `deploy/deploy.sh` derives the redirect URL from the route
-(route URL + `/oauth2/callback`, printed so you can register it with the IdP) and generates
-the cookie secret. The service targets the proxy port (4180), not the app port. Get the
-OIDC client registered early — it's the long pole.
+values in `.env.production`. The IdP registration values come from the user's IdP (issuer
+URL, client id, client secret) — never imply that the agent provides them and never request
+secrets in chat. IBM App ID users can save the credentials JSON locally as
+`.secrets/appid.json` (ignored) so the agent can map it into `.env.production`.
+`deploy/deploy.sh` derives the redirect URL from the route (route URL +
+`/oauth2/callback`, printed so you can register it with the IdP) and generates the cookie
+secret. The service targets the proxy port (4180), not the app port. Get the OIDC client
+registered early — it's the long pole.
+
+For IBM App ID, register the printed callback under the App ID instance → **Manage
+Authentication → Authentication settings → Add web redirect URI**.
 
 The production advantage is that the application code and trust boundary stay the same when
 the OIDC provider changes. Do not describe that as "just exchange the IdP," though: every

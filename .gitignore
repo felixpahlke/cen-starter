@@ -5,6 +5,7 @@ coverage/
 
 .env
 .env.production
+.secrets/
 *.local
 
 .DS_Store

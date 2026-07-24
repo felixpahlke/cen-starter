@@ -6,6 +6,14 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
 
 ## [Unreleased]
 
+- OpenShift auto-deploy no longer asks for or stores a GitHub token. It uses the existing
+  `gh` login to register a generated read-only SSH deploy key and webhook, restores the
+  namespace `system:webhook` RoleBinding required for external deliveries, and verifies a
+  live GitHub ping before declaring auto-deploy configured. Setup now offers repository
+  publication only after inspecting existing remotes and confirming host, owner, name, and
+  visibility; IBM work defaults to `github.ibm.com` without overriding an existing origin.
+- Agent guidance keeps secrets out of chat, points OpenShift users to **Copy login command**,
+  and names the IBM App ID redirect-URI location.
 - The default shadcn theme now matches IBM's refreshed design language: pill-shaped buttons,
   generously rounded cards (~16px) and inputs, white cards on a near-white page in light
   mode, deep blue `#0043CE` primary, and a near-black dark mode whose focus rings are blue

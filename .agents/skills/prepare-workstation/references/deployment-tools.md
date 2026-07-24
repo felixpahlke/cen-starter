@@ -1,6 +1,30 @@
 # Deployment tools
 
-Install both deployment clients as part of the standard workstation baseline.
+Install the repository and deployment clients as part of the standard workstation baseline.
+
+## GitHub CLI
+
+Check first:
+
+```bash
+gh --version
+```
+
+On macOS with Homebrew:
+
+```bash
+brew install gh
+```
+
+Use the approved package or the [official GitHub CLI installation
+guide](https://github.com/cli/cli/blob/trunk/docs/install_linux.md) elsewhere. Authentication
+is deliberately deferred until a workflow needs it. IBM project repositories default to
+`github.ibm.com`; log in through the browser without putting a token in chat:
+
+```bash
+gh auth status --hostname github.ibm.com
+gh auth login --hostname github.ibm.com --web
+```
 
 ## OpenShift CLI
 

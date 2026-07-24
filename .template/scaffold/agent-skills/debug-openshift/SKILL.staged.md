@@ -6,7 +6,7 @@ description: Triage a broken OpenShift deployment of this app with the oc CLI �
 # Debug an OpenShift deployment
 
 Runbook for "the deployment is broken / pending / crashing". Work top-down; don't guess at
-fixes before you've seen events and logs. Manifests live in `deploy/openshift/`.
+fixes before you've seen events and logs. Manifests live in `infra/deploy/openshift/`.
 
 ## Triage order
 
@@ -22,7 +22,7 @@ oc rollout status deploy/<app>                    # stuck rollout?
 ## Failure modes, most likely first
 
 - **CrashLoopBackOff** — read the log's first lines. This app validates env on boot
-  (`backend/src/env.ts`) and prints exactly which variable is missing or malformed; fix the
+  (`app/backend/src/env.ts`) and prints exactly which variable is missing or malformed; fix the
   `app-env` secret, don't guess: `oc set data secret/app-env KEY=value` then restart. Second
   suspect: database unreachable (check `DATABASE_URL`, network policy, DB pod).
 - **Migration failure on startup** — logs show the failing SQL. See `.agents/skills/db-migrations/`

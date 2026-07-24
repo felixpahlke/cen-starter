@@ -6,7 +6,7 @@ import { defineConfig, loadEnv } from "vite";
 
 export default defineConfig(({ mode }) => {
   // The API port lives in the root .env so backend and proxy can't drift apart.
-  const env = loadEnv(mode, path.resolve(import.meta.dirname, ".."), "");
+  const env = loadEnv(mode, path.resolve(import.meta.dirname, "../.."), "");
   const apiPort = env.API_PORT || "3000";
 
   return {

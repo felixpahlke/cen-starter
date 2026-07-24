@@ -12,14 +12,13 @@ import {
   Loading,
   Tag,
 } from "@carbon/react";
-import { createFileRoute, Link, Navigate, Outlet, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useTheme } from "@/components/theme-provider";
 import { signOut, useSession } from "@/lib/auth";
-import { errorMessage } from "@/lib/errors";
 
-type AppRoute = "/" | "/items" | "/settings" | "/admin";
+type AppRoute = "/" | "/items";
 
 type NavItem = {
   to: AppRoute;
@@ -30,8 +29,6 @@ type NavItem = {
 const navItems: NavItem[] = [
   { to: "/", label: "Dashboard" },
   { to: "/items", label: "Items" },
-  { to: "/settings", label: "Settings" },
-  { to: "/admin", label: "Admin", admin: true },
 ];
 
 export const Route = createFileRoute("/_layout")({
@@ -39,7 +36,6 @@ export const Route = createFileRoute("/_layout")({
 });
 
 function ProtectedLayout() {
-  const router = useRouter();
   const session = useSession();
   const { resolvedTheme, setTheme } = useTheme();
   const [panelOpen, setPanelOpen] = useState(false);
@@ -49,23 +45,16 @@ function ProtectedLayout() {
   }
 
   if (!session.data) {
-    return <Navigate to="/login" />;
+    return null;
   }
 
   const user = session.data.user;
   const visibleItems = navItems.filter((item) => !item.admin || user.role === "admin");
   const dark = resolvedTheme === "dark";
 
-  async function handleSignOut() {
-    const result = await signOut();
-
-    if (result.error) {
-      toast.error(errorMessage(result.error, "Could not sign out"));
-      return;
-    }
-
+  function handleSignOut() {
     toast.success("Signed out");
-    await router.navigate({ to: "/login" });
+    signOut();
   }
 
   return (

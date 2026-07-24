@@ -375,12 +375,12 @@ ensure_application() {
     info "Updating Code Engine application '$APP_NAME' with a cloud-side source build."
     ibmcloud ce application update --name "$APP_NAME" \
       --build-source . \
-      --build-dockerfile deploy/Dockerfile
+      --build-dockerfile infra/deploy/Dockerfile
   else
     info "Creating Code Engine application '$APP_NAME' with a cloud-side source build."
     ibmcloud ce application create --name "$APP_NAME" \
       --build-source . \
-      --build-dockerfile deploy/Dockerfile \
+      --build-dockerfile infra/deploy/Dockerfile \
       --image "$image" \
       --registry-secret "$REGISTRY_SECRET" \
       --port 8080 \

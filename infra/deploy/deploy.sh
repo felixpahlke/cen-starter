@@ -5,7 +5,7 @@ APP_NAME="cen-starter"
 APP_CONTAINER="cen-starter"
 APP_SECRET="app-env"
 ENV_FILE=".env.production"
-OPENSHIFT_DIR="deploy/openshift"
+OPENSHIFT_DIR="infra/deploy/openshift"
 POSTGRES_MANIFEST="$OPENSHIFT_DIR/postgres.yaml"
 POSTGRES_SECRET="postgres-env"
 GITHUB_SOURCE_SECRET="github-source"
@@ -436,7 +436,7 @@ spec:
   strategy:
     type: Docker
     dockerStrategy:
-      dockerfilePath: deploy/Dockerfile
+      dockerfilePath: infra/deploy/Dockerfile
   output:
     to:
       kind: ImageStreamTag

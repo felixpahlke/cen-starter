@@ -5,61 +5,61 @@
   "combinesWith": ["backend-only"],
   "requires": [],
   "delete": [
-    "backend/src/db/**",
-    "backend/drizzle.config.ts",
-    "docker-compose.yml",
-    "deploy/openshift/postgres.yaml",
-    "backend/src/auth/better-auth.ts",
-    "backend/src/routes/items.ts",
-    "backend/src/routes/items.test.ts",
-    "shared/src/schemas/items.ts",
+    "app/backend/src/db/**",
+    "app/backend/drizzle.config.ts",
+    "infra/docker-compose.yml",
+    "infra/deploy/openshift/postgres.yaml",
+    "app/backend/src/auth/better-auth.ts",
+    "app/backend/src/routes/items.ts",
+    "app/backend/src/routes/items.test.ts",
+    "app/shared/src/schemas/items.ts",
     ".template/scaffold/agent-skills/db-migrations/**",
     ".template/scaffold/agent-skills/add-resource/**",
-    "frontend/src/routes/_layout/items.tsx",
-    "frontend/src/routes/login.tsx",
-    "frontend/src/routes/signup.tsx",
-    "frontend/src/routes/_layout/settings.tsx",
-    "frontend/src/routes/_layout/admin.tsx"
+    "app/frontend/src/routes/_layout/items.tsx",
+    "app/frontend/src/routes/login.tsx",
+    "app/frontend/src/routes/signup.tsx",
+    "app/frontend/src/routes/_layout/settings.tsx",
+    "app/frontend/src/routes/_layout/admin.tsx"
   ],
   "overlay": "overlay",
   "edits": [
     {
-      "file": "shared/src/index.ts",
+      "file": "app/shared/src/index.ts",
       "find": "export * from \"./schemas/items\";\n",
       "replace": ""
     },
     {
-      "file": "backend/src/index.ts",
+      "file": "app/backend/src/index.ts",
       "find": "import { auth } from \"./auth/better-auth\";\n",
       "replace": ""
     },
     {
-      "file": "backend/src/index.ts",
+      "file": "app/backend/src/index.ts",
       "find": "import { migrateOnStart } from \"./db/migrate-on-start\";\n",
       "replace": ""
     },
     {
-      "file": "backend/src/index.ts",
+      "file": "app/backend/src/index.ts",
       "find": "import { itemsRoute } from \"./routes/items\";\n",
       "replace": ""
     },
     {
-      "file": "backend/src/index.ts",
+      "file": "app/backend/src/index.ts",
       "find": "const api = new OpenAPIHono().route(\"/health\", healthRoute).route(\"/items\", itemsRoute);",
       "replace": "const api = new OpenAPIHono().route(\"/health\", healthRoute);"
     },
     {
-      "file": "backend/src/index.ts",
+      "file": "app/backend/src/index.ts",
       "find": "app.on([\"GET\", \"POST\"], \"/api/auth/*\", (c) => auth.handler(c.req.raw));\n",
       "replace": ""
     },
     {
-      "file": "backend/src/index.ts",
+      "file": "app/backend/src/index.ts",
       "find": "await migrateOnStart();\n",
       "replace": ""
     },
     {
-      "file": "backend/src/env.ts",
+      "file": "app/backend/src/env.ts",
       "find": "  DATABASE_URL: z.url(),\n  BETTER_AUTH_SECRET: z.string().min(32),\n  BETTER_AUTH_URL: z.url(),\n  MIGRATE_ON_START: z.enum([\"true\", \"false\"]).optional(),\n});",
       "replace": "  API_KEY: z.string().min(1),\n});"
     },
@@ -74,17 +74,17 @@
       "replace": "# API key accepted by the no-database auth stub. Generate: openssl rand -hex 32\nAPI_KEY=replace-with-a-real-api-key\n"
     },
     {
-      "file": "deploy/ce-deploy.sh",
+      "file": "infra/deploy/ce-deploy.sh",
       "find": "require_database_url() {\n  database_url=$(env_file_value DATABASE_URL \"$ENV_FILE\" || true)\n\n  if [[ -z \"$database_url\" ]]; then\n    error \"DATABASE_URL is missing or empty in $ENV_FILE; provision IBM Cloud Databases for PostgreSQL and add its connection string\"\n    exit 1\n  fi\n}\n",
       "replace": ""
     },
     {
-      "file": "deploy/ce-deploy.sh",
+      "file": "infra/deploy/ce-deploy.sh",
       "find": "require_database_url\n",
       "replace": ""
     },
     {
-      "file": "deploy/Dockerfile",
+      "file": "infra/deploy/Dockerfile",
       "find": "# Keep migration SQL available without shipping Drizzle tooling or app source.\nRUN rm -rf /app/backend-prod/src /app/backend-prod/drizzle.config.ts /app/backend-prod/tsconfig.json \\\n  && mkdir -p /app/backend-prod/src/db \\\n  && cp -R /app/backend/src/db/migrations /app/backend-prod/src/db/migrations\n",
       "replace": "RUN rm -rf /app/backend-prod/src /app/backend-prod/drizzle.config.ts /app/backend-prod/tsconfig.json\n"
     },
@@ -94,7 +94,7 @@
       "replace": "    \"verify:flavors\": \"tsx .template/scripts/verify-flavors.ts\"\n"
     },
     {
-      "file": "backend/package.json",
+      "file": "app/backend/package.json",
       "find": "    \"typecheck\": \"tsc --noEmit\",\n    \"db:generate\": \"drizzle-kit generate\",\n    \"db:migrate\": \"drizzle-kit migrate\",\n    \"db:seed\": \"tsx src/db/seed.ts\",\n    \"db:studio\": \"drizzle-kit studio\"\n",
       "replace": "    \"typecheck\": \"tsc --noEmit\"\n"
     }

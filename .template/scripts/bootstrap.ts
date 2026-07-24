@@ -133,7 +133,7 @@ async function main() {
   }
 
   pkg.name = name;
-  const composePath = path.join(root, "docker-compose.yml");
+  const composePath = path.join(root, "infra/docker-compose.yml");
   try {
     const compose = await readFile(composePath, "utf8");
     await writeFile(composePath, compose.replace(/^name: .*$/m, `name: ${name}`));

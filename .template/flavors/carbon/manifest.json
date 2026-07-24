@@ -5,15 +5,15 @@
   "combinesWith": ["oauth-proxy"],
   "requires": [],
   "delete": [
-    "frontend/src/components/ui/**",
-    "frontend/src/components/mode-toggle.tsx",
-    "frontend/src/lib/utils.ts",
-    "frontend/src/styles/themes/**"
+    "app/frontend/src/components/ui/**",
+    "app/frontend/src/components/mode-toggle.tsx",
+    "app/frontend/src/lib/utils.ts",
+    "app/frontend/src/styles/themes/**"
   ],
   "overlay": "overlay",
   "edits": [
     {
-      "file": "frontend/src/main.tsx",
+      "file": "app/frontend/src/main.tsx",
       "find": "import \"./styles/index.css\";\n",
       "replace": "import \"./styles/carbon.scss\";\nimport \"./styles/index.css\";\n"
     }

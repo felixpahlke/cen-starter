@@ -18,12 +18,12 @@ below serves that one test.
 3. **AGENTS.md accuracy pass.** It documents conventions — check they're still true after
    months of project work (new packages? changed auth? extra services?). An agent-facing doc
    that lies is worse than none.
-4. **Env hygiene.** `.env.example` lists every variable `backend/src/env.ts` requires, with
+4. **Env hygiene.** `.env.example` lists every variable `app/backend/src/env.ts` requires, with
    comments; no real secrets committed anywhere (`git log -p -- .env` should show nothing —
    if it does, rotate those secrets, don't just delete the file).
 5. **Deploy reality.** `deploy/` docs match where the app actually runs: namespace, image
    registry, route URL, who owns the database. Undocumented manual cluster tweaks are the #1
-   handover killer — hunt for them (`oc diff -k deploy/openshift`).
+   handover killer — hunt for them (`oc diff -k infra/deploy/openshift`).
 6. **Known issues** honestly listed (README section or HANDOVER.md): open bugs, tech debt,
    "don't touch X because Y".
 7. **The proof:** fresh-clone test in a temp dir — clone, `pnpm install`, `cp .env.example

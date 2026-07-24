@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!backend/src/db/migrations", "!**/routeTree.gen.ts"]
+    "includes": ["**", "!app/backend/src/db/migrations", "!**/routeTree.gen.ts"]
   },
   "formatter": {
     "indentStyle": "space",

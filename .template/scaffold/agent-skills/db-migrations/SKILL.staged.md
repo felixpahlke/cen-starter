@@ -5,12 +5,12 @@ description: Create, apply, and repair Drizzle database migrations — including
 
 # Database migrations
 
-Schema truth lives in `backend/src/db/schema.ts`; migrations are generated from it by
-drizzle-kit into `backend/src/db/migrations/`. Never edit schema and database independently.
+Schema truth lives in `app/backend/src/db/schema.ts`; migrations are generated from it by
+drizzle-kit into `app/backend/src/db/migrations/`. Never edit schema and database independently.
 
 ## Normal flow
 
-1. Edit `backend/src/db/schema.ts`.
+1. Edit `app/backend/src/db/schema.ts`.
 2. `pnpm db:generate` — creates a migration. **Read the generated SQL** before applying;
    drizzle-kit occasionally chooses a destructive interpretation (drop + recreate) for renames.
 3. `pnpm db:migrate` (database running: `docker compose up -d --wait`).
@@ -22,7 +22,7 @@ drizzle-kit into `backend/src/db/migrations/`. Never edit schema and database in
 - Editing a migration that is merely generated-but-unapplied locally is fine — regenerate
   instead when possible (`delete the file + pnpm db:generate` again).
 - While the project is unreleased (no shared environment has applied them), you may squash:
-  delete `backend/src/db/migrations/` entirely, reset the dev database (below), regenerate one
+  delete `app/backend/src/db/migrations/` entirely, reset the dev database (below), regenerate one
   clean migration.
 
 ## Repair

@@ -11,6 +11,7 @@ POSTGRES_SECRET="postgres-env"
 GITHUB_SOURCE_SECRET="github-source"
 GITHUB_WEBHOOK_SECRET="github-webhook-secret"
 GITHUB_WEBHOOK_KEY="WebHookSecretKey"
+GITHUB_WEBHOOK_ROLE_BINDING="${APP_NAME}-webhook"
 
 namespace=""
 image=""
@@ -22,10 +23,14 @@ route_url=""
 derived_env_summary=()
 
 tmp_files=()
+tmp_dirs=()
 
 cleanup() {
   if ((${#tmp_files[@]} > 0)); then
     rm -f -- "${tmp_files[@]}"
+  fi
+  if ((${#tmp_dirs[@]} > 0)); then
+    rm -rf -- "${tmp_dirs[@]}"
   fi
 }
 trap cleanup EXIT
@@ -64,11 +69,21 @@ need_command() {
 }
 
 make_temp_file() {
+  local variable_name="$1"
   local temp_file
 
   temp_file=$(mktemp)
   tmp_files+=("$temp_file")
-  printf '%s' "$temp_file"
+  printf -v "$variable_name" '%s' "$temp_file"
+}
+
+make_temp_dir() {
+  local variable_name="$1"
+  local temp_dir
+
+  temp_dir=$(mktemp -d)
+  tmp_dirs+=("$temp_dir")
+  printf -v "$variable_name" '%s' "$temp_dir"
 }
 
 strip_matching_quotes() {
@@ -293,13 +308,24 @@ derive_env_values() {
 create_app_secret() {
   local env_secret_file
 
-  env_secret_file=$(make_temp_file)
+  make_temp_file env_secret_file
 
   if [[ "$in_cluster_db_used" == "true" ]]; then
-    sed '/^GITHUB_TOKEN=/d;/^DATABASE_URL=/d' "$ENV_FILE" > "$env_secret_file"
+    sed \
+      -e '/^GITHUB_TOKEN=/d' \
+      -e '/^GH_TOKEN=/d' \
+      -e '/^GITHUB_ENTERPRISE_TOKEN=/d' \
+      -e '/^GH_ENTERPRISE_TOKEN=/d' \
+      -e '/^DATABASE_URL=/d' \
+      "$ENV_FILE" > "$env_secret_file"
     printf '\nDATABASE_URL=%s\n' "$database_url" >> "$env_secret_file"
   else
-    sed '/^GITHUB_TOKEN=/d' "$ENV_FILE" > "$env_secret_file"
+    sed \
+      -e '/^GITHUB_TOKEN=/d' \
+      -e '/^GH_TOKEN=/d' \
+      -e '/^GITHUB_ENTERPRISE_TOKEN=/d' \
+      -e '/^GH_ENTERPRISE_TOKEN=/d' \
+      "$ENV_FILE" > "$env_secret_file"
   fi
 
   derive_env_values "$env_secret_file"
@@ -309,25 +335,6 @@ create_app_secret() {
     --dry-run=client \
     -o yaml \
     | oc apply -n "$namespace" -f -
-}
-
-github_token() {
-  local token="${GITHUB_TOKEN:-}"
-
-  if [[ -z "$token" ]]; then
-    if token=$(env_file_value GITHUB_TOKEN "$ENV_FILE"); then
-      :
-    else
-      token=""
-    fi
-  fi
-
-  if [[ -z "$token" ]]; then
-    error "--autodeploy requires GITHUB_TOKEN; set it in the environment or add GITHUB_TOKEN=... to $ENV_FILE"
-    exit 1
-  fi
-
-  printf '%s' "$token"
 }
 
 parse_git_origin() {
@@ -347,6 +354,10 @@ parse_git_origin() {
     without_scheme="${remote_url#git@}"
     host="${without_scheme%%:*}"
     path="${without_scheme#*:}"
+  elif [[ "$remote_url" == ssh://git@*/*/* ]]; then
+    without_scheme="${remote_url#ssh://git@}"
+    host="${without_scheme%%/*}"
+    path="${without_scheme#*/}"
   elif [[ "$remote_url" == https://*/*/* ]]; then
     without_scheme="${remote_url#https://}"
     host="${without_scheme%%/*}"
@@ -370,18 +381,102 @@ parse_git_origin() {
     exit 1
   fi
 
-  GIT_HTTPS_URL="https://${host}/${owner}/${repo}.git"
-  GITHUB_API_BASE="https://api.${host}/repos/${owner}/${repo}"
+  GIT_HOST="$host"
+  GIT_OWNER="$owner"
+  GIT_REPO="$repo"
+  GIT_SSH_URL="git@${host}:${owner}/${repo}.git"
+  GITHUB_REPO_API_PATH="repos/${owner}/${repo}"
+}
+
+check_github_preconditions() {
+  need_command gh
+  need_command ssh-keygen
+
+  if ! gh auth status --hostname "$GIT_HOST" >/dev/null 2>&1; then
+    error "GitHub CLI is not logged in to $GIT_HOST"
+    printf 'Log in without pasting a token into chat:\n  gh auth login --hostname %s --web\n' \
+      "$GIT_HOST" >&2
+    exit 1
+  fi
+
+  if ! git ls-remote --exit-code origin refs/heads/main >/dev/null 2>&1; then
+    error "origin has no reachable main branch; push the project before deploying"
+    exit 1
+  fi
+}
+
+prepare_autodeploy() {
+  [[ "$autodeploy" == "true" ]] || return
+
+  parse_git_origin
+  check_github_preconditions
+}
+
+github_deploy_key_present() {
+  local public_key="$1"
+  local public_key_material=""
+
+  public_key_material=$(printf '%s\n' "$public_key" | awk '{print $2}')
+
+  gh api \
+    --hostname "$GIT_HOST" \
+    --paginate \
+    "$GITHUB_REPO_API_PATH/keys" \
+    --jq '.[].key' 2>/dev/null \
+    | awk '{print $2}' \
+    | grep -Fqx "$public_key_material"
+}
+
+add_github_deploy_key() {
+  local public_key="$1"
+
+  gh api \
+    --hostname "$GIT_HOST" \
+    --method POST \
+    "$GITHUB_REPO_API_PATH/keys" \
+    -f "title=OpenShift ${namespace}" \
+    -f "key=$public_key" \
+    -F read_only=true >/dev/null
 }
 
 ensure_github_source_secret() {
-  local token="$1"
+  local key_dir=""
+  local private_key=""
+  local public_key_file=""
+  local public_key=""
+  local existing_private_key=""
+
+  make_temp_dir key_dir
+  private_key="${key_dir}/id_ed25519"
+  public_key_file="${private_key}.pub"
+
+  existing_private_key=$(oc get secret "$GITHUB_SOURCE_SECRET" \
+    -n "$namespace" \
+    -o 'jsonpath={.data.ssh-privatekey}' 2>/dev/null || true)
+
+  if [[ -n "$existing_private_key" ]]; then
+    printf '%s' "$existing_private_key" | base64_decode > "$private_key"
+    chmod 600 "$private_key"
+    ssh-keygen -y -f "$private_key" > "$public_key_file"
+  else
+    ssh-keygen -q -t ed25519 -N '' -C "openshift-${namespace}" -f "$private_key"
+  fi
+
+  public_key=$(<"$public_key_file")
+
+  if ! github_deploy_key_present "$public_key"; then
+    if ! add_github_deploy_key "$public_key"; then
+      error "could not add the read-only deploy key to $GIT_HOST/$GIT_OWNER/$GIT_REPO"
+      printf 'Your GitHub account needs repository administration permission.\n' >&2
+      exit 1
+    fi
+    info "Added a read-only OpenShift deploy key to $GIT_HOST/$GIT_OWNER/$GIT_REPO."
+  fi
 
   oc create secret generic "$GITHUB_SOURCE_SECRET" \
     -n "$namespace" \
-    --type=kubernetes.io/basic-auth \
-    --from-literal=username=oauth2 \
-    --from-literal=password="$token" \
+    --type=kubernetes.io/ssh-auth \
+    --from-file=ssh-privatekey="$private_key" \
     --dry-run=client \
     -o yaml \
     | oc apply -n "$namespace" -f -
@@ -411,6 +506,21 @@ ensure_github_webhook_secret() {
 
 apply_build_resources() {
   cat <<EOF | oc apply -n "$namespace" -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: $GITHUB_WEBHOOK_ROLE_BINDING
+  labels:
+    app.kubernetes.io/name: $APP_NAME
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:webhook
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: system:unauthenticated
+---
 apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
@@ -429,7 +539,7 @@ spec:
   source:
     type: Git
     git:
-      uri: "$GIT_HTTPS_URL"
+      uri: "$GIT_SSH_URL"
       ref: main
     sourceSecret:
       name: $GITHUB_SOURCE_SECRET
@@ -449,79 +559,99 @@ spec:
 EOF
 }
 
-manual_webhook_fallback() {
-  local webhook_url="$1"
-
-  warning "GitHub webhook was not created automatically."
-  {
-    printf 'Add this webhook manually in the repository settings:\n'
-    printf '  Payload URL: %s\n' "$webhook_url"
-    printf '  Content type: application/json\n'
-    printf '  Events: push\n'
-  } >&2
-}
-
-is_2xx() {
-  [[ "$1" =~ ^2[0-9][0-9]$ ]]
-}
-
 create_github_webhook() {
-  local token="$1"
-  local webhook_url="$2"
-  local hooks_url="${GITHUB_API_BASE}/hooks"
-  local response=""
-  local response_body=""
-  local http_code=""
-  local json_payload=""
+  local webhook_url="$1"
+  local hooks_json=""
+  local hook_id=""
 
-  response=$(curl -sS -w "\n%{http_code}" \
-    -H "Authorization: token $token" \
-    -H "Accept: application/vnd.github+json" \
-    "$hooks_url" || true)
-  http_code=$(printf '%s\n' "$response" | tail -n 1)
-  response_body=$(printf '%s\n' "$response" | sed '$d')
+  hooks_json=$(gh api \
+    --hostname "$GIT_HOST" \
+    --paginate \
+    --slurp \
+    "$GITHUB_REPO_API_PATH/hooks") || {
+      error "could not inspect webhooks for $GIT_HOST/$GIT_OWNER/$GIT_REPO"
+      exit 1
+    }
 
-  if ! is_2xx "$http_code"; then
-    warning "failed to list GitHub webhooks at $hooks_url (HTTP $http_code)"
-    if [[ -n "$response_body" ]]; then
-      printf '%s\n' "$response_body" >&2
+  hook_id=$(printf '%s' "$hooks_json" | node -e '
+    let input = "";
+    process.stdin.on("data", (chunk) => input += chunk);
+    process.stdin.on("end", () => {
+      const hooks = JSON.parse(input || "[]").flat();
+      const hook = hooks.find((candidate) => candidate.config?.url === process.argv[1]);
+      if (hook) process.stdout.write(String(hook.id));
+    });
+  ' "$webhook_url")
+
+  if [[ -z "$hook_id" ]]; then
+    hook_id=$(gh api \
+      --hostname "$GIT_HOST" \
+      --method POST \
+      "$GITHUB_REPO_API_PATH/hooks" \
+      -f name=web \
+      -F active=true \
+      -f 'events[]=push' \
+      -f "config[url]=$webhook_url" \
+      -f 'config[content_type]=json' \
+      -f 'config[insecure_ssl]=0' \
+      --jq '.id') || {
+        error "could not create the GitHub webhook; repository administration permission is required"
+        exit 1
+      }
+    info "Created the GitHub webhook for $APP_NAME." >&2
+  else
+    info "GitHub webhook already exists for $APP_NAME." >&2
+  fi
+
+  printf '%s' "$hook_id"
+}
+
+verify_github_webhook() {
+  local hook_id="$1"
+  local delivery=""
+  local delivery_id=""
+  local status_code=""
+  local previous_delivery_id=""
+  local deadline=$((SECONDS + 45))
+
+  previous_delivery_id=$(gh api \
+    --hostname "$GIT_HOST" \
+    "$GITHUB_REPO_API_PATH/hooks/$hook_id/deliveries?per_page=10" \
+    --jq '[.[] | select(.event == "ping")][0].id // empty' \
+    2>/dev/null || true)
+
+  gh api \
+    --hostname "$GIT_HOST" \
+    --method POST \
+    "$GITHUB_REPO_API_PATH/hooks/$hook_id/pings" >/dev/null || {
+      error "could not request a GitHub webhook ping"
+      exit 1
+    }
+
+  while ((SECONDS < deadline)); do
+    delivery=$(gh api \
+      --hostname "$GIT_HOST" \
+      "$GITHUB_REPO_API_PATH/hooks/$hook_id/deliveries?per_page=10" \
+      --jq '[.[] | select(.event == "ping")][0] | [.id, .status_code] | @tsv' \
+      2>/dev/null || true)
+    IFS=$'\t' read -r delivery_id status_code <<< "$delivery"
+
+    if [[ -n "$delivery_id" \
+      && "$delivery_id" != "$previous_delivery_id" \
+      && "$status_code" =~ ^2[0-9][0-9]$ ]]; then
+      info "Verified GitHub can reach the OpenShift webhook endpoint (HTTP $status_code)."
+      return
     fi
-    manual_webhook_fallback "$webhook_url"
-    return 0
+
+    sleep 3
+  done
+
+  error "GitHub could not successfully deliver to the OpenShift webhook endpoint"
+  if [[ -n "$status_code" ]]; then
+    printf 'Latest ping returned HTTP %s. Inspect GitHub repository Settings → Webhooks.\n' \
+      "$status_code" >&2
   fi
-
-  if printf '%s\n' "$response_body" | grep -Fq "$webhook_url"; then
-    info "GitHub webhook already exists for $APP_NAME."
-    return 0
-  fi
-
-  json_payload="{\"name\":\"web\",\"active\":true,\"events\":[\"push\"],\"config\":{\"url\":\"$webhook_url\",\"content_type\":\"json\",\"insecure_ssl\":\"0\"}}"
-
-  response=$(curl -sS -w "\n%{http_code}" \
-    -X POST \
-    -H "Authorization: Bearer $token" \
-    -H "Accept: application/vnd.github+json" \
-    -H "X-GitHub-Api-Version: 2022-11-28" \
-    "$hooks_url" \
-    -d "$json_payload" || true)
-  http_code=$(printf '%s\n' "$response" | tail -n 1)
-  response_body=$(printf '%s\n' "$response" | sed '$d')
-
-  if is_2xx "$http_code" && printf '%s\n' "$response_body" | grep -q '"id"'; then
-    info "GitHub webhook created for $APP_NAME."
-    return 0
-  fi
-
-  if [[ "$http_code" == "422" ]] && printf '%s\n' "$response_body" | grep -Fq "Hook already exists"; then
-    info "GitHub webhook already exists for $APP_NAME."
-    return 0
-  fi
-
-  warning "failed to create GitHub webhook at $hooks_url (HTTP $http_code)"
-  if [[ -n "$response_body" ]]; then
-    printf '%s\n' "$response_body" >&2
-  fi
-  manual_webhook_fallback "$webhook_url"
+  exit 1
 }
 
 wait_for_build() {
@@ -556,24 +686,21 @@ wait_for_build() {
 }
 
 configure_autodeploy() {
-  local token=""
   local webhook_secret_value=""
   local server_url=""
   local webhook_url=""
+  local hook_id=""
   local started_build=""
   local build_ref=""
 
   need_command git
-  need_command curl
-
-  token=$(github_token)
-  parse_git_origin
+  need_command node
 
   if [[ -n "$image" ]]; then
     warning "--autodeploy uses the ImageStream build output; ignoring -i '$image'"
   fi
 
-  ensure_github_source_secret "$token"
+  ensure_github_source_secret
   webhook_secret_value=$(ensure_github_webhook_secret)
 
   apply_build_resources
@@ -583,7 +710,8 @@ configure_autodeploy() {
   server_url=$(oc whoami --show-server)
   server_url="${server_url%/}"
   webhook_url="${server_url}/apis/build.openshift.io/v1/namespaces/${namespace}/buildconfigs/${APP_NAME}/webhooks/${webhook_secret_value}/github"
-  create_github_webhook "$token" "$webhook_url"
+  hook_id=$(create_github_webhook "$webhook_url")
+  verify_github_webhook "$hook_id"
 
   started_build=$(oc start-build -n "$namespace" "$APP_NAME" -o name)
   build_ref="build/${started_build##*/}"
@@ -644,6 +772,7 @@ print_summary() {
 
 parse_args "$@"
 check_preconditions
+prepare_autodeploy
 configure_database
 ensure_route
 capture_route_url

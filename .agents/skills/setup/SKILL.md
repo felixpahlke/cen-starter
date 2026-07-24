@@ -216,3 +216,19 @@ complete** after finalization succeeds and its changes are committed.
 If the user is not ready to confirm, report the exact state as **configured and verified;
 finalization pending**. Do not start feature work: post-setup feature skills intentionally do
 not become discoverable until finalization.
+
+## 7. Offer to publish
+
+Publishing is optional and never implicit. After finalization, inspect `git remote get-url
+origin`, the current branch/upstream, and the remote heads before asking anything. If `origin`
+already points to the project's repository, report whether the current commit is pushed and
+do not propose creating another repository.
+
+If no project `origin` exists, offer to create and push one. For IBM work, recommend
+`github.ibm.com`, the configured project name, and private visibility, but explicitly confirm
+the host, owner or organization, repository name, and visibility — the user may want another
+organization, an internal repository, or a public project. Before claiming repository creation
+is unavailable, check `gh --version` and `gh auth status --hostname <host>`. If login is
+needed, direct the user to `gh auth login --hostname <host> --web`; never request a GitHub
+token in chat. Once confirmed, use `GH_HOST=<host> gh repo create <owner>/<name> --<visibility>
+--source=. --remote=origin --push`.

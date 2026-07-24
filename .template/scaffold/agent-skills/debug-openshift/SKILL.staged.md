@@ -32,6 +32,12 @@ oc rollout status deploy/<app>                    # stuck rollout?
   before hunting leaks; the default limits are modest.
 - **Route serves nothing / TLS errors** — `oc get route`, confirm service targets port 8080 and
   `curl -sk https://<route>/api/health` from outside. App must listen on `PORT` (set to 8080).
+- **Git push does not start a build** — inspect the repository webhook's latest delivery
+  before changing anything, then confirm the BuildConfig has a GitHub trigger and the
+  `<app>-webhook` RoleBinding grants `system:webhook` to `system:unauthenticated`. OpenShift's
+  secret is embedded in the webhook URL; it is not GitHub's optional HMAC secret. Rerun
+  `deploy/deploy.sh --autodeploy` to reconcile and verify the webhook instead of patching the
+  BuildConfig by hand.
 - **oauth-proxy flavor only:** sidecar misconfig — check cookie secret length, redirect URL
   matching the route host, and the IdP's registered callback.
 

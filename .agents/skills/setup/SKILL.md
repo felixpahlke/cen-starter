@@ -76,7 +76,13 @@ app, paste this line, press Enter"), and run whatever you can yourself instead o
 delegating steps to the user — with one exception: never run `pnpm dev` or any other
 never-exiting command as a blocking command (see step 5). If the role is skipped or
 ambiguous, mirror the technical depth of the user's own language and default to plain
-language. Use the question tool for the other interview decisions with fixed options too.
+language.
+
+Throughout setup, inspect before asking. When user input is still needed and there are
+meaningful mutually exclusive choices, use the question tool, one decision at a time, with
+the recommendation first. Use a free-form question only for genuinely open-ended input such
+as a new name or path; do not manufacture choices or ask for anything the workspace or
+connected tools can answer.
 
 ### The decision tree — the only configurations that exist
 
@@ -174,7 +180,7 @@ affected `.env` values together (including `DATABASE_URL` when changing `DB_PORT
 rerun it. Do not stop services belonging to other projects.
 
 For local auth, `pnpm dev` applies migrations and repeat-safely creates the development admin
-`admin@example.com` / `ChangeMe` if missing; it never resets an existing password and refuses
+`admin@example.com` / `changethis` if missing; it never resets an existing password and refuses
 to seed outside local development. With `oauth-proxy`, Dex owns those credentials and the
 backend creates the local admin profile from the real authenticated subject on first login.
 This rule matches the named local identity, not the first person to log in.
@@ -227,8 +233,10 @@ do not propose creating another repository.
 If no project `origin` exists, offer to create and push one. For IBM work, recommend
 `github.ibm.com`, the configured project name, and private visibility, but explicitly confirm
 the host, owner or organization, repository name, and visibility — the user may want another
-organization, an internal repository, or a public project. Before claiming repository creation
-is unavailable, check `gh --version` and `gh auth status --hostname <host>`. If login is
-needed, direct the user to `gh auth login --hostname <host> --web`; never request a GitHub
-token in chat. Once confirmed, use `GH_HOST=<host> gh repo create <owner>/<name> --<visibility>
---source=. --remote=origin --push`.
+organization, an internal repository, or a public project. Use the question tool for choices
+such as existing versus new repository, host, owner from known memberships, and visibility;
+ask only a genuinely new name free-form. Before claiming repository creation is unavailable,
+check `gh --version` and `gh auth status --hostname <host>`. If login is needed, direct the
+user to `gh auth login --hostname <host> --web`; never request a GitHub token in chat. Once
+confirmed, use `GH_HOST=<host> gh repo create <owner>/<name> --<visibility> --source=.
+--remote=origin --push`.

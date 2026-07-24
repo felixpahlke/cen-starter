@@ -50,7 +50,7 @@ your data stays in the database volume.
 | http://localhost:3000/api/health | API health check |
 | http://localhost:3000/api/docs | Swagger UI, generated from the zod schemas |
 
-Sign in with the development admin: **admin@example.com** / **ChangeMe**. It exists only in
+Sign in with the development admin: **admin@example.com** / **changethis**. It exists only in
 local development. With the OAuth proxy you'll land on the bundled Dex login page first —
 same credentials, no IdP registration needed locally.
 

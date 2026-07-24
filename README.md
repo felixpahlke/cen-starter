@@ -35,7 +35,7 @@ Just want to look around first? The base app runs as-is, before any setup:
 ```bash
 pnpm install
 cp .env.example .env
-pnpm dev    # http://localhost:5173 — sign in: admin@example.com / ChangeMe
+pnpm dev    # http://localhost:5173 — sign in: admin@example.com / changethis
 ```
 
 ## Start a project
@@ -60,7 +60,7 @@ pnpm bootstrap        # asks for a project name, then a numbered menu of valid s
 
 pnpm dev              # port check → dev containers → migrations → seed → api + web
 # open http://localhost:5173 (base) or http://localhost:4180 (OAuth proxy)
-# sign in: admin@example.com / ChangeMe
+# sign in: admin@example.com / changethis
 # Ctrl-C stops the apps and dev containers; database data remains in its container volume
 
 git add -A && git commit -m "Configure CEN Starter"    # finalize requires a clean tree
@@ -85,7 +85,7 @@ pnpm bootstrap --name my-app --flavors oauth-proxy
 
 Local development needs no external IdP or client registration: `pnpm dev` starts a bundled
 Dex test IdP and OAuth2 Proxy. Both auth variants start with the same development admin:
-`admin@example.com` / `ChangeMe`. The default proxied URL is http://localhost:4180; Dex and
+`admin@example.com` / `changethis`. The default proxied URL is http://localhost:4180; Dex and
 proxy ports are ordinary `.env` settings if that port is occupied.
 
 Keep the base local auth when the product itself must own accounts and credentials (for
@@ -107,7 +107,7 @@ relinked. The guided setup skill covers the detailed decision and production cav
 
 ## Why you'll like it
 
-- **Instant start.** Run `pnpm dev`, then sign in as `admin@example.com` / `ChangeMe`. The
+- **Instant start.** Run `pnpm dev`, then sign in as `admin@example.com` / `changethis`. The
   local-auth seed creates the account up front; the OAuth variant creates its local profile
   from Dex's real identity on first login. No external identity setup is required locally.
 - **Type-safe without the ceremony.** The frontend infers API types straight from the backend

@@ -14,6 +14,8 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
   visibility; IBM work defaults to `github.ibm.com` without overriding an existing origin.
 - Agent guidance keeps secrets out of chat, points OpenShift users to **Copy login command**,
   and names the IBM App ID redirect-URI location.
+- Guided setup and deployment use structured questions for meaningful choices after first
+  inspecting available state; genuinely open-ended values remain free-form.
 - The default shadcn theme now matches IBM's refreshed design language: pill-shaped buttons,
   generously rounded cards (~16px) and inputs, white cards on a near-white page in light
   mode, deep blue `#0043CE` primary, and a near-black dark mode whose focus rings are blue
@@ -41,7 +43,7 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
   headers cannot be spoofed from the internet.
 - `pnpm dev` now owns the complete local lifecycle: Ctrl-C or termination stops the native
   app processes and runs `docker compose down`, while preserving database data in its volume.
-- Added the same ready-to-use development admin (`admin@example.com` / `ChangeMe`) to every
+- Added the same ready-to-use development admin (`admin@example.com` / `changethis`) to every
   database-backed auth variant. Local auth uses an idempotent `pnpm db:seed`; OAuth assigns
   the role when that exact Dex identity first authenticates, using its real OIDC subject.
   `no-database` retains API-key auth.

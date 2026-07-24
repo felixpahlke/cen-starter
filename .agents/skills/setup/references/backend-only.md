@@ -34,7 +34,7 @@ remains is Hono + Swagger + the API-key auth stub — zero Docker, single tiny c
 2. `pnpm dev` (db + development seed + API, no web server), then
    `curl localhost:3000/api/health` and open `/api/docs`.
 3. Verify a better-auth cookie session through `/api/auth/*` with the seeded development
-   admin `admin@example.com` / `ChangeMe`. Tell your user that other clients authenticate
+   admin `admin@example.com` / `changethis`. Tell your user that other clients authenticate
    through the same REST endpoints; API-key or token auth is a customization on the auth seam
    (`backend/src/auth/`).
 

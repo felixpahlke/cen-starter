@@ -77,7 +77,7 @@ localhost-only dev server.
 
 `pnpm dev` starts Postgres + [Dex](https://dexidp.io/) (a dev OIDC provider) + oauth2-proxy
 in compose. The app entry URL is the `OAUTH_PROXY_PORT` in `.env` (4180 by default). Log in
-with `admin@example.com` / `ChangeMe`. Dex owns the development password;
+with `admin@example.com` / `changethis`. Dex owns the development password;
 `dev/dex/config.yaml` reads its ports from `.env`. `pnpm db:seed` does not invent an OIDC
 subject: the local row is JIT-created from the first real login and receives the admin role
 only for this exact local identity. Opening `WEB_PORT` directly shows the not-authenticated
@@ -87,7 +87,7 @@ state — that's expected, headers only exist behind the proxy.
 
 1. `pnpm check` and `pnpm test` green.
 2. `pnpm dev`, open the configured `OAUTH_PROXY_PORT` → Dex login with
-   `admin@example.com` / `ChangeMe` → app renders with the Dex user shown in the user menu;
+   `admin@example.com` / `changethis` → app renders with the Dex user shown in the user menu;
    items CRUD works; `/api/me` returns the user with the `admin` role.
 3. Sign out via the user menu → back to the Dex login.
 

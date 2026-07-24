@@ -18,6 +18,15 @@ Two things happen automatically so you don't handle them:
   in production, guarded by an advisory lock). There is no manual migration step. Teams that
   want manual control set `MIGRATE_ON_START=false` in `.env.production`.
 
+## Ask only for unresolved decisions
+
+Inspect `git`, `gh`, and `oc` state before asking. When meaningful fixed choices remain, use
+the question tool if available, one decision at a time, with the recommendation first.
+Typical choices are an existing versus new repository, repository owner and visibility,
+one of the user's available namespaces, identity provider, and auto-deploy versus explicit
+deploy when the user's context has not already settled it. Use free-form only for values
+that cannot sensibly be choices, such as a new name or URL. Never ask for credentials in chat.
+
 ## Preconditions
 
 - `oc` CLI logged in (`oc whoami`) and a namespace the user may deploy to. If login is

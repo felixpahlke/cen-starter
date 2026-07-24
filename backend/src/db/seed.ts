@@ -7,7 +7,7 @@ import { user } from "./schema";
 const admin = {
   email: "admin@example.com",
   name: "Admin",
-  password: "ChangeMe",
+  password: "changethis",
 } as const;
 
 async function seed() {

@@ -40,13 +40,18 @@ Database data survives `pnpm dev` shutdowns in the Compose volume.
 7. **Frontend imports backend types type-only**: `import type { AppType } from "@cen/backend"`. A value import would pull server code into the bundle.
 8. **pnpm only.** Never npm or yarn.
 9. Don't weaken `tsconfig`, Biome rules, or zod schemas to make an error go away — fix the cause.
+10. **Use structured questions for real choices.** Inspect the workspace and connected tools
+    first. When user input is still needed and there are meaningful mutually exclusive
+    options, use the environment's question tool if available, one decision at a time, with
+    the recommendation first. Ask free-form only for genuinely open-ended values; do not
+    invent choices, request secrets in chat, or ask what you can discover yourself.
 
 ## Pitfalls
 
 - Ports live in the root `.env`; `pnpm dev` reports all conflicts together. Change `DB_PORT`
   together with the port inside `DATABASE_URL`, and never stop containers you don't
   recognize — they belong to other projects.
-- `admin@example.com` / `ChangeMe` is the well-known development identity. It exists only in
+- `admin@example.com` / `changethis` is the well-known development identity. It exists only in
   local development; never copy it into production configuration.
 - Generated files are never edited by hand: database migrations and
   `frontend/src/routeTree.gen.ts` (regenerates on `dev`/`build`).

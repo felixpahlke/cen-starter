@@ -8,7 +8,7 @@
   "edits": [
     {
       "file": "pnpm-workspace.yaml",
-      "find": "  - frontend\n",
+      "find": "  - app/frontend\n",
       "replace": ""
     },
     {

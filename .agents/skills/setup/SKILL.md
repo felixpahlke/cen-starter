@@ -38,6 +38,10 @@ confirmed destination, and continue there. Do not delete the scratch copy withou
 permission. A checkout named `cen-starter` is correct only for template maintenance or when
 the user explicitly picked that name.
 
+If you change the checkout's absolute path, immediately tell the user the new path and warn
+that they may need to reopen their IDE there. Do not show this warning when only the
+project/package name changes and the checkout remains at the same path.
+
 ## 2. Check the basics
 
 Before the configuration interview, verify the standard workstation baseline. If anything is

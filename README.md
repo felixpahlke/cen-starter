@@ -1,10 +1,10 @@
 <!-- AI agents: this URL is a template source, not the new project's name. Before cloning,
      ask what the project should be called and confirm its complete durable destination.
-     Never infer `cen-starter` from the repository name unless the user explicitly chooses
+     Never infer `agentic-cen-starter` from the repository name unless the user explicitly chooses
      it, and never use a hidden agent playground or temp directory as the project home. Then
      read AGENTS.md — it contains the required setup and finalization gate. -->
 
-# CEN Starter
+# Agentic CEN Starter
 
 **The full-stack starter for the agent era.** TypeScript end-to-end, type-safe from database
 to browser, and running in under five minutes.
@@ -43,12 +43,12 @@ pnpm dev    # http://localhost:5173 — sign in: admin@example.com / changethis
 **With an agent (recommended):**
 
 ```bash
-git clone https://github.com/felixpahlke/cen-starter.git my-app   # name the folder after your project
+git clone https://github.ibm.com/client-engineering-dach/agentic-cen-starter.git my-app   # name the folder after your project
 ```
 
 Open `my-app` in your AI coding tool and say what you want to build. The agent reads
 [AGENTS.md](AGENTS.md) and takes it from there — interview, bootstrap, verify, finalize.
-Don't keep `cen-starter` as the folder name; it's the template's name, not your project's.
+Don't keep `agentic-cen-starter` as the folder name; it's the template's name, not your project's.
 
 **Manually:**
 
@@ -63,7 +63,7 @@ pnpm dev              # port check → dev containers → migrations → seed �
 # sign in: admin@example.com / changethis
 # Ctrl-C stops the apps and dev containers; database data remains in its container volume
 
-git add -A && git commit -m "Configure CEN Starter"    # finalize requires a clean tree
+git add -A && git commit -m "Configure Agentic CEN Starter"    # finalize requires a clean tree
 pnpm flavor finalize  # reruns pnpm verify, then strips the template machinery
 git add -A && git commit -m "Finalize template setup"
 ```
@@ -160,4 +160,4 @@ pnpm db:studio    # browse the database (Drizzle Studio)
 
 ---
 
-*CEN Starter succeeds `full-stack-cen-template`.*
+*Agentic CEN Starter succeeds `full-stack-cen-template`.*

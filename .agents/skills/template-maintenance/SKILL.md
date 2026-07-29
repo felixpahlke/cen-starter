@@ -31,8 +31,11 @@ each one. A broken anchor fails loudly at the apply step, naming the anchor. Whe
 manifests, prefer converting fragile `edits` into `delete` + `overlay` — anchors are the
 maintenance cost.
 
-Keep the canonical resource (`backend/src/routes/items.ts`, `shared/src/schemas/items.ts`)
-exemplary: it gets copied into every project resource, flaws included.
+Keep the `add-resource` skill's reference implementation
+(`.template/scaffold/agent-skills/add-resource/assets/projects/`, plus the Carbon variant in
+the carbon flavor overlay) exemplary: it gets copied into every project resource, flaws
+included. `verify:flavors` materializes it in every compatible variant, so drift fails the
+matrix instead of shipping.
 
 ## Adding a flavor
 

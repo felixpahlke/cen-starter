@@ -6,10 +6,9 @@ import { auth } from "./auth/better-auth";
 import { migrateOnStart } from "./db/migrate-on-start";
 import { env } from "./env";
 import { healthRoute } from "./routes/health";
-import { itemsRoute } from "./routes/items";
 
 // Chained so the frontend can infer types for every route (Hono RPC).
-const api = new OpenAPIHono().route("/health", healthRoute).route("/items", itemsRoute);
+const api = new OpenAPIHono().route("/health", healthRoute);
 
 export type AppType = typeof api;
 

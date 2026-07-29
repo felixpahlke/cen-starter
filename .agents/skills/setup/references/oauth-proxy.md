@@ -1,8 +1,8 @@
 # oauth-proxy
 
 Authentication moves out of the app into an [oauth2-proxy](https://oauth2-proxy.github.io/)
-in front of it, connected to a company IdP via OIDC. better-auth is removed; the database,
-Drizzle, and the items resource stay.
+in front of it, connected to a company IdP via OIDC. better-auth is removed; the database
+and Drizzle stay.
 
 ## When to choose it
 
@@ -88,7 +88,7 @@ state — that's expected, headers only exist behind the proxy.
 1. `pnpm check` and `pnpm test` green.
 2. `pnpm dev`, open the configured `OAUTH_PROXY_PORT` → Dex login with
    `admin@example.com` / `changethis` → app renders with the Dex user shown in the user menu;
-   items CRUD works; `/api/me` returns the user with the `admin` role.
+   `/api/me` returns the user with the `admin` role.
 3. Sign out via the user menu → back to the Dex login.
 
 ## Production

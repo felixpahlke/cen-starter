@@ -1,6 +1,6 @@
 {
   "name": "oauth-proxy",
-  "description": "Replace local Better Auth with oauth2-proxy/OIDC while keeping PostgreSQL, Drizzle, and the example items resource.",
+  "description": "Replace local Better Auth with oauth2-proxy/OIDC while keeping PostgreSQL and Drizzle.",
   "conflicts": ["no-database", "backend-only"],
   "requires": [],
   "delete": [

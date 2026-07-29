@@ -1,6 +1,6 @@
 // @ts-nocheck — template overlay; this line is stripped when `pnpm flavor apply` copies the file into place
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { Home, LogOut, type LucideIcon, Package } from "lucide-react";
+import { Home, LogOut, type LucideIcon } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import {
 import { signOut, useSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
-type AppRoute = "/" | "/items";
+type AppRoute = "/";
 
 type NavItem = {
   to: AppRoute;
@@ -23,10 +23,7 @@ type NavItem = {
   icon: LucideIcon;
 };
 
-const navItems: NavItem[] = [
-  { to: "/", label: "Dashboard", icon: Home },
-  { to: "/items", label: "Items", icon: Package },
-];
+const navItems: NavItem[] = [{ to: "/", label: "Dashboard", icon: Home }];
 
 export const Route = createFileRoute("/_layout")({
   component: ProtectedLayout,

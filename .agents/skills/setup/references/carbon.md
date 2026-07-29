@@ -31,19 +31,20 @@ and restyle by hand using the template repo's `carbon` overlay as the reference.
   layout/spacing, Carbon components for controls, mapped tokens for custom color needs.
   Generated from `@carbon/themes`; regeneration is a template-maintenance task.
 - Pages: UI Shell layout (Header/nav/global actions/account panel), Carbon forms
-  (TextInput/PasswordInput + react-hook-form Controller, `invalidText` errors), items as
-  DataTable + Modals + OverflowMenu row actions, admin as user DataTable with role/status Tags.
+  (TextInput/PasswordInput + react-hook-form Controller, `invalidText` errors), admin as user
+  DataTable with role/status Tags. The `add-resource` skill's Carbon assets carry the
+  DataTable + Modal + OverflowMenu CRUD pattern for new resources.
 
 ## Post-apply checks
 
 1. `pnpm check` and `pnpm test` green (apply runs them).
 2. `pnpm dev`, then log in with `admin@example.com` / `changethis` and click through: dashboard
-   (UI Shell renders, active nav underline) → items create/edit/delete via modals → theme
-   toggle (g10 ↔ g90, body background must follow) → account panel sign-out. With the
-   `oauth-proxy,carbon` combination, enter through `OAUTH_PROXY_PORT` from `.env` and use its
-   Dex login.
-3. The canonical copy pattern changes: new pages copy `_layout/items.tsx` (DataTable + Modal
-   pattern), not a shadcn page. `.agents/skills/add-page` still applies for routing/nav.
+   (UI Shell renders, active nav underline) → theme toggle (g10 ↔ g90, body background must
+   follow) → account panel sign-out. With the `oauth-proxy,carbon` combination, enter through
+   `OAUTH_PROXY_PORT` from `.env` and use its Dex login.
+3. The flavor swaps the staged `add-resource` skill's frontend material to the Carbon
+   variant — new resources get the DataTable + Modal pattern, not a shadcn page.
+   `.agents/skills/add-page` still applies for routing/nav.
 
 ## Retrofitting late
 

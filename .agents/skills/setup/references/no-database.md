@@ -1,7 +1,7 @@
 # no-database
 
-Removes PostgreSQL, Drizzle, Better Auth persistence, and the example items resource. The app
-boots with zero Docker: Hono API, Swagger UI, frontend shell, and shared package remain.
+Removes PostgreSQL, Drizzle, and Better Auth persistence. The app boots with zero Docker:
+Hono API, Swagger UI, frontend shell, and shared package remain.
 
 ## When to choose it
 
@@ -17,8 +17,9 @@ oauth-proxy needs the user table).
 
 ## What it changes
 
-- Deletes `backend/src/db/`, `drizzle.config.ts`, `docker-compose.yml`, the items resource
-  (schema, route, tests, frontend page), and the login/signup/settings/admin routes.
+- Deletes `backend/src/db/`, `drizzle.config.ts`, `docker-compose.yml`, the
+  login/signup/settings/admin routes, and the Drizzle-based `add-resource` and
+  `db-migrations` skills (their canonical workflow assumes a database).
 - **Auth seam swap**: `backend/src/auth/index.ts` becomes an API-key implementation with the
   identical exported interface (`getSession`, `requireAuth`, `Session`). A request with
   `x-api-key: $API_KEY` gets a synthetic admin session for `api@local`; everything else is

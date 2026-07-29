@@ -17,17 +17,14 @@ import { useState } from "react";
 import { useTheme } from "@/components/theme-provider";
 import { signOut, useSession } from "@/lib/auth";
 
-type AppRoute = "/" | "/items";
+type AppRoute = "/";
 
 type NavItem = {
   to: AppRoute;
   label: string;
 };
 
-const navItems: NavItem[] = [
-  { to: "/", label: "Dashboard" },
-  { to: "/items", label: "Items" },
-];
+const navItems: NavItem[] = [{ to: "/", label: "Dashboard" }];
 
 export const Route = createFileRoute("/_layout")({
   component: ProtectedLayout,

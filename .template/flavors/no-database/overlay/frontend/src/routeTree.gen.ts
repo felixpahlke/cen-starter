@@ -15,12 +15,12 @@ import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
 const LayoutRoute = LayoutRouteImport.update({
   id: '/_layout',
   getParentRoute: () => rootRouteImport,
-})
+} as any)
 const LayoutIndexRoute = LayoutIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => LayoutRoute,
-})
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof LayoutIndexRoute

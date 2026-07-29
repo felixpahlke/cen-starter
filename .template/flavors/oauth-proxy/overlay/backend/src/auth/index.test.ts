@@ -62,7 +62,6 @@ beforeAll(async () => {
 beforeEach(async () => {
   store.env.NODE_ENV = "development";
   store.env.DATABASE_URL = "postgres://postgres@localhost:5432/app";
-  await testDb().delete(schema.items);
   await testDb().delete(schema.user);
 });
 

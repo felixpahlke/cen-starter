@@ -10,9 +10,10 @@ description: >-
 
 # Template setup
 
-This repo is a **maximal base app** (database, local auth, admin panel, shadcn/ui frontend,
-example `items` resource). Flavors subtract or swap parts of it. Your job: find out what your
-user actually needs, apply the matching flavors, then hand over a running app.
+This repo is a **maximal base app** (database, local auth, admin panel, shadcn/ui frontend).
+It ships no domain resource — the first real one is created after setup via the
+`add-resource` skill. Flavors subtract or swap parts of the base. Your job: find out what
+your user actually needs, apply the matching flavors, then hand over a running app.
 
 This skill and the `.template/` machinery are deleted by `pnpm flavor finalize` — in a
 finalized project none of this applies.

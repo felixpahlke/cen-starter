@@ -30,8 +30,8 @@ function Dashboard() {
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <p className="rounded-lg border bg-muted/50 p-4 font-mono text-sm">
-            Add projects. A project has a name and an optional description, belongs to the
-            signed-in user, and gets a page in the sidebar.
+            Add projects. A project has a name and an optional description, belongs to the signed-in
+            user, and gets a page in the sidebar.
           </p>
           <p className="text-muted-foreground text-sm">
             Tell your agent something like this — the add-resource skill handles the rest, from

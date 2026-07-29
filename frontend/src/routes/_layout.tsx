@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Navigate, Outlet, useRouter } from "@tanstack/react-router";
-import { Home, LogOut, type LucideIcon, Package, Settings, Shield } from "lucide-react";
+import { Home, LogOut, type LucideIcon, Settings, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,7 +18,7 @@ import { signOut, useSession } from "@/lib/auth";
 import { errorMessage } from "@/lib/errors";
 import { cn } from "@/lib/utils";
 
-type AppRoute = "/" | "/items" | "/settings" | "/admin";
+type AppRoute = "/" | "/settings" | "/admin";
 
 type NavItem = {
   to: AppRoute;
@@ -29,7 +29,6 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { to: "/", label: "Dashboard", icon: Home },
-  { to: "/items", label: "Items", icon: Package },
   { to: "/settings", label: "Settings", icon: Settings },
   { to: "/admin", label: "Admin", icon: Shield, admin: true },
 ];

@@ -20,8 +20,9 @@ finalizes — deleting `.template/` and leaving exactly your app, nothing more.
 The repo is **agent-first** and has two states:
 
 - **Setup mode** (as cloned): the maximal base app — database, auth, admin panel, shadcn/ui
-  frontend, an example resource. `.template/` contains small, CI-tested transformations
-  ("flavors") that subtract or swap parts: Carbon UI, OAuth proxy, backend-only, no database.
+  frontend. No placeholder domain: your first real resource is one prompt away once setup is
+  done. `.template/` contains small, CI-tested transformations ("flavors") that subtract or
+  swap parts: Carbon UI, OAuth proxy, backend-only, no database.
 - **Your project** (after `pnpm flavor finalize`): the machinery is gone, AGENTS.md becomes
   the project's own working guide, and the agent feature skills are active. Every file left
   is one you keep.
@@ -140,9 +141,13 @@ OpenShift and Code Engine scripts included.
 
 ![The dashboard: app shell, navigation, and the signed-in state](docs/images/dashboard-light.png)
 
-| The example resource | Dark mode, one toggle away |
+| Your first resource, one prompt later | Dark mode, one toggle away |
 | --- | --- |
-| ![The items page: a typed CRUD table](docs/images/items-light.png) | ![The same items page in dark mode](docs/images/items-dark.png) |
+| ![A projects page: a typed CRUD table](docs/images/projects-light.png) | ![The same projects page in dark mode](docs/images/projects-dark.png) |
+
+The projects page isn't shipped with the template — it's what the `add-resource` skill
+builds from the one-sentence prompt on the dashboard: schema, migration, API, tests, and
+this page.
 
 ## Everyday commands
 

@@ -19,7 +19,7 @@ import { useTheme } from "@/components/theme-provider";
 import { signOut, useSession } from "@/lib/auth";
 import { errorMessage } from "@/lib/errors";
 
-type AppRoute = "/" | "/items" | "/settings" | "/admin";
+type AppRoute = "/" | "/settings" | "/admin";
 
 type NavItem = {
   to: AppRoute;
@@ -29,7 +29,6 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { to: "/", label: "Dashboard" },
-  { to: "/items", label: "Items" },
   { to: "/settings", label: "Settings" },
   { to: "/admin", label: "Admin", admin: true },
 ];

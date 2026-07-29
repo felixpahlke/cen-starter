@@ -6,14 +6,10 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { migrateOnStart } from "./db/migrate-on-start";
 import { env } from "./env";
 import { healthRoute } from "./routes/health";
-import { itemsRoute } from "./routes/items";
 import { meRoute } from "./routes/me";
 
 // Chained so the frontend can infer types for every route (Hono RPC).
-const api = new OpenAPIHono()
-  .route("/health", healthRoute)
-  .route("/me", meRoute)
-  .route("/items", itemsRoute);
+const api = new OpenAPIHono().route("/health", healthRoute).route("/me", meRoute);
 
 export type AppType = typeof api;
 

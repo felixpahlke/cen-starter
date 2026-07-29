@@ -31,7 +31,7 @@ Database data survives `pnpm dev` shutdowns in the Compose volume.
 
 ## Rules
 
-1. **Copy the canonical resource.** `shared/src/schemas/items.ts` + `backend/src/routes/items.ts` show the pattern for every resource: schemas in shared, `createRoute` definitions, one chained `OpenAPIHono`. Don't invent a second style.
+1. **Copy the reference resource.** New entity? Use `.agents/skills/add-resource/` — its `assets/projects/` is a complete, verified implementation (schema, table, route, tests, page) to copy and adapt. Don't invent a second style.
 2. **Schemas live in `shared/`.** The zod schema is the single source of truth — API validation, OpenAPI docs, and frontend forms all derive from it. Never duplicate a schema on one side.
 3. **Auth is a seam.** Feature code goes through the seam only: `protectedRouter()` from `backend/src/routes/lib.ts` for route files, `getSession` / `Session` from `backend/src/auth` on the server, `frontend/src/lib/auth` in the browser. Never import the auth implementation anywhere else (the seam files, `routes/lib.ts`, and the auth mount in `backend/src/index.ts` are the only exceptions) — it is swappable and feature code must not know which one is installed.
 4. **Database changes**: edit `backend/src/db/schema/` (one file per resource, exported from `schema/index.ts`) → `pnpm db:generate` → `pnpm db:migrate`. Never edit generated migration files by hand.

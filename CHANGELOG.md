@@ -6,6 +6,41 @@ Format: [Keep a Changelog](https://keepachangelog.com), semver on `cen.templateV
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-07-29
+
+**Breaking: the starter no longer ships the `items` example resource.** A fresh finalized
+project contains infrastructure, authentication, and the application shell — no placeholder
+domain. The canonical CRUD pattern now lives inside the `add-resource` skill as a complete,
+executable reference implementation.
+
+- `add-resource` is self-contained: `assets/projects/` holds real, compilable files (shared
+  zod schema, Drizzle table, Hono route, hermetic test, frontend page) plus `references/`
+  explaining the cross-stack patterns and page anatomy. Agents and humans copy and adapt —
+  the skill never points at app files that may not exist.
+- The carbon flavor swaps the skill's frontend material to Carbon (DataTable/Modal page +
+  Carbon anatomy reference); backend-only strips the frontend material; no-database still
+  removes the skill entirely.
+- `verify:flavors` now materializes the skill's reference resource in every compatible
+  finalized variant — copy map, registration edits, migration generation, route-tree
+  regeneration, full verify — so skill drift fails the matrix instead of shipping. New
+  `--only <variant,...>` flag runs a subset.
+- The Drizzle schema is split by domain: `backend/src/db/schema/` with `auth.ts` and one
+  file per resource, exported through `schema/index.ts`. Skills, docs, and AGENTS.md teach
+  the one-file-per-resource rule.
+- The dashboard now shows the one-sentence prompt that creates the first real resource;
+  README screenshots show the page that prompt produces, captioned honestly.
+- `docs/add-a-feature.md` walks the skill's copy map by hand instead of maintaining a
+  second CRUD implementation.
+- The template's initial migrations were regenerated for new clones (base: auth tables
+  only; oauth-proxy: reduced user table).
+
+**Existing projects:** pulling this release does not delete anything you built — project
+intent wins in every conflict. If you kept the old `items` example, it remains yours (or
+delete its files and drop the table with a forward migration). Never adopt the regenerated
+initial migrations: your applied migration history stays as-is, forward-only.
+
+Also in this release:
+
 - OpenShift auto-deploy no longer asks for or stores a GitHub token. It uses the existing
   `gh` login to register a generated read-only SSH deploy key and webhook, restores the
   namespace `system:webhook` RoleBinding required for external deliveries, and verifies a

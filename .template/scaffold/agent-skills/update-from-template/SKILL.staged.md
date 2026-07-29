@@ -37,6 +37,12 @@ Expected conflict types, in order of likelihood:
   `package.json` → `cen.flavors` for what was applied). Delete them again; the template's
   `.agents/skills/setup/references/<flavor>.md` (visible in the upstream repo) lists what
   each flavor removes.
+- **Regenerated template migrations** — the template occasionally regenerates its *initial*
+  migration for new clones. Your project's applied migration history wins: keep your
+  `backend/src/db/migrations/` exactly as-is and change your database forward-only with new
+  migrations. Never adopt upstream's rewritten migration history, and never delete a
+  resource's table just because the template no longer ships an example — what your project
+  built, your project keeps.
 
 ## Verify — before telling the user it's done
 

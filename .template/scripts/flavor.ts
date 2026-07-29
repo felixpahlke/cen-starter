@@ -590,7 +590,9 @@ async function copyOverlay(
   }
 
   await mkdir(path.dirname(target), { recursive: true });
-  if (!/\.(ts|tsx)$/.test(source)) {
+  // Destinations under .template/ are staged material (e.g. skill assets), not live code:
+  // they keep their @ts-nocheck header until someone copies them into the app.
+  if (!/\.(ts|tsx)$/.test(source) || destination.startsWith(".template/")) {
     await cp(source, target, { force: true });
     return;
   }

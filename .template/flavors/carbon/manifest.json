@@ -8,7 +8,9 @@
     "frontend/src/components/ui/**",
     "frontend/src/components/mode-toggle.tsx",
     "frontend/src/lib/utils.ts",
-    "frontend/src/styles/themes/**"
+    "frontend/src/styles/themes/**",
+    ".template/scaffold/agent-skills/add-resource/references/frontend-shadcn.md",
+    ".template/scaffold/agent-skills/add-resource/assets/projects/frontend/shadcn/**"
   ],
   "overlay": "overlay",
   "edits": [

@@ -152,7 +152,7 @@ pnpm check        # typecheck + lint — green means done
 pnpm test         # backend tests (in-memory Postgres, real migrations)
 pnpm verify       # check + test + production build
 pnpm fix          # auto-fix lint/format
-pnpm db:generate  # create a migration after editing backend/src/db/schema.ts
+pnpm db:generate  # create a migration after editing backend/src/db/schema/
 pnpm db:migrate   # apply migrations
 pnpm db:seed      # create the development admin if it is missing
 pnpm db:studio    # browse the database (Drizzle Studio)

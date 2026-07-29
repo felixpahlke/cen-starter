@@ -15,7 +15,7 @@ const ignoredDirectories = new Set([".git", ".codex", "coverage", "dist", "node_
 const ignoredFiles = new Set([".env", ".env.production"]);
 
 async function main() {
-  const variants = await flavorVariants();
+  const variants = await flavorVariants(onlyFilter());
   const temporaryRoot = await mkdtemp(path.join(os.tmpdir(), "cen-flavor-check-"));
   let failed = false;
 
@@ -99,7 +99,15 @@ async function main() {
   console.log(`\nVerified ${variants.length} flavor variants.`);
 }
 
-async function flavorVariants() {
+function onlyFilter() {
+  const index = process.argv.indexOf("--only");
+  if (index === -1) return null;
+  const value = process.argv[index + 1];
+  if (!value) throw new Error("--only requires a comma-separated list, e.g. --only base,carbon");
+  return new Set(value.split(","));
+}
+
+async function flavorVariants(only: Set<string> | null) {
   const available = await readManifests();
   const names = new Set(available.map((manifest) => manifest.name));
   const variants = [[], ...available.map((manifest) => [manifest.name])];
@@ -113,7 +121,13 @@ async function flavorVariants() {
     }
   }
 
-  return variants;
+  if (!only) return variants;
+  const selected = variants.filter((variant) => only.has(variant.join("+") || "base"));
+  if (selected.length !== only.size) {
+    const known = variants.map((variant) => variant.join("+") || "base").join(", ");
+    throw new Error(`--only matched ${selected.length} of ${only.size} variants; known: ${known}`);
+  }
+  return selected;
 }
 
 async function skillNames(directory: string) {

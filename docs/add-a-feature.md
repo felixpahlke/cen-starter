@@ -55,10 +55,12 @@ Never restate these shapes anywhere else — `.pick` and `.partial` derive the v
 
 ## 2. Table + migration
 
-In `backend/src/db/schema.ts`, add the table at the bottom, under the
-`// --- application tables ---` comment where `items` already lives:
+Create `backend/src/db/schema/notes.ts` — every resource gets its own schema file:
 
 ```ts
+import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { user } from "./auth";
+
 export const notes = pgTable("note", {
   id: uuid("id").primaryKey().defaultRandom(),
   content: text("content").notNull(),
@@ -67,6 +69,14 @@ export const notes = pgTable("note", {
     .references(() => user.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+```
+
+Then export it from `backend/src/db/schema/index.ts`:
+
+```ts
+export * from "./auth";
+export * from "./items";
+export * from "./notes";
 ```
 
 Then generate and apply the migration:

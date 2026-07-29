@@ -5,12 +5,15 @@ description: Create, apply, and repair Drizzle database migrations — including
 
 # Database migrations
 
-Schema truth lives in `backend/src/db/schema.ts`; migrations are generated from it by
-drizzle-kit into `backend/src/db/migrations/`. Never edit schema and database independently.
+Schema truth lives in `backend/src/db/schema/` — one file per domain (`auth.ts` for auth
+tables, one file per application resource, e.g. `projects.ts`), all exported through
+`schema/index.ts`. Migrations are generated from it by drizzle-kit into
+`backend/src/db/migrations/`. Never edit schema and database independently.
 
 ## Normal flow
 
-1. Edit `backend/src/db/schema.ts`.
+1. Edit the resource's file in `backend/src/db/schema/` (new resource → new file, export it
+   from `schema/index.ts`).
 2. `pnpm db:generate` — creates a migration. **Read the generated SQL** before applying;
    drizzle-kit occasionally chooses a destructive interpretation (drop + recreate) for renames.
 3. `pnpm db:migrate` (database running: `docker compose up -d --wait`).
@@ -33,5 +36,5 @@ drizzle-kit into `backend/src/db/migrations/`. Never edit schema and database in
   migration, not an edit to the failed one. If the deploy applied it partially, compare actual
   schema (`\d` via psql or Studio) against the journal before deciding.
 - **"relation already exists":** the database has state the journal doesn't know about —
-  usually a table created manually or by better-auth's CLI. Reconcile by making schema.ts match
-  reality, then `pnpm db:generate` and inspect the diff it produces.
+  usually a table created manually or by better-auth's CLI. Reconcile by making the schema
+  files match reality, then `pnpm db:generate` and inspect the diff it produces.

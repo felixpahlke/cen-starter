@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { cp, mkdtemp, readdir, readFile, rm, stat } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import process from "node:process";
@@ -84,6 +84,7 @@ async function main() {
         commit(workspace, `Configure ${label}`);
         run(pnpm, ["flavor", "finalize"], workspace);
         await assertFinalized(workspace, stagedSkills);
+        await verifyResourceMaterialization(workspace, names);
       } catch (error) {
         failed = true;
         console.error(`Failed workspace retained at ${workspace}`);
@@ -97,6 +98,141 @@ async function main() {
   }
 
   console.log(`\nVerified ${variants.length} flavor variants.`);
+}
+
+// Executable verification of the add-resource skill: materialize its reference
+// implementation in the finalized project exactly as the skill instructs (copy map +
+// registration edits), then prove the result compiles, migrates, tests, and builds.
+// This is what keeps the skill's assets from drifting away from the live architecture.
+async function verifyResourceMaterialization(workspace: string, names: string[]) {
+  const skill = path.join(workspace, ".agents/skills/add-resource");
+  const skillExists = await exists(skill);
+  const expectSkill = !names.includes("no-database");
+
+  if (!expectSkill) {
+    if (skillExists) {
+      throw new Error("no-database variants must not ship the add-resource skill.");
+    }
+    console.log("add-resource skill correctly absent; skipping materialization.");
+    return;
+  }
+  if (!skillExists) throw new Error("Finalized project is missing the add-resource skill.");
+
+  const assets = path.join(skill, "assets/projects");
+  const hasFrontend = await exists(path.join(workspace, "frontend"));
+  const shadcnPage = path.join(assets, "frontend/shadcn/projects.tsx");
+  const carbonPage = path.join(assets, "frontend/carbon/projects.tsx");
+  const hasShadcn = await exists(shadcnPage);
+  const hasCarbon = await exists(carbonPage);
+
+  if (!hasFrontend && (hasShadcn || hasCarbon)) {
+    throw new Error("Backend-only project still ships frontend skill assets.");
+  }
+  if (hasFrontend && hasShadcn === hasCarbon) {
+    throw new Error(
+      `Expected exactly one frontend asset variant, found shadcn=${hasShadcn} carbon=${hasCarbon}.`,
+    );
+  }
+
+  console.log("Materializing the projects resource from the add-resource skill...");
+  await placeAsset(assets, "shared/projects.ts", workspace, "shared/src/schemas/projects.ts");
+  await placeAsset(
+    assets,
+    "backend/db/projects.ts",
+    workspace,
+    "backend/src/db/schema/projects.ts",
+  );
+  await placeAsset(
+    assets,
+    "backend/routes/projects.ts",
+    workspace,
+    "backend/src/routes/projects.ts",
+  );
+  await placeAsset(
+    assets,
+    "backend/routes/projects.test.ts",
+    workspace,
+    "backend/src/routes/projects.test.ts",
+  );
+  if (hasFrontend) {
+    await placeAsset(
+      assets,
+      hasCarbon ? "frontend/carbon/projects.tsx" : "frontend/shadcn/projects.tsx",
+      workspace,
+      "frontend/src/routes/_layout/projects.tsx",
+    );
+  }
+
+  // The registration edits the skill prescribes, applied as exact-match anchors so drift
+  // in the base files fails loudly here instead of silently in a generated project.
+  await appendLine(workspace, "shared/src/index.ts", 'export * from "./schemas/projects";');
+  await appendLine(workspace, "backend/src/db/schema/index.ts", 'export * from "./projects";');
+  await editAnchored(
+    workspace,
+    "backend/src/index.ts",
+    'import { healthRoute } from "./routes/health";\n',
+    'import { healthRoute } from "./routes/health";\nimport { projectsRoute } from "./routes/projects";\n',
+  );
+  await editAnchored(
+    workspace,
+    "backend/src/index.ts",
+    '.route("/health", healthRoute)',
+    '.route("/health", healthRoute).route("/projects", projectsRoute)',
+  );
+
+  // What the skill tells agents to do when formatting complains: pnpm fix.
+  run(pnpm, ["fix"], workspace);
+
+  run(pnpm, ["db:generate"], workspace);
+  const migrations = path.join(workspace, "backend/src/db/migrations");
+  const generated = (await readdir(migrations)).filter((file) => file.endsWith(".sql"));
+  const migrationSql = await Promise.all(
+    generated.map((file) => readFile(path.join(migrations, file), "utf8")),
+  );
+  if (!migrationSql.some((sql) => sql.includes('CREATE TABLE "project"'))) {
+    throw new Error("db:generate did not produce a migration creating the project table.");
+  }
+
+  if (hasFrontend) {
+    // Regenerates routeTree.gen.ts through the supported tooling; typecheck needs it.
+    run(pnpm, ["--filter", "@cen/frontend", "build"], workspace);
+    const routeTree = await readFile(path.join(workspace, "frontend/src/routeTree.gen.ts"), "utf8");
+    if (!routeTree.includes("/_layout/projects")) {
+      throw new Error("Route tree regeneration did not pick up the projects page.");
+    }
+  }
+
+  run(pnpm, ["verify"], workspace);
+  console.log("add-resource materialization verified.");
+}
+
+async function placeAsset(assets: string, asset: string, workspace: string, destination: string) {
+  const source = path.join(assets, asset);
+  if (!(await exists(source))) throw new Error(`Skill asset missing: ${asset}`);
+  const content = await readFile(source, "utf8");
+  const newline = content.indexOf("\n");
+  const firstLine = newline === -1 ? content : content.slice(0, newline);
+  if (!firstLine.startsWith("// @ts-nocheck — skill asset")) {
+    throw new Error(`Skill asset ${asset} is missing its @ts-nocheck marker line.`);
+  }
+  const target = path.join(workspace, destination);
+  await mkdir(path.dirname(target), { recursive: true });
+  await writeFile(target, content.slice(newline + 1));
+}
+
+async function appendLine(workspace: string, relative: string, line: string) {
+  const file = path.join(workspace, relative);
+  const content = await readFile(file, "utf8");
+  await writeFile(file, `${content}${line}\n`);
+}
+
+async function editAnchored(workspace: string, relative: string, find: string, replace: string) {
+  const file = path.join(workspace, relative);
+  const content = await readFile(file, "utf8");
+  if (!content.includes(find)) {
+    throw new Error(`Anchor not found in ${relative}: ${JSON.stringify(find)}`);
+  }
+  await writeFile(file, content.replace(find, replace));
 }
 
 function onlyFilter() {

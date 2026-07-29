@@ -1,6 +1,6 @@
 // @ts-nocheck — template overlay; this line is stripped when `pnpm flavor apply` copies the file into place
-import { Api, ArrowRight, Package } from "@carbon/icons-react";
-import { ClickableTile } from "@carbon/react";
+import { Api, ArrowRight } from "@carbon/icons-react";
+import { ClickableTile, Tile } from "@carbon/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useSession } from "@/lib/auth";
 
@@ -21,15 +21,21 @@ function Dashboard() {
         </p>
       </div>
       <div className="grid max-w-4xl gap-4 sm:grid-cols-2">
-        <ClickableTile href="/items" renderIcon={ArrowRight} className="min-h-40">
-          <div className="flex h-full flex-col justify-between gap-6">
-            <Package size={20} />
+        <Tile className="min-h-40">
+          <div className="flex h-full flex-col gap-4">
             <div className="space-y-2">
-              <h2 className="cds--type-heading-03">Items</h2>
-              <p className="cds--type-body-01 text-text-secondary">Open the CRUD resource.</p>
+              <h2 className="cds--type-heading-03">Add your first resource</h2>
+              <p className="cds--type-body-01 text-text-secondary">
+                The shell, sign-in, and typed API chain are wired — your domain is what&apos;s
+                missing. Tell your agent:
+              </p>
             </div>
+            <p className="cds--type-body-01 border-border-subtle-01 border-l-2 pl-4">
+              Add projects. A project has a name and an optional description, belongs to the
+              signed-in user, and gets a page in the sidebar.
+            </p>
           </div>
-        </ClickableTile>
+        </Tile>
         {/* The backend serves Swagger UI only outside production. */}
         {import.meta.env.DEV && (
           <ClickableTile href="/api/docs" renderIcon={ArrowRight} className="min-h-40">

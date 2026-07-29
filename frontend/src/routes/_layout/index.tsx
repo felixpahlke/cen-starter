@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, BookOpen, Package } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSession } from "@/lib/auth";
@@ -22,27 +22,32 @@ function Dashboard() {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>This is the template</CardTitle>
+          <CardTitle>Add your first resource</CardTitle>
           <CardDescription>
-            The app shell, auth flow, typed API client, and CRUD resource are wired together.
+            The app shell, sign-in, and typed API chain are wired. What&apos;s missing is your
+            domain — the first real resource replaces this card.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-3 sm:flex-row">
-          <Button asChild>
-            <Link to="/items">
-              <Package />
-              Open items
-              <ArrowRight />
-            </Link>
-          </Button>
+        <CardContent className="flex flex-col gap-4">
+          <p className="rounded-lg border bg-muted/50 p-4 font-mono text-sm">
+            Add projects. A project has a name and an optional description, belongs to the
+            signed-in user, and gets a page in the sidebar.
+          </p>
+          <p className="text-muted-foreground text-sm">
+            Tell your agent something like this — the add-resource skill handles the rest, from
+            database migration to sidebar page. Prefer doing it by hand? Follow{" "}
+            <code>docs/add-a-feature.md</code>.
+          </p>
           {/* The backend serves Swagger UI only outside production. */}
           {import.meta.env.DEV && (
-            <Button asChild variant="outline">
-              <a href="/api/docs">
-                <BookOpen />
-                Swagger UI
-              </a>
-            </Button>
+            <div>
+              <Button asChild variant="outline">
+                <a href="/api/docs">
+                  <BookOpen />
+                  Swagger UI
+                </a>
+              </Button>
+            </div>
           )}
         </CardContent>
       </Card>

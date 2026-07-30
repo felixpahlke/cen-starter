@@ -34,6 +34,21 @@ function run(command: string, argv: string[], opts: { allowFail?: boolean } = {}
   return result.status === 0;
 }
 
+function titleCase(value: string) {
+  return value
+    .split(/[-_.]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+function kebabCase(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function tryGit(argv: string[]) {
   try {
     return execFileSync("git", argv, {
@@ -89,36 +104,30 @@ async function main() {
     return next.value;
   }
 
-  // --- project name -------------------------------------------------------
+  // --- app name -------------------------------------------------------------
+  // The display name ("CEN Starter" in the layout headers, tab title, API docs title,
+  // Dex login screen) is the question; the package name is derived from it. Flags stay
+  // authoritative for agents and scripts. After bootstrap the brand lives as plain
+  // strings in the app code — rebrand later by editing those.
   let name = flag("name");
+  let brand = flag("brand")?.trim();
   if (!name) {
     const directoryName = path.basename(root);
-    const isTemplateName = directoryName === "cen-starter";
-    const prompt = isTemplateName
-      ? "Project name (required; cen-starter is only the template name): "
-      : `Project name [${directoryName}]: `;
+    const suggestion = directoryName === "cen-starter" ? "" : titleCase(directoryName);
+    const prompt = suggestion
+      ? `App name [${suggestion}]: `
+      : "App name (what users should see in the header — this is only the template): ";
     const answer = (await ask(prompt)).trim();
-    if (!answer && isTemplateName) {
-      fail("Choose a project name, or pass one explicitly with `--name <project-name>`.");
+    if (!answer && !suggestion) {
+      fail('Choose an app name, or pass `--name <project-name> [--brand "<Display Name>"]`.');
     }
-    name = answer || directoryName;
+    brand ||= answer || suggestion;
+    name = kebabCase(brand);
   }
+  brand ||= titleCase(name);
   if (!/^[a-z0-9][a-z0-9._-]*$/.test(name)) {
     fail(`"${name}" is not a valid package name (lowercase letters, digits, ".", "_", "-").`);
   }
-
-  // --- display brand --------------------------------------------------------
-  // The visible app name ("CEN Starter" in the layout headers, tab title, API docs
-  // title, Dex login screen). Title-cased from the package name unless --brand
-  // overrides it; after bootstrap it lives as plain strings in the app code —
-  // rebrand later by editing those.
-  const brand =
-    flag("brand")?.trim() ||
-    name
-      .split(/[-_.]+/)
-      .filter(Boolean)
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
   if (/[<>"&\\`]/.test(brand) || brand.includes(": ")) {
     fail(`--brand "${brand}" contains characters that would break the rewritten files.`);
   }

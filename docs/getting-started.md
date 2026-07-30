@@ -26,7 +26,7 @@ it to `docker` or `podman` when both are installed.
 git clone https://github.com/felixpahlke/cen-starter.git my-app   # folder = your project name
 cd my-app
 pnpm install
-pnpm bootstrap    # asks for a project name, then a numbered menu of valid setups
+pnpm bootstrap    # asks for the app's name, then a numbered menu of valid setups
 ```
 
 The menu is the whole configuration decision — pick by what your project is, not by

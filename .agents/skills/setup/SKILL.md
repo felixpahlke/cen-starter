@@ -18,30 +18,23 @@ your user actually needs, apply the matching flavors, then hand over a running a
 This skill and the `.template/` machinery are deleted by `pnpm flavor finalize` — in a
 finalized project none of this applies.
 
-## 1. Confirm the project location
+## 1. The app's name matters; its path doesn't
 
-`cen-starter` is the source template's name, not a default project name, and hidden agent
-workspaces or temporary paths (for example `~/.bob/`, `~/.codex/`, `/tmp/`, macOS
-`/var/folders/`) are scratch space, not a project home, unless the user explicitly chose
-them.
+The checkout's current location is the project's home — do not ask about it and do not
+move it. Relocating a repository the user has open breaks their IDE session and loses any
+running chat; no tidier path is worth that. The folder name has no technical effect after
+bootstrap (the package and Compose project are named there), so a checkout still named
+`cen-starter` gets at most a one-line aside that they can rename the folder later.
 
-Before any setup mutation, confirm both the user-chosen project name and its complete
-durable path. If either is unknown, stop before installing dependencies, applying flavors,
-or editing files, and ask: **"What should the project be called, and where would you like
-me to create it?"** (The role question from section 3 always comes first, on its own —
-ask this one after it.) If useful, inspect the home directory for an
-existing visible development folder and recommend one concrete `<folder>/<project-name>`
-path. Do not infer the name from the template URL or invent several arbitrary locations.
+The one exception, raised as a warning rather than a question: a genuinely disposable path
+(a hidden agent workspace such as `~/.bob/` or `~/.codex/`, `/tmp/`, macOS `/var/folders/`)
+can vanish without notice. Say so, let the user decide where the project should live, and
+only then continue. Never pick a destination for them or move anything unprompted.
 
-If the repository is already cloned into scratch space, or into a folder named `cen-starter`
-the user did not deliberately choose, preserve any work, move or recreate the clone at the
-confirmed destination, and continue there. Do not delete the scratch copy without
-permission. A checkout named `cen-starter` is correct only for template maintenance or when
-the user explicitly picked that name.
-
-If you change the checkout's absolute path, immediately tell the user the new path and warn
-that they may need to reopen their IDE there. Do not show this warning when only the
-project/package name changes and the checkout remains at the same path.
+What to actually confirm is the app's **name** — bootstrap rewrites the visible brand
+(layout headers, browser tab title, API docs title, Dex login screen) across the codebase
+from it, so it comes from the user, not from a folder name. Ask for it in the interview
+(section 3); never infer it from the template URL or the directory.
 
 ## 2. Check the basics
 
@@ -57,7 +50,7 @@ about to recommend.
 
 ### Adapt to the user
 
-The user's role is your **first question, asked on its own** — before the project name,
+The user's role is your **first question, asked on its own** — before the app's name,
 before anything else, and never bundled with another question in the same message. If your
 environment has a question tool (structured options the user clicks), you **must** use it
 for this — never a numbered list in prose. Offer exactly these options (a plain
@@ -79,10 +72,19 @@ never-exiting command as a blocking command (see step 5). If the role is skipped
 ambiguous, mirror the technical depth of the user's own language and default to plain
 language.
 
+### Name the app
+
+Right after the role question, ask on its own — free-form: **"What should the app be
+called?"** The user's exact wording becomes the visible brand (`--brand`), and the package
+name is its kebab-cased form ("TaskMaster Pro" → `--name taskmaster-pro`). If the user
+already named the product in conversation ("build me TaskMaster"), use that and confirm it
+in passing instead of re-asking. Never silently ship a name derived from the folder — the
+answer ends up in the header, the browser tab, and the login screen.
+
 Throughout setup, inspect before asking. When user input is still needed and there are
 meaningful mutually exclusive choices, use the question tool, one decision at a time, with
 the recommendation first. Use a free-form question only for genuinely open-ended input such
-as a new name or path; do not manufacture choices or ask for anything the workspace or
+as the app's name; do not manufacture choices or ask for anything the workspace or
 connected tools can answer.
 
 ### The decision tree — the only configurations that exist
@@ -143,14 +145,14 @@ pnpm install
 pnpm bootstrap --name <project-name> [--brand "<Display Name>"] --flavors <comma-separated-names|none>
 ```
 
-Bootstrap names the package and Compose project, rewrites the visible app name (layout
-headers, browser tab title, API docs title, Dex login screen) from "CEN Starter" to a
-title-cased form of the project name — add `--brand "<Display Name>"` when the product's
-proper name differs from that derivation (capitalization like "IBM", punctuation) —
-preserves the template remote as `upstream`, applies all chosen flavors in one validated
-operation, creates `.env` from the resulting `.env.example`, and sets `cen.bootstrapped`
-only after every step succeeds. On a fresh clone,
-do not copy `.env` or run flavor commands separately first.
+Pass the app name from the interview verbatim as `--brand` and its kebab-cased form as
+`--name`. Bootstrap names the package and Compose project, rewrites the visible app name
+(layout headers, browser tab title, API docs title, Dex login screen) from "CEN Starter"
+to the brand (without `--brand` it falls back to title-casing the package name), preserves
+the template remote as `upstream`, applies all chosen flavors in one validated operation,
+creates `.env` from the resulting `.env.example`, and sets `cen.bootstrapped` only after
+every step succeeds. On a fresh clone, do not copy `.env` or run flavor commands
+separately first.
 
 Supported combinations are declared in the manifests (`combinesWith`) and **order matters**:
 the combining flavor goes last (`oauth-proxy,carbon`, `backend-only,no-database`). Everything

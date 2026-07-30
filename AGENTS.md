@@ -6,8 +6,8 @@ This is an unconfigured clone of the Agentic CEN Starter template: `.template/` 
 `package.json` → `cen.finalized` is `false`.
 
 Whatever the user asked for — even a concrete feature like "build a todo list" — the first
-step is setup. Read `.agents/skills/setup/SKILL.md` and follow it completely: confirm the
-project name and location, interview the user, bootstrap the chosen configuration, verify
+step is setup. Read `.agents/skills/setup/SKILL.md` and follow it completely: ask what the
+app is called, interview the user, bootstrap the chosen configuration, verify
 the running app, and finalize with the user's explicit approval. A feature request never
 overrides this gate.
 

@@ -1,7 +1,7 @@
-<!-- AI agents: this URL is a template source, not the new project's name. Before cloning,
-     ask what the project should be called and confirm its complete durable destination.
-     Never infer `agentic-cen-starter` from the repository name unless the user explicitly chooses
-     it, and never use a hidden agent playground or temp directory as the project home. Then
+<!-- AI agents: this URL is a template source, not the new app's name. Before cloning, ask
+     what the app should be called — never infer `agentic-cen-starter` from the repository
+     name — and clone into a sensible visible folder (suggest one default; never a hidden
+     agent playground or temp directory). Once cloned, the checkout stays where it is. Then
      read AGENTS.md — it contains the required setup and finalization gate. -->
 
 # Agentic CEN Starter
@@ -57,7 +57,7 @@ Don't keep `agentic-cen-starter` as the folder name; it's the template's name, n
 pnpm create cen-app@latest ~/dev/my-app   # clone + install + bootstrap in one step
 # or, from a plain clone of this repo:
 pnpm install
-pnpm bootstrap        # asks for a project name, then a numbered menu of valid setups
+pnpm bootstrap        # asks for the app's name, then a numbered menu of valid setups
 
 pnpm dev              # port check → dev containers → migrations → seed → api + web
 # open http://localhost:5173 (base) or http://localhost:4180 (OAuth proxy)

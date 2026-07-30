@@ -140,12 +140,16 @@ more disruptive.
 
 ```bash
 pnpm install
-pnpm bootstrap --name <project-name> --flavors <comma-separated-names|none>
+pnpm bootstrap --name <project-name> [--brand "<Display Name>"] --flavors <comma-separated-names|none>
 ```
 
-Bootstrap names the package and Compose project, preserves the template remote as `upstream`,
-applies all chosen flavors in one validated operation, creates `.env` from the resulting
-`.env.example`, and sets `cen.bootstrapped` only after every step succeeds. On a fresh clone,
+Bootstrap names the package and Compose project, rewrites the visible app name (layout
+headers, browser tab title, API docs title, Dex login screen) from "CEN Starter" to a
+title-cased form of the project name — add `--brand "<Display Name>"` when the product's
+proper name differs from that derivation (capitalization like "IBM", punctuation) —
+preserves the template remote as `upstream`, applies all chosen flavors in one validated
+operation, creates `.env` from the resulting `.env.example`, and sets `cen.bootstrapped`
+only after every step succeeds. On a fresh clone,
 do not copy `.env` or run flavor commands separately first.
 
 Supported combinations are declared in the manifests (`combinesWith`) and **order matters**:
@@ -203,7 +207,7 @@ state:
 
 ```bash
 pnpm verify
-git add -A && git commit -m "Configure CEN Starter"
+git add -A && git commit -m "Configure Agentic CEN Starter"
 ```
 
 ## 6. Finalize — only with explicit user confirmation

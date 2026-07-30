@@ -9,7 +9,7 @@ import { createInterface } from "node:readline/promises";
 // Post-clone bootstrap (run as `pnpm bootstrap`, or by create-cen-app). One-time by design:
 // refuses to run twice and is deleted by `pnpm flavor finalize`.
 // ("setup" would shadow pnpm's own builtin `pnpm setup` command — don't rename it back.)
-// Usage: pnpm bootstrap [--name <project-name>] [--flavors <a,b|none>]
+// Usage: pnpm bootstrap [--name <project-name>] [--brand <display-name>] [--flavors <a,b|none>]
 
 const root = path.resolve(import.meta.dirname, "../..");
 const require = createRequire(import.meta.url);
@@ -105,6 +105,22 @@ async function main() {
   }
   if (!/^[a-z0-9][a-z0-9._-]*$/.test(name)) {
     fail(`"${name}" is not a valid package name (lowercase letters, digits, ".", "_", "-").`);
+  }
+
+  // --- display brand --------------------------------------------------------
+  // The visible app name ("CEN Starter" in the layout headers, tab title, API docs
+  // title, Dex login screen). Title-cased from the package name unless --brand
+  // overrides it; after bootstrap it lives as plain strings in the app code —
+  // rebrand later by editing those.
+  const brand =
+    flag("brand")?.trim() ||
+    name
+      .split(/[-_.]+/)
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  if (/[<>"&\\`]/.test(brand) || brand.includes(": ")) {
+    fail(`--brand "${brand}" contains characters that would break the rewritten files.`);
   }
 
   // Stale container volumes from an earlier project with the same Compose project name would be
@@ -210,6 +226,7 @@ async function main() {
   // bootstrapped marker is deliberately written only after every step succeeds.
   await writeFile(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
   console.log(`✓ Project renamed to "${name}"`);
+  await applyBrand(brand);
 
   if (chosen.length) {
     console.log(`\nApplying flavors: ${chosen.join(", ")}`);
@@ -247,6 +264,35 @@ Next steps:
 
 Working with an AI agent? Point it at this repo — AGENTS.md routes it through the
 remaining setup steps (verify, approve, finalize) before adding your first resource.`);
+}
+
+// Rewrite the template's visible brand to the project's display name — in the working
+// tree AND the flavor overlays, so flavors applied now or later carry the project's
+// name regardless of ordering. .template/ is deleted at finalize, so rewriting overlay
+// sources is safe.
+async function applyBrand(brand: string) {
+  if (brand === "CEN Starter") return;
+  const extensions = new Set([".ts", ".tsx", ".html", ".yaml", ".yml"]);
+  const skip = new Set(["node_modules", "dist", "coverage"]);
+  let count = 0;
+  for (const dir of ["frontend", "backend", "shared", "deploy", "dev", ".template/flavors"]) {
+    const entries = await readdir(path.join(root, dir), {
+      recursive: true,
+      withFileTypes: true,
+    }).catch(() => null);
+    if (!entries) continue; // flavored away — fine
+    for (const entry of entries) {
+      if (!entry.isFile() || !extensions.has(path.extname(entry.name))) continue;
+      const file = path.join(entry.parentPath, entry.name);
+      const parts = path.relative(root, file).split(path.sep);
+      if (parts.some((part) => skip.has(part))) continue;
+      const text = await readFile(file, "utf8");
+      if (!text.includes("CEN Starter")) continue;
+      await writeFile(file, text.replaceAll("CEN Starter", brand));
+      count += 1;
+    }
+  }
+  console.log(`✓ App name set to "${brand}" (${count} file${count === 1 ? "" : "s"})`);
 }
 
 main();

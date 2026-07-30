@@ -54,8 +54,8 @@ function ProtectedLayout() {
   return (
     <div className="min-h-dvh">
       <Header aria-label="CEN Starter">
-        <HeaderName as={Link} to="/" prefix="CEN">
-          Starter
+        <HeaderName as={Link} to="/" prefix="">
+          CEN Starter
         </HeaderName>
         <HeaderNavigation aria-label="Main navigation">
           {navItems.map((item) => (

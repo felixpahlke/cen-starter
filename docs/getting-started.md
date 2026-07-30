@@ -13,7 +13,7 @@ doing it yourself, and for understanding what the agent does.
 | Container engine | dev database (and Dex/proxy with OAuth) | Docker or Podman with Compose; use the company software portal on managed machines |
 | Git | you know why | `brew install git` |
 
-> 🤖 **With your agent:** "Check my machine for CEN Starter development and install what's
+> 🤖 **With your agent:** "Check my machine for Agentic CEN Starter development and install what's
 > missing." — it audits and fixes one tool at a time (the `prepare-workstation` skill).
 
 On IBM-managed machines, don't install Docker Desktop. Use an approved Docker-compatible
@@ -73,7 +73,7 @@ pnpm db:studio    # browse the database
 When the configuration is settled (app runs, you've signed in):
 
 ```bash
-git add -A && git commit -m "Configure CEN Starter"
+git add -A && git commit -m "Configure Agentic CEN Starter"
 pnpm flavor finalize    # reruns pnpm verify, strips the template machinery
 git add -A && git commit -m "Finalize template setup"
 ```

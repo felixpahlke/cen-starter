@@ -2,7 +2,7 @@
 
 ## STOP — this template is not set up yet
 
-This is an unconfigured clone of the CEN Starter template: `.template/` exists and
+This is an unconfigured clone of the Agentic CEN Starter template: `.template/` exists and
 `package.json` → `cen.finalized` is `false`.
 
 Whatever the user asked for — even a concrete feature like "build a todo list" — the first

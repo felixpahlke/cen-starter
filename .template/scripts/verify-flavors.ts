@@ -63,6 +63,7 @@ async function main() {
           ],
           workspace,
         );
+        await assertBrandApplied(workspace);
         const stagedSkills = await skillNames(
           path.join(workspace, ".template/scaffold/agent-skills"),
         );
@@ -204,6 +205,29 @@ async function verifyResourceMaterialization(workspace: string, names: string[])
 
   run(pnpm, ["verify"], workspace);
   console.log("add-resource materialization verified.");
+}
+
+// Bootstrap rewrites the visible "CEN Starter" brand to the project's display name — in
+// the working tree and the flavor overlays. Any app file still carrying it would ship
+// the template's name in a generated project's UI (headers, tab title, API docs, Dex).
+async function assertBrandApplied(workspace: string) {
+  const extensions = new Set([".ts", ".tsx", ".html", ".yaml", ".yml"]);
+  for (const dir of ["frontend", "backend", "shared", "deploy", "dev", ".template/flavors"]) {
+    const entries = await readdir(path.join(workspace, dir), {
+      recursive: true,
+      withFileTypes: true,
+    }).catch(() => null);
+    if (!entries) continue;
+    for (const entry of entries) {
+      if (!entry.isFile() || !extensions.has(path.extname(entry.name))) continue;
+      const file = path.join(entry.parentPath, entry.name);
+      const relative = path.relative(workspace, file);
+      if (relative.split(path.sep).some((part) => ignoredDirectories.has(part))) continue;
+      if ((await readFile(file, "utf8")).includes("CEN Starter")) {
+        throw new Error(`Bootstrap left the template brand "CEN Starter" in ${relative}.`);
+      }
+    }
+  }
 }
 
 async function placeAsset(assets: string, asset: string, workspace: string, destination: string) {

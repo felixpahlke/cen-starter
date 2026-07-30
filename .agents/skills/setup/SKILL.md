@@ -11,7 +11,7 @@ description: >-
 # Template setup
 
 This repo is a **maximal base app** (database, local auth, admin panel, shadcn/ui frontend).
-It ships no domain resource — the first real one is created after setup via the
+The first domain resource is created after setup via the
 `add-resource` skill. Flavors subtract or swap parts of the base. Your job: find out what
 your user actually needs, apply the matching flavors, then hand over a running app.
 

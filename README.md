@@ -20,9 +20,9 @@ finalizes — deleting `.template/` and leaving exactly your app, nothing more.
 The repo is **agent-first** and has two states:
 
 - **Setup mode** (as cloned): the maximal base app — database, auth, admin panel, shadcn/ui
-  frontend. No placeholder domain: your first real resource is one prompt away once setup is
-  done. `.template/` contains small, CI-tested transformations ("flavors") that subtract or
-  swap parts: Carbon UI, OAuth proxy, backend-only, no database.
+  frontend — with your first resource one prompt away. `.template/` contains small, CI-tested
+  transformations ("flavors") that subtract or swap parts: Carbon UI, OAuth proxy,
+  backend-only, no database.
 - **Your project** (after `pnpm flavor finalize`): the machinery is gone, AGENTS.md becomes
   the project's own working guide, and the agent feature skills are active. Every file left
   is one you keep.
@@ -73,7 +73,8 @@ Requires Node ≥ 22, pnpm, and Docker or Podman with Compose (for the dev datab
 default `CEN_CONTAINER_ENGINE=auto` uses the first ready engine; set it explicitly in `.env`
 when both are installed. If a port is taken, adjust `.env`. Finalization is reversible only
 through git; after it, the feature skills for AI agents are active and the template is out of
-your way.
+your way. Step-by-step version with prerequisites and troubleshooting:
+[docs/getting-started.md](docs/getting-started.md).
 
 ## Choose authentication
 
@@ -145,9 +146,8 @@ OpenShift and Code Engine scripts included.
 | --- | --- |
 | ![A projects page: a typed CRUD table](docs/images/projects-light.png) | ![The same projects page in dark mode](docs/images/projects-dark.png) |
 
-The projects page isn't shipped with the template — it's what the `add-resource` skill
-builds from the one-sentence prompt on the dashboard: schema, migration, API, tests, and
-this page.
+The projects page is what the `add-resource` skill builds from the one-sentence prompt on
+the dashboard: schema, migration, API, tests, and this page.
 
 ## Everyday commands
 

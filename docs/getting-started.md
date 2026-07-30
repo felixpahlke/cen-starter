@@ -55,9 +55,8 @@ local development. With the OAuth proxy you'll land on the bundled Dex login pag
 same credentials, no IdP registration needed locally.
 
 Look around: the **Admin** page manages users, and `pnpm db:studio` opens a database
-browser. There is deliberately no example domain — the dashboard shows the one-sentence
-prompt that creates your first real resource, and [add-a-feature.md](add-a-feature.md)
-walks through the same thing by hand.
+browser. The dashboard shows the one-sentence prompt that creates your first resource;
+[add-a-feature.md](add-a-feature.md) walks through the same thing by hand.
 
 ## Everyday commands
 

@@ -14,26 +14,20 @@ function Dashboard() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="space-y-2">
-        <h1 className="cds--type-heading-05">Welcome, {name}</h1>
-        <p className="cds--type-body-01 text-text-secondary">
-          CEN Starter is ready for authenticated product work.
-        </p>
-      </div>
+      <h1 className="cds--type-heading-05">Welcome, {name}</h1>
       <div className="grid max-w-4xl gap-4 sm:grid-cols-2">
         <Tile className="min-h-40">
           <div className="flex h-full flex-col gap-4">
             <div className="space-y-2">
               <h2 className="cds--type-heading-03">Add your first resource</h2>
               <p className="cds--type-body-01 text-text-secondary">
-                The shell, sign-in, and typed API chain are wired — your domain is what&apos;s
-                missing. Tell your agent:
+                Tell your AI agent what you need — for example:
               </p>
             </div>
-            <p className="cds--type-body-01 border-border-subtle-01 border-l-2 pl-4">
-              Add projects. A project has a name and an optional description, belongs to the
-              signed-in user, and gets a page in the sidebar.
-            </p>
+            <blockquote className="cds--type-body-01 border-border-subtle-01 border-l-2 pl-4 italic">
+              “Add projects. A project has a name and an optional description, belongs to the
+              signed-in user, and gets a page in the sidebar.”
+            </blockquote>
           </div>
         </Tile>
         {/* The backend serves Swagger UI only outside production. */}

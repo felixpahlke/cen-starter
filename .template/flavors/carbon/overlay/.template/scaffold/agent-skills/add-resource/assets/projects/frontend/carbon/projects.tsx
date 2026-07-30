@@ -88,12 +88,7 @@ function ProjectsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="space-y-2">
-        <h1 className="cds--type-heading-05">Projects</h1>
-        <p className="cds--type-body-01 text-text-secondary">
-          Create, edit, and delete your projects.
-        </p>
-      </div>
+      <h1 className="cds--type-heading-05">Projects</h1>
       <DataTable rows={rows} headers={projectHeaders} size="lg">
         {({
           rows: tableRows,
@@ -103,7 +98,7 @@ function ProjectsPage() {
           getTableProps,
           getCellProps,
         }) => (
-          <TableContainer title="All projects" description="Records owned by the signed-in user.">
+          <TableContainer title="All projects">
             <TableToolbar>
               <TableToolbarContent>
                 <Button renderIcon={Add} onClick={() => setCreateOpen(true)}>

@@ -11,24 +11,25 @@ export const Route = createFileRoute("/_layout/")({
 function Dashboard() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
-      <div className="space-y-2">
-        <h1 className="font-semibold text-3xl tracking-tight">Welcome</h1>
-        <p className="text-muted-foreground">CEN Starter is ready for product work.</p>
-      </div>
+      <h1 className="font-semibold text-3xl tracking-tight">Welcome</h1>
       <Card>
         <CardHeader>
-          <CardTitle>This is the no-database template</CardTitle>
-          <CardDescription>
-            The app shell and typed health API are wired without local persistence.
-          </CardDescription>
+          <CardTitle>Add your first page</CardTitle>
+          <CardDescription>Tell your AI agent what you need — for example:</CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button asChild variant="outline">
-            <a href="/api/docs">
-              <BookOpen />
-              Swagger UI
-            </a>
-          </Button>
+        <CardContent className="flex flex-col gap-4">
+          <blockquote className="border-primary border-l-2 pl-4 text-sm italic">
+            “Add a status page in the sidebar that calls a new /api/status endpoint and shows the
+            result.”
+          </blockquote>
+          <div>
+            <Button asChild variant="outline">
+              <a href="/api/docs">
+                <BookOpen />
+                Swagger UI
+              </a>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

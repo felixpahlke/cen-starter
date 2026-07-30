@@ -49,12 +49,7 @@ function Login() {
   return (
     <main className="flex min-h-svh items-center justify-center p-6">
       <section className="w-full max-w-sm space-y-6">
-        <div className="space-y-2">
-          <h1 className="cds--type-heading-05">Sign in</h1>
-          <p className="cds--type-body-01 text-text-secondary">
-            Access CEN Starter with your email and password.
-          </p>
-        </div>
+        <h1 className="cds--type-heading-05">Sign in</h1>
         <Form onSubmit={form.handleSubmit(onSubmit)}>
           <Stack gap={6}>
             <Controller

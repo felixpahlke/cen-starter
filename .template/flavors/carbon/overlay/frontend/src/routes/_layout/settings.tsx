@@ -77,21 +77,11 @@ function SettingsPage() {
 
   return (
     <div className="flex max-w-4xl flex-col gap-6">
-      <div className="space-y-2">
-        <h1 className="cds--type-heading-05">Settings</h1>
-        <p className="cds--type-body-01 text-text-secondary">
-          Account details for the current user.
-        </p>
-      </div>
+      <h1 className="cds--type-heading-05">Settings</h1>
       <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <Tile>
           <Stack gap={6}>
-            <div className="space-y-1">
-              <h2 className="cds--type-heading-03">Current user</h2>
-              <p className="cds--type-body-01 text-text-secondary">
-                Session identity returned by Better Auth.
-              </p>
-            </div>
+            <h2 className="cds--type-heading-03">Current user</h2>
             <InfoRow label="Name" value={user?.name ?? ""} />
             <InfoRow label="Email" value={user?.email ?? ""} />
             <InfoRow label="Role" value={user?.role === "admin" ? "admin" : "user"} />

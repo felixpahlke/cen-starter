@@ -118,12 +118,7 @@ function AdminPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="space-y-2">
-        <h1 className="cds--type-heading-05">Admin</h1>
-        <p className="cds--type-body-01 text-text-secondary">
-          User management from the Better Auth admin plugin.
-        </p>
-      </div>
+      <h1 className="cds--type-heading-05">Admin</h1>
       <DataTable rows={rows} headers={userHeaders} size="lg">
         {({
           rows: tableRows,

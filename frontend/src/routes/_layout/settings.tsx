@@ -87,15 +87,11 @@ function SettingsPage() {
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
-      <div className="space-y-2">
-        <h1 className="font-semibold text-3xl tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">Account details for the current user.</p>
-      </div>
+      <h1 className="font-semibold text-3xl tracking-tight">Settings</h1>
       <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <Card>
           <CardHeader>
             <CardTitle>Current user</CardTitle>
-            <CardDescription>Session identity returned by Better Auth.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <InfoRow label="Name" value={user?.name ?? ""} />

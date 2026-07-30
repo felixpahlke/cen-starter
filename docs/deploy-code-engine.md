@@ -1,12 +1,13 @@
 # Deploy to IBM Cloud Code Engine
 
-Same single container as everywhere else (API + built SPA, port 8080, migrations applied
-at boot), run as a serverless Code Engine app. `deploy/ce-deploy.sh` does the heavy lifting
-and is safe to rerun — it builds the image **in the cloud** from your working tree, so you
-don't need Docker locally. Reference details: [deploy/README.md](../deploy/README.md).
-
 > 🤖 **With your agent:** "Deploy this to Code Engine, project `<name>`." — the
-> `deploy-code-engine` skill runs this guide and verifies the result.
+> `deploy-code-engine` skill runs this guide and verifies the result. The rest of this
+> page is the same work by hand.
+
+One container (API + built SPA, port 8080, migrations applied at boot), run as a
+serverless Code Engine app. `deploy/ce-deploy.sh` does the heavy lifting and is safe to
+rerun — it builds the image **in the cloud** from your working tree, so you don't need
+Docker locally. Reference details: [deploy/README.md](../deploy/README.md).
 
 ## Before you start
 

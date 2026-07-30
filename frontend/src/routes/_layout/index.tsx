@@ -14,28 +14,20 @@ function Dashboard() {
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
-      <div className="space-y-2">
-        <h1 className="font-semibold text-3xl tracking-tight">Welcome, {name}</h1>
-        <p className="text-muted-foreground">
-          CEN Starter is ready for authenticated product work.
-        </p>
-      </div>
+      <h1 className="font-semibold text-3xl tracking-tight">Welcome, {name}</h1>
       <Card>
         <CardHeader>
           <CardTitle>Add your first resource</CardTitle>
-          <CardDescription>
-            The app shell, sign-in, and typed API chain are wired. What&apos;s missing is your
-            domain — the first real resource replaces this card.
-          </CardDescription>
+          <CardDescription>Tell your AI agent what you need — for example:</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <p className="rounded-lg border bg-muted/50 p-4 font-mono text-sm">
-            Add projects. A project has a name and an optional description, belongs to the signed-in
-            user, and gets a page in the sidebar.
-          </p>
+          <blockquote className="border-primary border-l-2 pl-4 text-sm italic">
+            “Add projects. A project has a name and an optional description, belongs to the
+            signed-in user, and gets a page in the sidebar.”
+          </blockquote>
           <p className="text-muted-foreground text-sm">
-            Tell your agent something like this — the add-resource skill handles the rest, from
-            database migration to sidebar page. Prefer doing it by hand? Follow{" "}
+            One sentence like this is the whole feature request — the agent takes it from schema to
+            migration to sidebar page. Prefer doing it by hand? Follow{" "}
             <code>docs/add-a-feature.md</code>.
           </p>
           {/* The backend serves Swagger UI only outside production. */}

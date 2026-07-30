@@ -111,12 +111,7 @@ function AdminPage() {
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
-          <h1 className="font-semibold text-3xl tracking-tight">Admin</h1>
-          <p className="text-muted-foreground">
-            User management from the Better Auth admin plugin.
-          </p>
-        </div>
+        <h1 className="font-semibold text-3xl tracking-tight">Admin</h1>
         <CreateUserDialog open={createOpen} onOpenChange={setCreateOpen} />
       </div>
       <Card>

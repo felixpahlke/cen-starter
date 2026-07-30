@@ -7,13 +7,10 @@ The core loop of this template: data model → API → frontend, one type-safe c
 > the `add-resource` skill collects what's missing, creates every file, generates the
 > migration, and verifies the result. The rest of this page is the same work by hand.
 
-There is **no client generation step** anywhere below. The frontend infers API types
-directly from the backend code (Hono RPC) — the moment the route is registered, the
-frontend already knows the new endpoints.
-
 ## The chain
 
-One zod schema in `shared/` feeds everything:
+One zod schema in `shared/` feeds everything — no client generation step; the frontend
+infers API types straight from the backend code (Hono RPC):
 
 ```
 shared zod schema
@@ -30,9 +27,9 @@ variables).
 
 ## The reference implementation
 
-The starter deliberately ships no example domain in the app itself. Instead, a complete,
-verified reference implementation of a `projects` resource lives in the `add-resource`
-skill — real files, compiled and tested against every release of the template:
+The canonical pattern lives in the `add-resource` skill: a complete reference
+implementation of a `projects` resource — real files, compiled and tested against every
+release of the template:
 
 ```
 .agents/skills/add-resource/
@@ -41,8 +38,6 @@ skill — real files, compiled and tested against every release of the template:
   references/frontend-*.md     page anatomy for this project's design system
   assets/projects/             the files you copy
 ```
-
-(In no-database setups this skill is intentionally absent — its workflow assumes Drizzle.)
 
 ## Doing it by hand
 

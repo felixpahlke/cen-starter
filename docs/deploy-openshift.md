@@ -1,12 +1,13 @@
 # Deploy to OpenShift
 
-The app ships as one container: the API serves the built SPA on port 8080, and the image
-applies its own database migrations at boot. `deploy/deploy.sh` does the heavy lifting and
-is safe to rerun. Reference details live in [deploy/README.md](../deploy/README.md).
-
 > 🤖 **With your agent:** "Deploy this to OpenShift, namespace `<name>`, auto-deploy." —
-> the `deploy-openshift` skill runs this whole guide and verifies the result. Do it by
-> hand once so you know what exists in the cluster afterwards.
+> the `deploy-openshift` skill runs this whole guide and verifies the result. The rest of
+> this page is the same work by hand — worth doing once so you know what exists in the
+> cluster afterwards.
+
+One container: the API serves the built SPA on port 8080, and the image applies its own
+database migrations at boot. `deploy/deploy.sh` does the heavy lifting and is safe to
+rerun. Reference details live in [deploy/README.md](../deploy/README.md).
 
 ## Before you start
 

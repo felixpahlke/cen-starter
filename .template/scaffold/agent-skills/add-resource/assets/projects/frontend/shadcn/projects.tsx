@@ -9,7 +9,7 @@ import { type Control, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -79,16 +79,12 @@ function ProjectsPage() {
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
-          <h1 className="font-semibold text-3xl tracking-tight">Projects</h1>
-          <p className="text-muted-foreground">Create, edit, and delete your projects.</p>
-        </div>
+        <h1 className="font-semibold text-3xl tracking-tight">Projects</h1>
         <CreateProjectDialog open={createOpen} onOpenChange={setCreateOpen} />
       </div>
       <Card>
         <CardHeader>
           <CardTitle>All projects</CardTitle>
-          <CardDescription>Records owned by the signed-in user.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>

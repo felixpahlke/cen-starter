@@ -51,12 +51,7 @@ function Signup() {
   return (
     <main className="flex min-h-svh items-center justify-center p-6">
       <section className="w-full max-w-sm space-y-6">
-        <div className="space-y-2">
-          <h1 className="cds--type-heading-05">Create account</h1>
-          <p className="cds--type-body-01 text-text-secondary">
-            Use an email and password to start with CEN Starter.
-          </p>
-        </div>
+        <h1 className="cds--type-heading-05">Create account</h1>
         <Form onSubmit={form.handleSubmit(onSubmit)}>
           <Stack gap={6}>
             <Controller

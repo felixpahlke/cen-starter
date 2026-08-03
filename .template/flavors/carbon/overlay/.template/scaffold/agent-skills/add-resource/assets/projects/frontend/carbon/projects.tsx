@@ -28,8 +28,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { type Control, Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import type { z } from "zod";
+import { toast } from "@/components/toaster";
 import { api } from "@/lib/api";
 import { errorMessage } from "@/lib/errors";
 

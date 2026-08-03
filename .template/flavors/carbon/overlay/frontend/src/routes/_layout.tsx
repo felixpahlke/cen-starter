@@ -14,8 +14,8 @@ import {
 } from "@carbon/react";
 import { createFileRoute, Link, Navigate, Outlet, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
-import { toast } from "sonner";
 import { useTheme } from "@/components/theme-provider";
+import { toast } from "@/components/toaster";
 import { signOut, useSession } from "@/lib/auth";
 import { errorMessage } from "@/lib/errors";
 

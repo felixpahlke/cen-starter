@@ -3,8 +3,8 @@ import { Button, Link as CarbonLink, Form, PasswordInput, Stack, TextInput } fro
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, Navigate, Link as RouterLink, useNavigate } from "@tanstack/react-router";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
+import { toast } from "@/components/toaster";
 import { signUp, useSession } from "@/lib/auth";
 import { errorMessage } from "@/lib/errors";
 

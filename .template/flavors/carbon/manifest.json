@@ -37,6 +37,7 @@
         "class-variance-authority",
         "clsx",
         "lucide-react",
+        "sonner",
         "tailwind-merge"
       ]
     }

@@ -43,7 +43,7 @@ async function main() {
             pnpm,
             ["bootstrap", "--flavors", "none"],
             workspace,
-            "Choose a project name",
+            "Choose an app name",
             "\n",
           );
           expectFailure(pnpm, ["db:generate"], workspace, "setup mode");
@@ -64,6 +64,7 @@ async function main() {
           workspace,
         );
         await assertBrandApplied(workspace);
+        await assertCarbonToaster(workspace, names);
         const stagedSkills = await skillNames(
           path.join(workspace, ".template/scaffold/agent-skills"),
         );
@@ -99,6 +100,25 @@ async function main() {
   }
 
   console.log(`\nVerified ${variants.length} flavor variants.`);
+}
+
+async function assertCarbonToaster(workspace: string, names: string[]) {
+  if (!names.includes("carbon")) return;
+
+  const frontendPackage = JSON.parse(
+    await readFile(path.join(workspace, "frontend/package.json"), "utf8"),
+  ) as { dependencies?: Record<string, string> };
+  if (frontendPackage.dependencies?.sonner) {
+    throw new Error("Carbon output must remove the Sonner dependency.");
+  }
+
+  const toaster = await readFile(
+    path.join(workspace, "frontend/src/components/toaster.tsx"),
+    "utf8",
+  );
+  if (!toaster.includes("ToastNotification") || toaster.includes('from "sonner"')) {
+    throw new Error("Carbon output must render Carbon ToastNotification components.");
+  }
 }
 
 // Executable verification of the add-resource skill: materialize its reference

@@ -3,7 +3,61 @@
 // reference the same family name. Carbon's global reset is disabled too: it is
 // UNLAYERED and would defeat every layered Tailwind utility (padding/margin/
 // border/font on reset-listed elements); Tailwind's preflight covers the reset.
+@use "@carbon/react/scss/motion" as motion;
 @use "@carbon/react" with (
   $css--font-face: false,
   $css--reset: false
 );
+
+.cen-toast-stack {
+  position: fixed;
+  z-index: 9999;
+  inset-block-start: 4rem;
+  inset-inline-end: 1rem;
+  display: flex;
+  max-inline-size: calc(100vw - 2rem);
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.cen-toast {
+  display: grid;
+  grid-template-rows: 1fr;
+  max-inline-size: 100%;
+  pointer-events: auto;
+  transition:
+    grid-template-rows motion.$duration-moderate-01 motion.motion(exit, productive),
+    opacity motion.$duration-fast-02 motion.motion(exit, productive),
+    transform motion.$duration-moderate-01 motion.motion(exit, productive);
+  animation: cen-toast-enter motion.$duration-moderate-01 motion.motion(entrance, productive);
+}
+
+.cen-toast__content {
+  min-block-size: 0;
+  overflow: clip;
+  overflow-clip-margin: 0.5rem;
+  padding-block-end: 0.5rem;
+}
+
+.cen-toast[data-closing="true"] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(1rem);
+}
+
+@keyframes cen-toast-enter {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transform: translateX(1rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cen-toast {
+    transition: none;
+    animation: none;
+  }
+}

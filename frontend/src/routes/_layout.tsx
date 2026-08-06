@@ -29,7 +29,6 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { to: "/", label: "Dashboard", icon: Home },
-  { to: "/settings", label: "Settings", icon: Settings },
   { to: "/admin", label: "Admin", icon: Shield, admin: true },
 ];
 
@@ -151,6 +150,13 @@ function UserMenu({
           <div className="truncate font-normal text-muted-foreground text-xs">{email}</div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/settings">
+            <Settings />
+            Settings
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => void onSignOut()}>
           <LogOut />
           Sign out
@@ -179,7 +185,6 @@ function ProtectedLayoutSkeleton() {
           <Skeleton className="h-5 w-28" />
         </div>
         <div className="space-y-2 p-3">
-          <Skeleton className="h-9 w-full" />
           <Skeleton className="h-9 w-full" />
           <Skeleton className="h-9 w-full" />
         </div>

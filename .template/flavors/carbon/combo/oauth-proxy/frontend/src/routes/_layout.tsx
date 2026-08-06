@@ -5,11 +5,15 @@ import {
   Header,
   HeaderGlobalAction,
   HeaderGlobalBar,
+  HeaderMenuButton,
   HeaderMenuItem,
   HeaderName,
   HeaderNavigation,
   HeaderPanel,
   Loading,
+  SideNav,
+  SideNavItems,
+  SideNavLink,
   Tag,
 } from "@carbon/react";
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
@@ -33,6 +37,7 @@ export const Route = createFileRoute("/_layout")({
 function ProtectedLayout() {
   const session = useSession();
   const { resolvedTheme, setTheme } = useTheme();
+  const [menuOpen, setMenuOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
 
   if (session.isPending) {
@@ -54,6 +59,14 @@ function ProtectedLayout() {
   return (
     <div className="min-h-dvh">
       <Header aria-label="CEN Starter">
+        <HeaderMenuButton
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          isActive={menuOpen}
+          onClick={() => {
+            setPanelOpen(false);
+            setMenuOpen((open) => !open);
+          }}
+        />
         <HeaderName as={Link} to="/" prefix="">
           CEN Starter
         </HeaderName>
@@ -74,11 +87,23 @@ function ProtectedLayout() {
           <HeaderGlobalAction
             aria-label="Account"
             isActive={panelOpen}
-            onClick={() => setPanelOpen((open) => !open)}
+            onClick={() => {
+              setMenuOpen(false);
+              setPanelOpen((open) => !open);
+            }}
           >
             <UserAvatar size={20} />
           </HeaderGlobalAction>
         </HeaderGlobalBar>
+        <SideNav aria-label="Side navigation" expanded={menuOpen} isPersistent={false}>
+          <SideNavItems>
+            {navItems.map((item) => (
+              <SideNavLink key={item.to} as={Link} to={item.to} onClick={() => setMenuOpen(false)}>
+                {item.label}
+              </SideNavLink>
+            ))}
+          </SideNavItems>
+        </SideNav>
         <HeaderPanel
           aria-label="Account panel"
           expanded={panelOpen}

@@ -78,7 +78,7 @@ function SettingsPage() {
   return (
     <div className="flex max-w-4xl flex-col gap-6">
       <h1 className="cds--type-heading-05">Settings</h1>
-      <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+      <div className="grid items-start gap-6 lg:grid-cols-[1fr_1fr]">
         <Tile>
           <Stack gap={6}>
             <h2 className="cds--type-heading-03">Current user</h2>

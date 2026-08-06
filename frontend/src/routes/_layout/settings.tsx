@@ -88,7 +88,7 @@ function SettingsPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
       <h1 className="font-semibold text-3xl tracking-tight">Settings</h1>
-      <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+      <div className="grid items-start gap-6 lg:grid-cols-[1fr_1fr]">
         <Card>
           <CardHeader>
             <CardTitle>Current user</CardTitle>

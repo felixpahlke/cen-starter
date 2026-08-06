@@ -1,15 +1,19 @@
 // @ts-nocheck — template overlay; this line is stripped when `pnpm flavor apply` copies the file into place
-import { Asleep, Light, Logout, UserAvatar } from "@carbon/icons-react";
+import { Asleep, Light, Logout, Settings, UserAvatar } from "@carbon/icons-react";
 import {
   Button,
   Header,
   HeaderGlobalAction,
   HeaderGlobalBar,
+  HeaderMenuButton,
   HeaderMenuItem,
   HeaderName,
   HeaderNavigation,
   HeaderPanel,
   Loading,
+  SideNav,
+  SideNavItems,
+  SideNavLink,
   Tag,
 } from "@carbon/react";
 import { createFileRoute, Link, Navigate, Outlet, useRouter } from "@tanstack/react-router";
@@ -29,7 +33,6 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { to: "/", label: "Dashboard" },
-  { to: "/settings", label: "Settings" },
   { to: "/admin", label: "Admin", admin: true },
 ];
 
@@ -41,6 +44,7 @@ function ProtectedLayout() {
   const router = useRouter();
   const session = useSession();
   const { resolvedTheme, setTheme } = useTheme();
+  const [menuOpen, setMenuOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
 
   if (session.isPending) {
@@ -70,6 +74,14 @@ function ProtectedLayout() {
   return (
     <div className="min-h-dvh">
       <Header aria-label="CEN Starter">
+        <HeaderMenuButton
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          isActive={menuOpen}
+          onClick={() => {
+            setPanelOpen(false);
+            setMenuOpen((open) => !open);
+          }}
+        />
         <HeaderName as={Link} to="/" prefix="">
           CEN Starter
         </HeaderName>
@@ -90,11 +102,23 @@ function ProtectedLayout() {
           <HeaderGlobalAction
             aria-label="Account"
             isActive={panelOpen}
-            onClick={() => setPanelOpen((open) => !open)}
+            onClick={() => {
+              setMenuOpen(false);
+              setPanelOpen((open) => !open);
+            }}
           >
             <UserAvatar size={20} />
           </HeaderGlobalAction>
         </HeaderGlobalBar>
+        <SideNav aria-label="Side navigation" expanded={menuOpen} isPersistent={false}>
+          <SideNavItems>
+            {visibleItems.map((item) => (
+              <SideNavLink key={item.to} as={Link} to={item.to} onClick={() => setMenuOpen(false)}>
+                {item.label}
+              </SideNavLink>
+            ))}
+          </SideNavItems>
+        </SideNav>
         <HeaderPanel
           aria-label="Account panel"
           expanded={panelOpen}
@@ -112,7 +136,18 @@ function ProtectedLayout() {
                 </Tag>
               )}
             </div>
-            <div className="border-border-subtle-01 border-t pt-4">
+            <div className="flex flex-col items-start border-border-subtle-01 border-t pt-4">
+              <Button
+                kind="ghost"
+                size="sm"
+                renderIcon={Settings}
+                onClick={() => {
+                  setPanelOpen(false);
+                  void router.navigate({ to: "/settings" });
+                }}
+              >
+                Settings
+              </Button>
               <Button kind="ghost" size="sm" renderIcon={Logout} onClick={handleSignOut}>
                 Sign out
               </Button>

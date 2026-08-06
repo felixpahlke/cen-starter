@@ -1,6 +1,5 @@
 // @ts-nocheck — template overlay; this line is stripped when `pnpm flavor apply` copies the file into place
-import { Api, ArrowRight } from "@carbon/icons-react";
-import { ClickableTile, Tile } from "@carbon/react";
+import { Button } from "@carbon/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useSession } from "@/lib/auth";
 
@@ -13,36 +12,30 @@ function Dashboard() {
   const name = session.data?.user.name ?? "there";
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="cds--type-heading-05">Welcome, {name}</h1>
-      <div className="grid max-w-4xl gap-4 sm:grid-cols-2">
-        <Tile className="min-h-40">
-          <div className="flex h-full flex-col gap-4">
-            <div className="space-y-2">
-              <h2 className="cds--type-heading-03">Add your first resource</h2>
-              <p className="cds--type-body-01 text-text-secondary">
-                Tell your AI agent what you need — for example:
-              </p>
-            </div>
-            <blockquote className="cds--type-body-01 border-border-subtle-01 border-l-2 pl-4 italic">
-              “Add projects. A project has a name and an optional description, belongs to the
-              signed-in user, and gets a page in the sidebar.”
-            </blockquote>
-          </div>
-        </Tile>
-        {/* The backend serves Swagger UI only outside production. */}
-        {import.meta.env.DEV && (
-          <ClickableTile href="/api/docs" renderIcon={ArrowRight} className="min-h-40">
-            <div className="flex h-full flex-col justify-between gap-6">
-              <Api size={20} />
-              <div className="space-y-2">
-                <h2 className="cds--type-heading-03">API docs</h2>
-                <p className="cds--type-body-01 text-text-secondary">View the OpenAPI reference.</p>
-              </div>
-            </div>
-          </ClickableTile>
-        )}
+    <div className="flex max-w-2xl flex-col gap-6">
+      <div className="space-y-2">
+        <p className="cds--type-body-compact-01 text-text-secondary">Welcome, {name}</p>
+        <h1 className="cds--type-heading-04">Add your first resource</h1>
+        <p className="cds--type-body-01 text-text-secondary">
+          Tell your AI agent what to build in one sentence:
+        </p>
       </div>
+      <blockquote className="cds--type-body-01 border-border-subtle-01 border-l-2 pl-4 italic">
+        “Add projects. A project has a name and an optional description, belongs to the signed-in
+        user, and gets a page in the sidebar.”
+      </blockquote>
+      <p className="cds--type-body-compact-01 text-text-secondary">
+        The agent handles the schema, migration, API, and page. Prefer doing it by hand? Follow{" "}
+        <code>docs/add-a-feature.md</code>.
+      </p>
+      {/* The backend serves Swagger UI only outside production. */}
+      {import.meta.env.DEV && (
+        <div>
+          <Button kind="tertiary" size="sm" href="/api/docs">
+            API docs
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
